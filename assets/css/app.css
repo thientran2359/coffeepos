@@ -1,0 +1,493 @@
+:root {
+    --coffeepos-bg: #f3f4f8;
+    --coffeepos-surface: #ffffff;
+    --coffeepos-surface-muted: #f7f8fb;
+    --coffeepos-border: #dde2ef;
+    --coffeepos-text: #161a24;
+    --coffeepos-text-muted: #63708a;
+    --coffeepos-primary: #2d63ff;
+    --coffeepos-primary-dark: #1848d6;
+    --coffeepos-danger: #dc3545;
+    --coffeepos-warning: #f5a524;
+    --coffeepos-success: #0f9d58;
+    --coffeepos-radius: 12px;
+    --coffeepos-shadow: 0 10px 30px rgba(24, 42, 94, 0.08);
+}
+
+.coffeepos {
+    margin: 0;
+    padding: 0;
+    background: var(--coffeepos-bg);
+    color: var(--coffeepos-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+#coffeepos-app {
+    max-width: 1400px;
+    margin: 1.25rem auto;
+    padding: 1rem;
+}
+
+.coffeepos-cashier {
+    min-height: calc(100vh - 2.5rem);
+    border-radius: var(--coffeepos-radius);
+    overflow: hidden;
+    box-shadow: var(--coffeepos-shadow);
+    background: var(--coffeepos-surface);
+}
+
+.coffeepos-cashier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: #f1f5ff;
+    border-bottom: 1px solid var(--coffeepos-border);
+}
+
+.coffeepos-cashier-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.coffeepos-cashier-brand strong {
+    font-size: 1.15rem;
+}
+
+.coffeepos-cashier-brand [data-component="shift-status"],
+.coffeepos-cashier-brand [data-component="cashier-identity"] {
+    font-size: 0.8125rem;
+    color: var(--coffeepos-text-muted);
+    background: #ffffff;
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 999px;
+    padding: 0.25rem 0.6rem;
+}
+
+.coffeepos-cashier-utilities {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.coffeepos-cashier-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    min-height: 70vh;
+}
+
+.coffeepos-menu-panel,
+.coffeepos-cart-panel {
+    padding: 1rem;
+}
+
+.coffeepos-menu-panel {
+    background: var(--coffeepos-surface-muted);
+    border-right: 1px solid var(--coffeepos-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.coffeepos-cart-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    background: var(--coffeepos-surface);
+}
+
+.coffeepos-menu-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+}
+
+.coffeepos-menu-search input {
+    width: 100%;
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.95rem;
+}
+
+.coffeepos-menu-search input:focus {
+    border-color: var(--coffeepos-primary);
+    outline: 2px solid rgba(45, 99, 255, 0.15);
+}
+
+.coffeepos-category-nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.coffeepos-chip {
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--coffeepos-text);
+    min-height: 44px;
+    padding: 0.55rem 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.coffeepos-chip.is-active,
+.coffeepos-chip[aria-pressed="true"] {
+    background: #e7efff;
+    border-color: #c8d8ff;
+    color: var(--coffeepos-primary-dark);
+    font-weight: 600;
+}
+
+.coffeepos-product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    align-content: flex-start;
+}
+
+.coffeepos-product-card {
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 12px;
+    background: #ffffff;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.coffeepos-product-card:hover {
+    border-color: #c4d3fc;
+}
+
+.coffeepos-product-card[data-state="pressed"] {
+    transform: scale(0.99);
+}
+
+.coffeepos-product-card[data-state="selected"] {
+    border-color: var(--coffeepos-primary);
+    box-shadow: 0 0 0 1px rgba(45, 99, 255, 0.2);
+}
+
+.coffeepos-product-card[data-state="out_of_stock"] {
+    border-style: dashed;
+    opacity: 0.75;
+}
+
+.coffeepos-product-card-button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    width: 100%;
+    min-height: 72px;
+    padding: 0.9rem;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.coffeepos-product-card-button:disabled {
+    cursor: not-allowed;
+}
+
+.coffeepos-product-name {
+    font-weight: 600;
+}
+
+.coffeepos-product-price {
+    color: var(--coffeepos-primary-dark);
+    font-weight: 700;
+}
+
+.coffeepos-product-meta {
+    color: var(--coffeepos-text-muted);
+    font-size: 0.8rem;
+}
+
+.coffeepos-panel-state {
+    grid-column: 1 / -1;
+    border: 1px dashed var(--coffeepos-border);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--coffeepos-text-muted);
+    padding: 1rem;
+}
+
+.coffeepos-cart-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.coffeepos-cart-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    flex: 1;
+}
+
+.coffeepos-cart-count {
+    min-width: 2rem;
+    text-align: center;
+    border-radius: 999px;
+    background: #edf2ff;
+    color: var(--coffeepos-primary-dark);
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+}
+
+.coffeepos-order-type,
+.coffeepos-customer-summary,
+.coffeepos-cart-items,
+.coffeepos-coupon,
+.coffeepos-cart-summary,
+.coffeepos-checkout {
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 0.75rem;
+}
+
+.coffeepos-order-type h3,
+.coffeepos-customer-summary h3,
+.coffeepos-coupon h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+}
+
+.coffeepos-order-type-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.coffeepos-table-placeholder {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--coffeepos-text-muted);
+}
+
+.coffeepos-cart-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.65rem;
+}
+
+.coffeepos-cart-item p {
+    margin: 0.25rem 0;
+    font-size: 0.82rem;
+    color: var(--coffeepos-text-muted);
+}
+
+.coffeepos-cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.coffeepos-cart-item-actions [data-component="cart-item-quantity"] {
+    min-width: 1.75rem;
+    text-align: center;
+}
+
+.coffeepos-btn,
+.coffeepos-btn-icon {
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 10px;
+    background: #ffffff;
+    color: var(--coffeepos-text);
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.84rem;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.coffeepos-btn-icon {
+    padding: 0.55rem;
+}
+
+.coffeepos-btn:disabled,
+.coffeepos-btn-icon:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.coffeepos-btn-light {
+    background: #f8f9fd;
+}
+
+.coffeepos-btn-primary {
+    background: var(--coffeepos-primary);
+    border-color: var(--coffeepos-primary);
+    color: #ffffff;
+}
+
+.coffeepos-btn-primary:hover:not(:disabled) {
+    background: var(--coffeepos-primary-dark);
+    border-color: var(--coffeepos-primary-dark);
+}
+
+.coffeepos-btn-danger {
+    background: #fff2f2;
+    border-color: #ffd3d3;
+    color: #a11f2d;
+}
+
+.coffeepos-checkout [data-action="checkout"] {
+    min-height: 50px;
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.coffeepos-empty-state {
+    color: var(--coffeepos-text-muted);
+}
+
+.coffeepos-empty-state strong {
+    display: block;
+    color: var(--coffeepos-text);
+    margin-bottom: 0.25rem;
+}
+
+.coffeepos-cart-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.coffeepos-cart-summary > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.coffeepos-cart-summary .is-total {
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--coffeepos-border);
+    font-size: 1rem;
+}
+
+.coffeepos-checkout button {
+    width: 100%;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+    font-size: 0.95rem;
+}
+
+.coffeepos-overlay-root {
+    position: relative;
+    z-index: 20;
+}
+
+.coffeepos-modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+}
+
+.coffeepos-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(13, 20, 39, 0.45);
+}
+
+.coffeepos-modal-dialog {
+    position: relative;
+    z-index: 1;
+    width: min(420px, 95vw);
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: var(--coffeepos-shadow);
+    padding: 1rem;
+}
+
+.coffeepos-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.coffeepos-toast-region {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    display: grid;
+    gap: 0.4rem;
+    max-width: 320px;
+    z-index: 30;
+}
+
+.coffeepos-toast {
+    border-radius: 10px;
+    padding: 0.6rem 0.75rem;
+    color: #ffffff;
+    font-size: 0.84rem;
+    box-shadow: var(--coffeepos-shadow);
+}
+
+.coffeepos-toast.is-info {
+    background: #0f66e8;
+}
+
+.coffeepos-toast.is-success {
+    background: var(--coffeepos-success);
+}
+
+.coffeepos-toast.is-warning {
+    background: var(--coffeepos-warning);
+}
+
+.coffeepos-toast.is-error {
+    background: var(--coffeepos-danger);
+}
+
+.coffeepos-placeholder {
+    margin: 0.4rem 0 0;
+    color: var(--coffeepos-text-muted);
+    font-size: 0.82rem;
+}
+
+@media (max-width: 1200px) {
+    .coffeepos-product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 960px) {
+    #coffeepos-app {
+        margin: 0.5rem;
+        padding: 0;
+    }
+
+    .coffeepos-cashier-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .coffeepos-menu-panel {
+        border-right: 0;
+        border-bottom: 1px solid var(--coffeepos-border);
+    }
+}
+
+@media (max-width: 640px) {
+    .coffeepos-cashier-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .coffeepos-menu-search {
+        grid-template-columns: 1fr;
+    }
+
+    .coffeepos-product-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,277 @@
+# WOOCOMMERCE-DATA.md
+
+# WooCommerce Data Ownership
+
+## 1. Purpose
+
+This document defines how CoffeePOS interacts with WooCommerce-native data.
+
+WooCommerce is the canonical commerce layer.
+
+---
+
+# 2. Product Retrieval
+
+CoffeePOS should retrieve products through WooCommerce APIs/query mechanisms.
+
+The POS product projection may expose:
+
+```text
+id
+name
+type
+price
+regular_price
+sale_price
+stock_status
+stock_quantity
+image
+categories
+variation_summary
+```
+
+The exact response DTO belongs to the API/UI layer.
+
+---
+
+# 3. Variable Products
+
+A variable product is identified using WooCommerce product type/data.
+
+Variation data comes from WooCommerce.
+
+The POS MUST NOT assume a fixed attribute structure.
+
+Example:
+
+```text
+Size
+Temperature
+Milk
+```
+
+may all be product attributes.
+
+The UI should render whatever required variation attributes are defined for the product.
+
+---
+
+# 4. Price
+
+Display price may be loaded to the browser.
+
+Trusted checkout price must be resolved/validated on the server.
+
+The following MUST NOT be treated as authoritative:
+
+```text
+JavaScript unit price
+JavaScript line total
+JavaScript subtotal
+JavaScript discount
+JavaScript final total
+```
+
+---
+
+# 5. Stock
+
+WooCommerce stock is authoritative.
+
+The POS may display:
+
+```text
+in stock
+out of stock
+low stock
+```
+
+according to project policy.
+
+Before checkout, revalidate availability.
+
+---
+
+# 6. Customers
+
+WooCommerce customer remains canonical.
+
+Phone lookup should use the existing customer mechanism or approved WooCommerce query.
+
+Do not create duplicate customer rows in CoffeePOS.
+
+---
+
+# 7. Coupons
+
+WooCommerce coupon functionality remains authoritative.
+
+CoffeePOS should:
+
+1. receive coupon input
+2. validate server-side
+3. apply the resulting discount according to WooCommerce rules
+4. show the resulting cart/order totals
+
+---
+
+# 8. Orders
+
+The POS must create standard WooCommerce orders.
+
+Conceptually:
+
+```text
+Cart
+ ↓
+WooCommerce Order
+ ↓
+Order Items
+ ↓
+Payment
+ ↓
+Order Status
+```
+
+POS-specific metadata is attached to the order/item where necessary.
+
+---
+
+# 9. Order Items
+
+Every purchased line must be represented using WooCommerce order items.
+
+The order item should preserve:
+
+- product
+- variation
+- quantity
+- final line price
+- POS-specific note/configuration where needed
+
+---
+
+# 10. Refunds
+
+Refunds must use WooCommerce refund functionality.
+
+Do not create a separate CoffeePOS refund ledger as the authoritative refund system.
+
+---
+
+# 11. Order Status
+
+Do not create custom WooCommerce order statuses just to represent:
+
+```text
+KDS new
+KDS preparing
+KDS ready
+```
+
+These should remain CoffeePOS operational states unless the final workflow explicitly requires WooCommerce status changes.
+
+---
+
+# 12. Order Context
+
+POS order metadata should be attached through WooCommerce CRUD APIs where possible.
+
+Avoid raw postmeta writes when a supported WooCommerce API exists.
+
+---
+
+# 13. HPOS Compatibility
+
+The implementation must remain compatible with WooCommerce's supported order storage architecture.
+
+Do not assume orders are stored only in `wp_posts/wp_postmeta`.
+
+Use WooCommerce order CRUD/APIs instead of direct order-table access where possible.
+
+---
+
+# 14. WooCommerce API Boundary
+
+Controllers and UI code should not be responsible for low-level WooCommerce data manipulation.
+
+Prefer:
+
+```text
+Application Service
+      ↓
+WooCommerce Repository/Adapter
+      ↓
+WooCommerce API
+```
+
+---
+
+# 15. Data Conversion
+
+When WooCommerce data enters the CoffeePOS application:
+
+```text
+WooCommerce object
+      ↓
+Adapter
+      ↓
+CoffeePOS DTO / domain representation
+```
+
+Do not pass large WooCommerce objects throughout the entire application without a reason.
+
+---
+
+# 16. Checkout Validation
+
+Before order creation:
+
+- verify products exist
+- verify variations belong to products
+- verify quantities
+- verify stock
+- verify customer context
+- verify coupon
+- resolve pricing
+- validate order type/table
+- validate payment context
+
+---
+
+# 17. Order Creation Failure
+
+If WooCommerce order creation fails:
+
+- return a stable error
+- do not claim payment success
+- do not reset the cashier cart as successful
+- preserve enough context for safe retry where possible
+
+---
+
+# 18. Reorder
+
+Quick reorder must use the historical WooCommerce order as the source.
+
+Flow:
+
+```text
+Old Order
+ ↓
+Order Items
+ ↓
+Current WooCommerce Product Validation
+ ↓
+New Cart
+```
+
+Reorder must not blindly copy historical prices or availability.
+
+---
+
+# 19. Reporting
+
+Where WooCommerce provides suitable queryable order/product data, reporting should use it.
+
+Do not duplicate order totals into a separate report table without a measured performance/data-warehouse requirement.

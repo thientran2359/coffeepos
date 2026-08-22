@@ -1,0 +1,12 @@
+{
+  "name": "coffeepos/coffeepos",
+  "description": "CoffeePOS WooCommerce POS plugin foundation",
+  "type": "wordpress-plugin",
+  "license": "proprietary",
+  "autoload": {
+    "psr-4": {
+      "CoffeePOS\\": "includes/"
+    }
+  },
+  "require": {}
+}

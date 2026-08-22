@@ -18,13 +18,19 @@ final class VariationView
 
     private bool $available;
 
+    private string $priceAmount;
+
+    private string $priceDisplay;
+
     public function __construct(
         int $id,
         int $productId,
         array $attributes,
         int $priceMinor,
         string $currency,
-        bool $available
+        bool $available,
+        string $priceAmount = '0',
+        string $priceDisplay = ''
     ) {
         $this->id = $id;
         $this->productId = $productId;
@@ -32,6 +38,8 @@ final class VariationView
         $this->priceMinor = $priceMinor;
         $this->currency = strtoupper(trim($currency));
         $this->available = $available;
+        $this->priceAmount = trim($priceAmount) === '' ? '0' : trim($priceAmount);
+        $this->priceDisplay = trim($priceDisplay);
     }
 
     public function toArray(): array
@@ -43,6 +51,8 @@ final class VariationView
             'price_minor' => $this->priceMinor,
             'currency' => $this->currency,
             'is_available' => $this->available,
+            'price_amount' => $this->priceAmount,
+            'price_display' => $this->priceDisplay,
         ];
     }
 }

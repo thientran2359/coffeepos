@@ -61,6 +61,35 @@ final class VariationService
         return $this->resolveVariation($productId, $selectedAttributes, $variations);
     }
 
+    public function listByProductId(int $productId): array
+    {
+        if ($productId <= 0) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_PRODUCT,
+                'Product id must be greater than zero.'
+            );
+        }
+
+        if ($this->variationGateway === null) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CONFIGURATION,
+                'Variation gateway is not configured.'
+            );
+        }
+
+        $views = [];
+
+        foreach ($this->variationGateway->findByProductId($productId) as $variation) {
+            if (! is_array($variation) || (int) ($variation['product_id'] ?? 0) !== $productId) {
+                continue;
+            }
+
+            $views[] = $this->projectVariation($variation);
+        }
+
+        return $views;
+    }
+
     public function resolveVariation(int $productId, array $selectedAttributes, array $variations): VariationView
     {
         if ($productId <= 0) {
@@ -167,7 +196,9 @@ final class VariationService
             $this->normalizeAttributes((array) ($variation['attributes'] ?? [])),
             (int) ($variation['price_minor'] ?? 0),
             $currency,
-            (bool) ($variation['is_available'] ?? false)
+            (bool) ($variation['is_available'] ?? false),
+            (string) ($variation['price_amount'] ?? '0'),
+            (string) ($variation['price_display'] ?? '')
         );
     }
 

@@ -9,6 +9,13 @@ use WC_Product;
 
 final class WooCommerceProductGateway implements ProductGatewayInterface
 {
+    private WooCommerceMoney $money;
+
+    public function __construct(?WooCommerceMoney $money = null)
+    {
+        $this->money = $money ?? new WooCommerceMoney();
+    }
+
     public function findById(int $productId): ?array
     {
         if ($productId <= 0 || ! function_exists('wc_get_product')) {
@@ -21,7 +28,7 @@ final class WooCommerceProductGateway implements ProductGatewayInterface
             return null;
         }
 
-        return $this->mapProduct($product);
+        return $this->mapProduct($product, true);
     }
 
     public function search(array $criteria = []): array
@@ -36,6 +43,7 @@ final class WooCommerceProductGateway implements ProductGatewayInterface
             'page' => (int) ($criteria['page'] ?? 1),
             'orderby' => 'menu_order',
             'order' => 'ASC',
+            'visibility' => 'catalog',
         ];
 
         $search = trim((string) ($criteria['search'] ?? ''));
@@ -58,43 +66,70 @@ final class WooCommerceProductGateway implements ProductGatewayInterface
                 continue;
             }
 
-            $result[] = $this->mapProduct($product);
+            $result[] = $this->mapProduct($product, false);
         }
 
         return $result;
     }
 
-    private function mapProduct(WC_Product $product): array
+    private function mapProduct(WC_Product $product, bool $includeAttributes): array
     {
+        $currency = $this->money->currentCurrency();
+        $price = (string) $product->get_price();
+
         return [
             'id' => $product->get_id(),
             'name' => $product->get_name(),
-            'price_minor' => $this->toMinor((string) $product->get_price()),
-            'currency' => (string) get_woocommerce_currency(),
+            'type' => $product->get_type(),
+            'price_minor' => $this->money->toMinor($price),
+            'price_amount' => $this->money->amountString($price),
+            'price_display' => $this->money->formatMinor($this->money->toMinor($price), $currency),
+            'currency' => $currency,
             'is_variable' => $product->is_type('variable'),
             'is_in_stock' => $product->is_in_stock(),
+            'is_purchasable' => $product->is_purchasable(),
             'image_url' => (string) wp_get_attachment_image_url($product->get_image_id(), 'thumbnail'),
+            'category_ids' => array_map('intval', $product->get_category_ids()),
+            'menu_order' => (int) $product->get_menu_order(),
+            'badge_label' => '',
+            'attributes' => $includeAttributes ? $this->mapVariationAttributes($product) : [],
         ];
     }
 
-    private function toMinor(string $price): int
+    private function mapVariationAttributes(WC_Product $product): array
     {
-        $decimals = function_exists('wc_get_price_decimals') ? max(0, (int) wc_get_price_decimals()) : 2;
-        $normalized = preg_replace('/[^0-9\.\-]/', '', $price) ?? '0';
-
-        if ($normalized === '' || $normalized === '-' || $normalized === '.') {
-            return 0;
+        if (! $product->is_type('variable') || ! method_exists($product, 'get_variation_attributes')) {
+            return [];
         }
 
-        $isNegative = strpos($normalized, '-') === 0;
-        $unsigned = ltrim($normalized, '-');
-        $parts = explode('.', $unsigned, 2);
-        $whole = preg_replace('/\D+/', '', $parts[0]) ?: '0';
-        $fraction = isset($parts[1]) ? preg_replace('/\D+/', '', $parts[1]) : '';
-        $fraction = substr(str_pad($fraction, $decimals, '0'), 0, $decimals);
+        $groups = [];
 
-        $minor = (int) ($whole . $fraction);
+        foreach ((array) $product->get_variation_attributes() as $attributeName => $options) {
+            $name = preg_replace('/^attribute_/', '', (string) $attributeName) ?? (string) $attributeName;
+            $optionViews = [];
 
-        return $isNegative ? -$minor : $minor;
+            foreach ((array) $options as $option) {
+                $value = (string) $option;
+                $label = $value;
+
+                if (taxonomy_exists($name)) {
+                    $term = get_term_by('slug', $value, $name);
+
+                    if ($term instanceof \WP_Term) {
+                        $label = (string) $term->name;
+                    }
+                }
+
+                $optionViews[] = ['value' => $value, 'label' => $label];
+            }
+
+            $groups[] = [
+                'name' => $name,
+                'label' => function_exists('wc_attribute_label') ? wc_attribute_label($name, $product) : $name,
+                'options' => $optionViews,
+            ];
+        }
+
+        return $groups;
     }
 }

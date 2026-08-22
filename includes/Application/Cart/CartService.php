@@ -144,6 +144,13 @@ final class CartService
         return CartView::fromDomain($cart);
     }
 
+    public function validate(Cart $cart): CartView
+    {
+        $this->cartValidationService->validateCart($cart);
+
+        return CartView::fromDomain($cart);
+    }
+
     private function mapDomainException(\InvalidArgumentException $exception): Phase01Exception
     {
         $message = $exception->getMessage();

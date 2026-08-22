@@ -26,6 +26,8 @@ final class CartItem
 
     private string $customNote;
 
+    private array $displaySnapshot;
+
     private function __construct(
         int $productId,
         int $variationId,
@@ -33,7 +35,8 @@ final class CartItem
         Money $unitPrice,
         ModifierSelection $modifierSelection,
         QuickNoteSelection $quickNoteSelection,
-        string $customNote
+        string $customNote,
+        array $displaySnapshot
     ) {
         if ($productId <= 0) {
             throw new \InvalidArgumentException('Product id must be greater than zero.');
@@ -54,6 +57,7 @@ final class CartItem
         $this->modifierSelection = $modifierSelection;
         $this->quickNoteSelection = $quickNoteSelection;
         $this->customNote = trim($customNote);
+        $this->displaySnapshot = $displaySnapshot;
         $this->identity = self::buildIdentity(
             $this->productId,
             $this->variationId,
@@ -70,7 +74,8 @@ final class CartItem
         Money $unitPrice,
         ?ModifierSelection $modifierSelection = null,
         ?QuickNoteSelection $quickNoteSelection = null,
-        string $customNote = ''
+        string $customNote = '',
+        array $displaySnapshot = []
     ): self {
         return new self(
             $productId,
@@ -79,7 +84,8 @@ final class CartItem
             $unitPrice,
             $modifierSelection ?? ModifierSelection::empty(),
             $quickNoteSelection ?? QuickNoteSelection::empty(),
-            $customNote
+            $customNote,
+            $displaySnapshot
         );
     }
 
@@ -123,6 +129,11 @@ final class CartItem
         return $this->customNote;
     }
 
+    public function displaySnapshot(): array
+    {
+        return $this->displaySnapshot;
+    }
+
     public function lineTotal(): Money
     {
         return $this->unitPrice->multiply($this->quantity);
@@ -137,7 +148,8 @@ final class CartItem
             $this->unitPrice,
             $this->modifierSelection,
             $this->quickNoteSelection,
-            $this->customNote
+            $this->customNote,
+            $this->displaySnapshot
         );
     }
 

@@ -18,6 +18,10 @@ final class Settings
 
     public const OPTION_UNINSTALL_DELETE_DATA = 'coffeepos_uninstall_delete_data';
 
+    public const OPTION_MODIFIER_GROUPS = 'coffeepos_modifier_groups';
+
+    public const OPTION_QUICK_NOTES = 'coffeepos_quick_notes';
+
     public function register(): void
     {
         add_action('admin_init', [$this, 'registerSettings']);
@@ -108,6 +112,25 @@ final class Settings
                 'capability' => Capabilities::MANAGE_WOOCOMMERCE,
                 'sanitize' => null,
             ],
+            self::OPTION_MODIFIER_GROUPS => [
+                'type' => 'array',
+                'default' => [],
+                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'sanitize' => null,
+            ],
+            self::OPTION_QUICK_NOTES => [
+                'type' => 'array',
+                'default' => [
+                    ['id' => 'less_ice', 'label' => 'Less ice', 'enabled' => true],
+                    ['id' => 'no_ice', 'label' => 'No ice', 'enabled' => true],
+                    ['id' => 'less_sweet', 'label' => 'Less sweet', 'enabled' => true],
+                    ['id' => 'no_sugar', 'label' => 'No sugar', 'enabled' => true],
+                    ['id' => 'extra_milk', 'label' => 'Extra milk', 'enabled' => true],
+                    ['id' => 'takeaway', 'label' => 'Takeaway', 'enabled' => true],
+                ],
+                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'sanitize' => null,
+            ],
         ];
     }
 
@@ -130,6 +153,14 @@ final class Settings
             return (bool) $value;
         }
 
+        if ($optionName === self::OPTION_MODIFIER_GROUPS) {
+            return self::sanitizeModifierGroups(is_array($value) ? $value : []);
+        }
+
+        if ($optionName === self::OPTION_QUICK_NOTES) {
+            return self::sanitizeQuickNotes(is_array($value) ? $value : []);
+        }
+
         $sanitizeCallback = $definition['sanitize'];
 
         if (is_string($sanitizeCallback) && is_callable($sanitizeCallback)) {
@@ -141,5 +172,98 @@ final class Settings
         }
 
         return $value;
+    }
+
+    private static function sanitizeModifierGroups(array $groups): array
+    {
+        $sanitized = [];
+
+        foreach ($groups as $group) {
+            if (! is_array($group)) {
+                continue;
+            }
+
+            $id = sanitize_key((string) ($group['id'] ?? ''));
+            $label = sanitize_text_field((string) ($group['label'] ?? ''));
+
+            if ($id === '' || $label === '') {
+                continue;
+            }
+
+            $selection = (string) ($group['selection'] ?? 'single');
+
+            if (! in_array($selection, ['single', 'multiple'], true)) {
+                $selection = 'single';
+            }
+
+            $options = [];
+
+            foreach ((array) ($group['options'] ?? []) as $option) {
+                if (! is_array($option)) {
+                    continue;
+                }
+
+                $optionId = sanitize_key((string) ($option['id'] ?? ''));
+                $optionLabel = sanitize_text_field((string) ($option['label'] ?? ''));
+
+                if ($optionId !== '' && $optionLabel !== '') {
+                    $options[] = ['id' => $optionId, 'label' => $optionLabel];
+                }
+            }
+
+            if ($options === []) {
+                continue;
+            }
+
+            $required = ! empty($group['required']);
+            $minimum = max(0, (int) ($group['minimum'] ?? ($required ? 1 : 0)));
+            $maximumDefault = $selection === 'single' ? 1 : count($options);
+            $maximum = max($minimum, min(count($options), (int) ($group['maximum'] ?? $maximumDefault)));
+
+            $sanitized[] = [
+                'id' => $id,
+                'label' => $label,
+                'selection' => $selection,
+                'required' => $required,
+                'minimum' => $minimum,
+                'maximum' => $maximum,
+                'enabled' => ! array_key_exists('enabled', $group) || ! empty($group['enabled']),
+                'sort_order' => (int) ($group['sort_order'] ?? 0),
+                'product_ids' => array_values(array_filter(array_map('absint', (array) ($group['product_ids'] ?? [])))),
+                'category_ids' => array_values(array_filter(array_map('absint', (array) ($group['category_ids'] ?? [])))),
+                'options' => $options,
+            ];
+        }
+
+        return $sanitized;
+    }
+
+    private static function sanitizeQuickNotes(array $notes): array
+    {
+        $sanitized = [];
+
+        foreach ($notes as $note) {
+            if (! is_array($note)) {
+                continue;
+            }
+
+            $id = sanitize_key((string) ($note['id'] ?? ''));
+            $label = sanitize_text_field((string) ($note['label'] ?? ''));
+
+            if ($id === '' || $label === '') {
+                continue;
+            }
+
+            $sanitized[] = [
+                'id' => $id,
+                'label' => $label,
+                'enabled' => ! array_key_exists('enabled', $note) || ! empty($note['enabled']),
+                'sort_order' => (int) ($note['sort_order'] ?? 0),
+                'product_ids' => array_values(array_filter(array_map('absint', (array) ($note['product_ids'] ?? [])))),
+                'category_ids' => array_values(array_filter(array_map('absint', (array) ($note['category_ids'] ?? [])))),
+            ];
+        }
+
+        return $sanitized;
     }
 }

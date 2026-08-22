@@ -29,4 +29,10 @@ final class Phase01ErrorCodes
     public const INVALID_COUPON = 'invalid_coupon';
 
     public const INVALID_CONFIGURATION = 'invalid_configuration';
+
+    public const INVALID_CART = 'invalid_cart';
+
+    public const CART_SESSION_NOT_FOUND = 'cart_session_not_found';
+
+    public const CART_REVISION_CONFLICT = 'cart_revision_conflict';
 }

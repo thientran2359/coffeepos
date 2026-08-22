@@ -89,7 +89,15 @@ final class ProductService
             $currency,
             (bool) ($product['is_variable'] ?? false),
             (bool) ($product['is_in_stock'] ?? false),
-            (string) ($product['image_url'] ?? '')
+            (string) ($product['image_url'] ?? ''),
+            (string) ($product['type'] ?? 'simple'),
+            (string) ($product['price_amount'] ?? '0'),
+            (string) ($product['price_display'] ?? ''),
+            (bool) ($product['is_purchasable'] ?? true),
+            (array) ($product['category_ids'] ?? []),
+            (int) ($product['menu_order'] ?? 0),
+            (string) ($product['badge_label'] ?? ''),
+            (array) ($product['attributes'] ?? [])
         );
     }
 

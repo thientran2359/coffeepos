@@ -10,6 +10,13 @@ use WC_Product_Variation;
 
 final class WooCommerceVariationGateway implements VariationGatewayInterface
 {
+    private WooCommerceMoney $money;
+
+    public function __construct(?WooCommerceMoney $money = null)
+    {
+        $this->money = $money ?? new WooCommerceMoney();
+    }
+
     public function findById(int $variationId): ?array
     {
         if ($variationId <= 0 || ! function_exists('wc_get_product')) {
@@ -64,33 +71,18 @@ final class WooCommerceVariationGateway implements VariationGatewayInterface
             $isVisible = (bool) $variation->variation_is_visible();
         }
 
+        $currency = $this->money->currentCurrency();
+        $price = (string) $variation->get_price();
+
         return [
             'id' => $variation->get_id(),
             'product_id' => $variation->get_parent_id(),
             'attributes' => (array) $variation->get_attributes(),
-            'price_minor' => $this->toMinor((string) $variation->get_price()),
-            'currency' => (string) get_woocommerce_currency(),
+            'price_minor' => $this->money->toMinor($price),
+            'price_amount' => $this->money->amountString($price),
+            'price_display' => $this->money->formatMinor($this->money->toMinor($price), $currency),
+            'currency' => $currency,
             'is_available' => $variation->is_purchasable() && $variation->is_in_stock() && $isVisible,
         ];
-    }
-
-    private function toMinor(string $price): int
-    {
-        $decimals = function_exists('wc_get_price_decimals') ? max(0, (int) wc_get_price_decimals()) : 2;
-        $normalized = preg_replace('/[^0-9\.\-]/', '', $price) ?? '0';
-
-        if ($normalized === '' || $normalized === '-' || $normalized === '.') {
-            return 0;
-        }
-
-        $isNegative = strpos($normalized, '-') === 0;
-        $unsigned = ltrim($normalized, '-');
-        $parts = explode('.', $unsigned, 2);
-        $whole = preg_replace('/\D+/', '', $parts[0]) ?: '0';
-        $fraction = isset($parts[1]) ? preg_replace('/\D+/', '', $parts[1]) : '';
-        $fraction = substr(str_pad($fraction, $decimals, '0'), 0, $decimals);
-        $minor = (int) ($whole . $fraction);
-
-        return $isNegative ? -$minor : $minor;
     }
 }

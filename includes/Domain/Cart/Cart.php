@@ -24,18 +24,70 @@ final class Cart
 
     private array $items = [];
 
-    private function __construct(string $currency)
+    private string $posSessionId;
+
+    private int $revision;
+
+    private string $updatedAt;
+
+    private function __construct(string $currency, string $posSessionId = '', int $revision = 0, string $updatedAt = '')
     {
         $this->currency = Money::zero($currency)->currency();
         $this->orderType = OrderType::takeaway();
         $this->tableContext = TableContext::none();
         $this->customerContext = CustomerContext::guest();
         $this->paymentContext = PaymentContext::none();
+        $this->posSessionId = trim($posSessionId);
+        $this->revision = max(0, $revision);
+        $this->updatedAt = trim($updatedAt);
     }
 
     public static function create(string $currency): self
     {
         return new self($currency);
+    }
+
+    public static function createSession(string $currency, string $posSessionId, string $updatedAt): self
+    {
+        if (trim($posSessionId) === '') {
+            throw new \InvalidArgumentException('POS session id cannot be empty.');
+        }
+
+        return new self($currency, $posSessionId, 0, $updatedAt);
+    }
+
+    public static function restoreSession(string $currency, string $posSessionId, int $revision, string $updatedAt): self
+    {
+        if (trim($posSessionId) === '' || $revision < 0) {
+            throw new \InvalidArgumentException('Invalid POS session metadata.');
+        }
+
+        return new self($currency, $posSessionId, $revision, $updatedAt);
+    }
+
+    public function posSessionId(): string
+    {
+        return $this->posSessionId;
+    }
+
+    public function revision(): int
+    {
+        return $this->revision;
+    }
+
+    public function updatedAt(): string
+    {
+        return $this->updatedAt;
+    }
+
+    public function advanceRevision(string $updatedAt): void
+    {
+        if ($this->posSessionId === '') {
+            throw new \InvalidArgumentException('Cannot revise a cart without a POS session id.');
+        }
+
+        $this->revision++;
+        $this->updatedAt = trim($updatedAt);
     }
 
     public function currency(): string

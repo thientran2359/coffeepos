@@ -8,20 +8,20 @@ if (! defined('ABSPATH')) {
 
 $cashierView = [
     'brand' => __('CoffeePOS', 'coffeepos'),
-    'shift' => __('No shift context', 'coffeepos'),
+    'shift' => __('No shift open', 'coffeepos'),
     'cashier' => __('Cashier', 'coffeepos'),
 ];
 
 ?>
-<section class="coffeepos-cashier" data-screen="cashier">
+<section class="coffeepos-cashier" data-component="cashier-screen">
     <?php require COFFEEPOS_PATH . 'templates/cashier/header.php'; ?>
 
-    <div class="coffeepos-cashier-layout">
+    <div class="coffeepos-cashier-layout" data-component="cashier-layout">
         <section class="coffeepos-menu-panel" data-component="menu-panel" data-state="normal">
             <?php require COFFEEPOS_PATH . 'templates/cashier/menu-panel.php'; ?>
         </section>
 
-        <aside class="coffeepos-cart-panel" data-component="cart-panel" data-state="empty">
+        <aside class="coffeepos-cart-panel" data-component="cart-panel" data-state="loading">
             <?php require COFFEEPOS_PATH . 'templates/cashier/cart-panel.php'; ?>
         </aside>
     </div>

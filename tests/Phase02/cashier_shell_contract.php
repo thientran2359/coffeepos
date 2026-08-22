@@ -22,7 +22,6 @@ $paths = [
     'loading' => 'templates/components/loading.php',
     'empty' => 'templates/components/empty-state.php',
     'error' => 'templates/components/error-state.php',
-    'foundationData' => 'templates/cashier/foundation-data.php',
     'app' => 'assets/js/app.js',
     'core' => 'assets/js/core/app.js',
     'renderer' => 'assets/js/ui/template-renderer.js',
@@ -114,6 +113,8 @@ $run('TC-01/02 route scope remains POS-only', static function () use ($assertCon
     $assertContains("'cashier'", $files['router'], 'Cashier route is not registered');
     $assertContains('if ($screen === null)', $files['router'], 'Unrelated routes are not returned untouched');
     $assertContains('return $template;', $files['router'], 'Router must preserve the WordPress template');
+    $assertContains("add_filter('show_admin_bar'", $files['router'], 'POS route does not control the admin bar');
+    $assertContains('self::isPosRequest() ? false : $show', $files['router'], 'Admin bar must only be hidden on POS routes');
 });
 
 $run('TC-03-06 complete Cashier layout contract', static function () use ($assertContains, $templateBundle): void {
@@ -145,7 +146,6 @@ $run('TC-07-09 catalog shell and presentation actions', static function () use (
         $assertContains($selector, $templateBundle, 'Missing catalog contract');
     }
 
-    $assertContains("'is_in_stock' => false", $files['foundationData'], 'Foundation catalog lacks an unavailable product');
     $assertContains("'out_of_stock'", $files['productCard'], 'Product card lacks out-of-stock state');
     $assertContains("setAttribute('data-state', 'selected')", $files['productJs'], 'Product card selection state is not implemented');
 });
@@ -261,17 +261,13 @@ $run('TC-19-21 keyboard and semantic control contracts', static function () use 
     }
 });
 
-$run('TC-22-25 Phase 02 has no business or persistence leakage', static function () use ($assert, $jsBundle, $templateBundle): void {
+$run('TC-22-25 presentation has no later-phase persistence leakage', static function () use ($assert, $jsBundle, $templateBundle): void {
     $presentationCode = $jsBundle . "\n" . $templateBundle;
 
     foreach ([
-        'fetch(',
-        'XMLHttpRequest',
         'innerHTML',
         'wc_create_order',
         'WC()->session',
-        'localStorage',
-        'sessionStorage',
         'BroadcastChannel',
     ] as $forbidden) {
         $assert(strpos($presentationCode, $forbidden) === false, 'Out-of-scope behavior found: ' . $forbidden);

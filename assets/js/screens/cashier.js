@@ -2,6 +2,7 @@
     'use strict';
 
     const CoffeePOS = window.CoffeePOS || {};
+    const setState = CoffeePOS.core.setState;
 
     CoffeePOS.screens = CoffeePOS.screens || {};
 
@@ -11,7 +12,6 @@
             if (value === undefined || value === null || value === '') {
                 return true;
             }
-
             try {
                 const url = new window.URL(String(value), window.location.href);
                 return url.protocol === 'http:' || url.protocol === 'https:';
@@ -19,112 +19,196 @@
                 return false;
             }
         });
+
+        const store = CoffeePOS.state.createCashierStore();
+        const api = CoffeePOS.api.createPosApi(CoffeePOS.api.createClient());
         const toast = CoffeePOS.ui.createToastController(root, renderer);
         const modal = CoffeePOS.ui.createModalController(root);
         const confirmDialog = CoffeePOS.ui.createConfirmDialogController(root);
-        const state = {
-            activeCategory: 'all',
-            searchTerm: '',
-            isSearching: false,
-            catalogState: 'normal',
-            searchResultsState: 'idle',
-            cartPanelState: 'empty',
-            orderTypeDisplayState: 'takeaway',
-            customerDisplayState: 'empty',
-            modalState: 'closed',
-            toastState: '',
-            selectedProductId: ''
-        };
-
+        const catalogRenderer = CoffeePOS.components.createCatalogRenderer(root, renderer);
+        const cartPanel = CoffeePOS.components.createCartPanelController(root, renderer);
         const categoryNav = CoffeePOS.components.createCategoryNavController(root, function (categoryId) {
-            state.activeCategory = categoryId;
+            store.setActiveCategory(categoryId);
         });
-        const search = CoffeePOS.components.createProductSearchController(root, function (term, resultsState) {
-            state.searchTerm = term;
-            state.isSearching = resultsState === 'loading';
-            state.searchResultsState = resultsState;
+        const search = CoffeePOS.components.createProductSearchController(root, renderer, categoryNav, function (term) {
+            store.setSearchTerm(term);
         });
-        const productCards = CoffeePOS.components.createProductCardController(root, function (product) {
-            state.selectedProductId = product.productId;
-            toast.show('Product selected.', 'info');
-            state.toastState = 'info';
-        });
-        const orderType = CoffeePOS.components.createOrderTypeController(root, function (value) {
-            state.orderTypeDisplayState = value;
-        });
+        const orderType = CoffeePOS.components.createOrderTypeController(root);
+        let catalogRequest = null;
+        let catalogSequence = 0;
+        let mutationPending = false;
 
-        function openFoundationModal(title, message, action) {
-            modal.open({ title: title, message: message, action: action, state: 'idle' });
-            state.modalState = 'open';
+        function setCatalogStatus(status) {
+            const scroll = root.querySelector('[data-component="catalog-scroll"]');
+            const nav = root.querySelector('[data-component="category-nav"]');
+            const loading = root.querySelector('[data-component="catalog-loading"]');
+            const empty = root.querySelector('[data-component="catalog-empty"]');
+            const error = root.querySelector('[data-component="catalog-error"]');
+            store.setCatalogStatus(status);
+            setState(scroll, status);
+            setState(nav, status);
+            loading.hidden = status !== 'loading' && status !== 'refreshing';
+            empty.hidden = status !== 'empty';
+            error.hidden = status !== 'error';
         }
 
-        function notifyUnavailable() {
-            toast.show('This action is not available yet.', 'info');
-            state.toastState = 'info';
+        async function loadCatalog() {
+            if (catalogRequest) {
+                catalogRequest.abort();
+            }
+            catalogRequest = new window.AbortController();
+            const sequence = ++catalogSequence;
+            setCatalogStatus(store.getState().catalog ? 'refreshing' : 'loading');
+
+            try {
+                const data = await api.loadCatalog(catalogRequest.signal);
+                if (sequence !== catalogSequence) {
+                    return;
+                }
+                const catalog = data.catalog || { categories: [] };
+                catalogRenderer.render(catalog);
+                search.setCatalog(catalog);
+                store.setCatalog(catalog);
+                setCatalogStatus(catalog.categories.length === 0 ? 'empty' : 'normal');
+                categoryNav.refresh();
+            } catch (error) {
+                if (error && error.name === 'AbortError') {
+                    return;
+                }
+                setCatalogStatus(store.getState().catalog ? 'normal' : 'error');
+                toast.show(error.message || 'The catalog could not be loaded.', 'error');
+            }
+        }
+
+        function reconcileConflict(error) {
+            const latest = error && error.code === 'cart_revision_conflict'
+                && error.details && error.details.cart;
+            if (!latest) {
+                return false;
+            }
+            store.setCart(latest);
+            cartPanel.render(latest);
+            toast.show(error.message || 'The cart changed and was refreshed.', 'warning');
+            return true;
+        }
+
+        async function mutate(operation) {
+            if (mutationPending) {
+                throw new Error('A cart update is already in progress.');
+            }
+            mutationPending = true;
+            store.setCartStatus('updating');
+            cartPanel.setUpdating();
+            try {
+                const data = await operation();
+                store.setCart(data.cart);
+                cartPanel.render(data.cart);
+                return data.cart;
+            } catch (error) {
+                if (!reconcileConflict(error)) {
+                    cartPanel.render(store.getState().cart || { items: [] });
+                    toast.show(error.message || 'The cart could not be updated.', 'error');
+                }
+                throw error;
+            } finally {
+                mutationPending = false;
+            }
+        }
+
+        async function createCart() {
+            cartPanel.setLoading();
+            try {
+                const data = await api.createCartSession();
+                store.setCart(data.cart);
+                cartPanel.render(data.cart);
+            } catch (error) {
+                store.setCartStatus('error');
+                cartPanel.setError();
+                toast.show(error.message || 'The cart could not be loaded.', 'error');
+            }
+        }
+
+        async function submitProduct(payload, mode, itemId) {
+            const cart = store.getState().cart;
+            if (!cart) {
+                throw new Error('The cart is not ready.');
+            }
+            const request = Object.assign({}, payload, {
+                pos_session_id: cart.pos_session_id,
+                expected_revision: cart.revision
+            });
+            if (mode === 'edit') {
+                return mutate(function () { return api.updateCartItem(itemId, request); });
+            }
+            return mutate(function () { return api.addCartItem(request); });
+        }
+
+        const productModal = CoffeePOS.components.createProductModalController(
+            root,
+            renderer,
+            api,
+            submitProduct,
+            function (modalState) { store.setProductModal(modalState); }
+        );
+
+        CoffeePOS.components.createProductCardController(root, function (product) {
+            productModal.openAdd(Number(product.productId));
+        });
+
+        function findItem(itemId) {
+            const cart = store.getState().cart;
+            return (cart && Array.isArray(cart.items) ? cart.items : []).find(function (item) {
+                return String(item.item_id || item.key) === String(itemId);
+            }) || null;
+        }
+
+        function cartPayload(cart) {
+            return { pos_session_id: cart.pos_session_id, expected_revision: cart.revision };
+        }
+
+        function updateQuantity(item, quantity) {
+            const cart = store.getState().cart;
+            return mutate(function () {
+                return api.updateCartItem(item.item_id, Object.assign(cartPayload(cart), { quantity: quantity }));
+            });
         }
 
         function onClick(event) {
             const trigger = CoffeePOS.core.closestAction(event, root);
-
             if (!trigger || trigger.disabled) {
                 return;
             }
-
             const action = trigger.getAttribute('data-action') || '';
+            const itemId = trigger.getAttribute('data-cart-item-key') || '';
+            const item = itemId ? findItem(itemId) : null;
+            const cart = store.getState().cart;
 
-            switch (action) {
-                case 'clear-cart':
-                    confirmDialog.open({
-                        title: 'Clear cart?',
-                        message: 'Remove all items from the current cart?',
-                        action: 'clear-cart'
-                    });
-                    return;
-
-                case 'open-customer':
-                    openFoundationModal('Find customer', 'No customer selected.', 'open-customer');
-                    return;
-
-                case 'open-coupon':
-                    openFoundationModal('Add coupon', 'No coupon selected.', 'open-coupon');
-                    return;
-
-                case 'open-table':
-                    openFoundationModal('Select table', 'No table selected.', 'open-table');
-                    return;
-
-                case 'retry-catalog':
-                case 'retry-cart':
-                case 'remove-coupon':
-                case 'checkout':
-                case 'increase-quantity':
-                case 'decrease-quantity':
-                case 'edit-cart-item':
-                case 'remove-cart-item':
-                case 'locate-product':
-                    notifyUnavailable();
-                    return;
-
-                default:
-                    return;
+            if (action === 'retry-catalog') {
+                loadCatalog();
+            } else if (action === 'retry-cart') {
+                createCart();
+            } else if (action === 'clear-cart' && cart && cart.items.length > 0) {
+                confirmDialog.open({ title: 'Clear cart?', message: 'Remove all items from the current cart?', action: 'clear-cart' });
+            } else if (action === 'increase-quantity' && item) {
+                updateQuantity(item, Number(item.quantity) + 1).catch(function () {});
+            } else if (action === 'decrease-quantity' && item && Number(item.quantity) > 1) {
+                updateQuantity(item, Number(item.quantity) - 1).catch(function () {});
+            } else if (action === 'edit-cart-item' && item) {
+                productModal.openEdit(item);
+            } else if (action === 'remove-cart-item' && item && cart) {
+                mutate(function () { return api.removeCartItem(item.item_id, cartPayload(cart)); }).catch(function () {});
+            } else if (action === 'open-customer' || action === 'open-table') {
+                modal.open({ title: 'Phase 4', message: 'This workflow belongs to Phase 4.', action: action, state: 'idle' });
+            } else if (action === 'open-coupon') {
+                modal.open({ title: 'Coupon', message: 'Coupon application is not part of Phase 3.', action: action, state: 'idle' });
             }
         }
 
         function onConfirm(event) {
-            if (event.detail && event.detail.action === 'clear-cart') {
-                toast.show('Cart is already empty.', 'success');
-                state.cartPanelState = 'empty';
-                state.toastState = 'success';
+            const cart = store.getState().cart;
+            if (cart && event.detail && event.detail.action === 'clear-cart') {
+                mutate(function () { return api.clearCart(cartPayload(cart)); }).catch(function () {});
             }
-        }
-
-        function onModalConfirm() {
-            modal.close();
-            notifyUnavailable();
-        }
-
-        function onModalClose() {
-            state.modalState = 'closed';
         }
 
         function init() {
@@ -133,17 +217,15 @@
             orderType.init();
             root.addEventListener('click', onClick);
             root.addEventListener('coffeepos:confirm', onConfirm);
-            root.addEventListener('coffeepos:modal-confirm', onModalConfirm);
-            root.addEventListener('coffeepos:modal-close', onModalClose);
+            loadCatalog();
+            createCart();
         }
 
         return {
             init: init,
-            getState: function () { return Object.assign({}, state); },
+            getState: store.getState,
             getRenderer: function () { return renderer; },
-            getSelectedProductId: productCards.getSelectedProductId,
-            setActiveCategory: categoryNav.setActive,
-            setOrderType: orderType.setSelected
+            refreshCatalog: loadCatalog
         };
     };
 

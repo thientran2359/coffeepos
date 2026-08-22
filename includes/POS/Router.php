@@ -35,6 +35,12 @@ final class Router
         add_action('init', [self::class, 'registerRewriteRules'], 20);
         add_filter('query_vars', [$this, 'addQueryVars']);
         add_filter('template_include', [$this, 'filterTemplate']);
+        add_filter('show_admin_bar', [$this, 'filterAdminBar']);
+    }
+
+    public function filterAdminBar(bool $show): bool
+    {
+        return self::isPosRequest() ? false : $show;
     }
 
     public static function registerRewriteRules(?string $baseSlug = null): void

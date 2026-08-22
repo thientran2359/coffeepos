@@ -617,6 +617,8 @@ data.
 Initial decision:
 
 - store definitions in plugin settings/options
+- use `coffeepos_modifier_groups` for modifier-group definitions
+- use `coffeepos_quick_notes` for quick-note definitions
 - give modifier groups, modifier options, and quick notes stable IDs
 - store labels, selection rules, enabled state, sort order, and optional
   product/category applicability

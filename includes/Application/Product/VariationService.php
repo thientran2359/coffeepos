@@ -133,7 +133,10 @@ final class VariationService
         $matchedVariation = null;
 
         foreach ($variationsForProduct as $variation) {
-            $candidateAttributes = $this->normalizeAttributes((array) ($variation['attributes'] ?? []));
+            $candidateAttributes = $this->normalizeAttributes(
+                (array) ($variation['attributes'] ?? []),
+                true
+            );
 
             if (! $this->isExactAttributeSetMatch($normalizedSelection, $candidateAttributes)) {
                 continue;
@@ -202,7 +205,7 @@ final class VariationService
         );
     }
 
-    private function normalizeAttributes(array $attributes): array
+    private function normalizeAttributes(array $attributes, bool $preserveEmptyValues = false): array
     {
         $normalized = [];
 
@@ -215,7 +218,7 @@ final class VariationService
 
             $normalizedValue = strtolower(trim((string) $value));
 
-            if ($normalizedKey === '' || $normalizedValue === '') {
+            if ($normalizedKey === '' || ($normalizedValue === '' && ! $preserveEmptyValues)) {
                 continue;
             }
 
@@ -238,7 +241,8 @@ final class VariationService
                 return false;
             }
 
-            if ($selectedAttributes[$attributeName] !== $attributeValue) {
+            // WooCommerce uses an empty variation attribute as an "Any" wildcard.
+            if ($attributeValue !== '' && $selectedAttributes[$attributeName] !== $attributeValue) {
                 return false;
             }
         }

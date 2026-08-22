@@ -128,7 +128,22 @@ final class WooCommerceCartSessionStore implements CartSessionStoreInterface
 
         $woocommerce = WC();
 
-        if (! is_object($woocommerce) || ! isset($woocommerce->session) || $woocommerce->session === null) {
+        if (! is_object($woocommerce)) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CONFIGURATION,
+                'WooCommerce session is unavailable.'
+            );
+        }
+
+        // WooCommerce does not load its customer session automatically for all
+        // custom REST requests. Initialize the official session handler lazily
+        // at the integration boundary so REST controllers stay transport-only.
+        if ((! isset($woocommerce->session) || $woocommerce->session === null)
+            && method_exists($woocommerce, 'initialize_session')) {
+            $woocommerce->initialize_session();
+        }
+
+        if (! isset($woocommerce->session) || $woocommerce->session === null) {
             throw Phase01Exception::withCode(
                 Phase01ErrorCodes::INVALID_CONFIGURATION,
                 'WooCommerce session is unavailable.'

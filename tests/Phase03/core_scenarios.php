@@ -1,0 +1,119 @@
+<?php
+
+declare(strict_types=1);
+
+use CoffeePOS\Application\Error\Phase01ErrorCodes;
+use CoffeePOS\Application\Error\Phase01Exception;
+use CoffeePOS\Application\Product\VariationService;
+use CoffeePOS\Domain\Cart\Cart;
+use CoffeePOS\Domain\Cart\CartItem;
+use CoffeePOS\Domain\Product\ModifierSelection;
+use CoffeePOS\Domain\Product\QuickNoteSelection;
+use CoffeePOS\Domain\Shared\Money;
+
+$root = dirname(__DIR__, 2);
+require $root . '/vendor/autoload.php';
+
+$failures = [];
+$test = static function (string $name, callable $callback) use (&$failures): void {
+    try {
+        $callback();
+        echo '[PASS] ' . $name . PHP_EOL;
+    } catch (Throwable $error) {
+        $failures[] = $name . ': ' . $error->getMessage();
+        echo '[FAIL] ' . end($failures) . PHP_EOL;
+    }
+};
+$assert = static function (bool $condition, string $message): void {
+    if (! $condition) {
+        throw new RuntimeException($message);
+    }
+};
+$variation = static function (int $id, array $attributes, bool $available = true): array {
+    return [
+        'id' => $id,
+        'product_id' => 10,
+        'attributes' => $attributes,
+        'price_minor' => 45000,
+        'price_amount' => '45000',
+        'price_display' => '45.000 đ',
+        'currency' => 'VND',
+        'is_available' => $available,
+    ];
+};
+
+$test('TC-11 full multi-attribute variation match', static function () use ($assert, $variation): void {
+    $service = new VariationService();
+    $view = $service->resolveVariation(10, ['pa_size' => 'm', 'pa_temperature' => 'cold'], [
+        $variation(101, ['pa_size' => 'm', 'pa_temperature' => 'hot']),
+        $variation(102, ['pa_size' => 'm', 'pa_temperature' => 'cold']),
+    ])->toArray();
+    $assert($view['id'] === 102, 'Resolver did not use the full attribute set.');
+});
+
+$test('TC-11 WooCommerce Any-attribute wildcard', static function () use ($assert, $variation): void {
+    $service = new VariationService();
+    $view = $service->resolveVariation(10, ['pa_size' => 'l', 'pa_temperature' => 'cold'], [
+        $variation(103, ['pa_size' => '', 'pa_temperature' => 'cold']),
+    ])->toArray();
+    $assert($view['id'] === 103, 'WooCommerce wildcard attribute did not resolve.');
+});
+
+$test('TC-12 invalid combination is rejected', static function () use ($assert, $variation): void {
+    try {
+        (new VariationService())->resolveVariation(10, ['pa_size' => 's'], [
+            $variation(104, ['pa_size' => 'm']),
+        ]);
+    } catch (Phase01Exception $error) {
+        $assert($error->errorCode() === Phase01ErrorCodes::VARIATION_NOT_FOUND, 'Unexpected error code.');
+        return;
+    }
+    throw new RuntimeException('Invalid combination was accepted.');
+});
+
+$test('TC-14 unavailable variation is rejected', static function () use ($assert, $variation): void {
+    try {
+        (new VariationService())->resolveVariation(10, ['pa_size' => 'm'], [
+            $variation(105, ['pa_size' => 'm'], false),
+        ]);
+    } catch (Phase01Exception $error) {
+        $assert($error->errorCode() === Phase01ErrorCodes::OUT_OF_STOCK, 'Unexpected error code.');
+        return;
+    }
+    throw new RuntimeException('Unavailable variation was accepted.');
+});
+
+$test('TC-27/28 cart identity merges equal configuration only', static function () use ($assert): void {
+    $cart = Cart::createSession('VND', 'session-a', '2026-08-23T00:00:00Z');
+    $make = static function (array $notes): CartItem {
+        return CartItem::create(
+            10,
+            0,
+            1,
+            Money::fromMinor(45000, 'VND'),
+            ModifierSelection::fromArray([]),
+            QuickNoteSelection::fromArray($notes),
+            ''
+        );
+    };
+    $cart->addItem($make(['less_ice']));
+    $cart->addItem($make(['less_ice']));
+    $cart->addItem($make(['no_ice']));
+    $assert(count($cart->items()) === 2, 'Different configuration did not remain separate.');
+    $assert($cart->totalQuantity() === 3, 'Equal configuration did not merge quantities.');
+});
+
+$test('Phase 03 modules are wired and checkout remains disabled', static function () use ($assert, $root): void {
+    $assets = file_get_contents($root . '/includes/Infrastructure/Assets/AssetLoader.php');
+    $screen = file_get_contents($root . '/assets/js/screens/cashier.js');
+    $cart = file_get_contents($root . '/templates/cashier/cart-panel.php');
+    foreach (['coffeepos-api-client', 'coffeepos-component-product-modal', 'coffeepos-component-cart-panel'] as $handle) {
+        $assert(strpos((string) $assets, $handle) !== false, 'Missing script handle: ' . $handle);
+    }
+    foreach (['loadCatalog()', 'createCart()', 'updateCartItem', 'removeCartItem', 'clearCart'] as $operation) {
+        $assert(strpos((string) $screen, $operation) !== false, 'Missing Cashier operation: ' . $operation);
+    }
+    $assert((bool) preg_match('/data-action="checkout"[^>]*disabled/', (string) $cart), 'Checkout must remain disabled.');
+});
+
+exit($failures === [] ? 0 : 1);

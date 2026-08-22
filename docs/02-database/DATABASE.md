@@ -94,6 +94,33 @@ Custom tables are preferred only when the data is:
 
 Do not create a custom table simply because it is technically possible.
 
+## WooCommerce session data
+
+The active POS cart is temporary server-side state stored through the
+WooCommerce session API. It is not stored in a CoffeePOS table, WordPress
+options, browser local storage, or a draft WooCommerce order.
+
+The CoffeePOS session payload is keyed by an opaque `pos_session_id` and
+contains at minimum:
+
+```text
+revision
+currency
+items
+customer context
+order type
+table context
+coupon context
+updated_at
+```
+
+`pos_session_id` is a logical cart identifier, not the WooCommerce session token
+and not an authorization credential. Multiple logical carts may coexist in one
+WooCommerce session only when explicitly addressed by different IDs.
+
+Active cart lifetime follows the WooCommerce session. A cart that must survive
+session expiry is explicitly suspended and moved to Suspended Cart storage.
+
 ---
 
 # 4. Order Data Ownership
@@ -312,8 +339,7 @@ Example:
       "options": [
         {
           "id": "oat",
-          "label": "Oat",
-          "price": "10000"
+          "label": "Oat"
         }
       ]
     }
@@ -321,7 +347,8 @@ Example:
 }
 ```
 
-The final schema must be defined by the modifier implementation before Phase 03 completion.
+This is the stable initial schema. Modifier selections do not carry price
+adjustments. Price-changing choices are represented by WooCommerce variations.
 
 ---
 
@@ -582,14 +609,19 @@ INDEX created_at
 
 ---
 
-# 17. Quick Notes Storage
+# 17. Modifier and Quick Notes Storage
 
-Quick notes may be configuration rather than transaction data.
+Modifier and quick-note definitions are configuration rather than transaction
+data.
 
-Initial recommendation:
+Initial decision:
 
-- store default quick-note definitions in plugin settings/options
-- store selected quick-note IDs on order item metadata
+- store definitions in plugin settings/options
+- give modifier groups, modifier options, and quick notes stable IDs
+- store labels, selection rules, enabled state, sort order, and optional
+  product/category applicability
+- modifiers and quick notes do not carry price adjustments
+- store selected stable IDs and captured display labels on order item metadata
 
 Do not create a custom table until there is a requirement for a full admin CRUD system with larger relational data.
 
@@ -607,6 +639,7 @@ Customer display page
 KDS polling interval
 Order queue polling interval
 Enable/disable customer display
+Modifier definitions
 Quick note definitions
 Receipt settings
 VietQR settings
@@ -761,4 +794,4 @@ Migration strategy
 Deletion policy
 ```
 
-Junie MUST NOT invent persistent storage without this information.
+Codex MUST NOT invent persistent storage without this information.

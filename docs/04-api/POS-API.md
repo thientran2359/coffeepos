@@ -12,11 +12,30 @@ The API is designed around application use cases rather than arbitrary database 
 
 # 2. Product Endpoints
 
+## GET /coffeepos/v1/catalog
+
+Purpose:
+
+Return the complete POS-visible `CatalogView` grouped and ordered by
+WooCommerce category for Cashier and Customer Display.
+
+Response fields and grouping rules are defined in
+`docs/03-ui/CATALOG-UI.md`. The response includes a catalog version, currency,
+ordered categories, and display-ready product projections using WooCommerce
+price and availability.
+
+This is the primary catalog endpoint for both screens. Category clicks and
+Cashier search operate locally on this complete projection and do not trigger
+filtered product requests.
+
+---
+
 ## GET /coffeepos/v1/products
 
 Purpose:
 
-Retrieve products for the cashier menu.
+Provide a generic paged product query for use cases that need server-side
+filtering. It is not the primary Cashier/Customer Display catalog source.
 
 Query parameters:
 
@@ -86,6 +105,10 @@ quick notes configuration
 ```
 
 The exact response must expose only the data needed by the cashier.
+
+Modifier configuration contains selection rules and display data only. It does
+not contain a CoffeePOS price adjustment. Price-changing choices are represented
+by WooCommerce variations.
 
 ---
 
@@ -164,27 +187,97 @@ customer_lookup_failed
 
 # 7. Cart Operations
 
-The browser may keep a local active-cart state, but server operations that require authoritative validation should use application endpoints.
+The active cart is authoritative server-side state in the WooCommerce session.
+The browser keeps only the latest returned projection.
 
-Potential endpoint:
+Every cart request is authenticated through the normal WordPress/WooCommerce
+session and identifies the logical cart with `pos_session_id`. This opaque ID is
+not a credential. Mutations also provide `expected_revision`.
 
-## POST /coffeepos/v1/cart/validate
+## POST /coffeepos/v1/cart/session
 
-Purpose:
+Creates a new empty logical cart in the current WooCommerce session.
 
-Validate current cart before checkout.
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "cart": {
+      "pos_session_id": "01J...",
+      "revision": 0,
+      "items": [],
+      "currency": "VND"
+    }
+  }
+}
+```
+
+The returned identifier may be placed in the Customer Display URL and channel
+name, but the WooCommerce session token must never be exposed.
+
+## GET /coffeepos/v1/cart
+
+Returns the current canonical projection for `pos_session_id`. Cashier and
+Customer Display use this endpoint for initial state and recovery.
+
+Query:
+
+```text
+pos_session_id
+```
+
+An unknown or expired ID returns `cart_session_not_found`; it must not create a
+new empty cart implicitly.
+
+## POST /coffeepos/v1/cart/items
 
 Request:
 
 ```json
 {
-  "cart": {
-    "items": [],
-    "customer": {},
-    "order_type": "takeaway",
-    "table": null,
-    "coupon_codes": []
-  }
+  "pos_session_id": "01J...",
+  "expected_revision": 4,
+  "product_id": 123,
+  "variation_id": 456,
+  "quantity": 2,
+  "modifiers": {},
+  "quick_notes": [],
+  "custom_note": ""
+}
+```
+
+The server ignores any client price, resolves the current WooCommerce
+product/variation price, validates configuration and stock, mutates the session
+cart, increments `revision`, and returns the full cart projection.
+
+## PATCH /coffeepos/v1/cart/items/{key}
+
+Updates quantity or configuration using `pos_session_id` and
+`expected_revision`. Price is re-resolved from WooCommerce.
+
+## DELETE /coffeepos/v1/cart/items/{key}
+
+Removes one item and returns the incremented cart projection.
+
+## DELETE /coffeepos/v1/cart
+
+Clears the logical cart after confirmation and returns the empty incremented
+projection. It does not destroy the surrounding WooCommerce session.
+
+## POST /coffeepos/v1/cart/validate
+
+Purpose:
+
+Load and validate the current session cart before checkout.
+
+Request:
+
+```json
+{
+  "pos_session_id": "01J...",
+  "expected_revision": 5
 }
 ```
 
@@ -202,6 +295,10 @@ Response:
   }
 }
 ```
+
+If `expected_revision` is stale, mutation/validation endpoints return HTTP 409
+with `cart_revision_conflict` and the latest cart projection or a documented
+link to retrieve it.
 
 ---
 
@@ -232,7 +329,8 @@ Request:
 
 ```json
 {
-  "cart": {},
+  "pos_session_id": "01J...",
+  "expected_revision": 5,
   "code": "SUMMER10"
 }
 ```
@@ -248,6 +346,9 @@ Response contains an updated trusted cart projection.
 Purpose:
 
 Remove a coupon from the current cart context.
+
+The request uses `pos_session_id` and `expected_revision`; the response returns
+the incremented canonical cart projection.
 
 ---
 
@@ -274,9 +375,13 @@ Request:
 ```json
 {
   "label": "Customer Nguyen",
-  "cart": {}
+  "pos_session_id": "01J...",
+  "expected_revision": 9
 }
 ```
+
+The server loads the active cart from the WooCommerce session. It does not
+accept a browser-owned cart snapshot as suspended-cart data.
 
 Response:
 
@@ -309,7 +414,9 @@ Returns the selected suspended cart.
 
 ## POST /coffeepos/v1/held-carts/{id}/resume
 
-Returns a cart projection suitable for restoring into the Cashier UI.
+Restores the payload into a logical WooCommerce session cart and returns its
+`pos_session_id`, new revision, and canonical projection after WooCommerce price
+and stock revalidation.
 
 ---
 
@@ -351,6 +458,10 @@ The UI is not authoritative.
 A cart projection should consistently expose:
 
 ```text
+pos_session_id
+revision
+updated_at
+currency
 items
 subtotal
 discount
@@ -376,3 +487,6 @@ line_total
 ```
 
 The final pricing fields should be server-derived when the API is authoritative.
+
+All item prices and totals are resolved from WooCommerce product/variation and
+coupon data. Client-supplied prices and modifier price adjustments are ignored.

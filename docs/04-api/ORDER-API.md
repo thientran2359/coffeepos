@@ -20,33 +20,17 @@ Request concept:
 
 ```json
 {
-  "cart": {
-    "items": [
-      {
-        "product_id": 123,
-        "variation_id": 456,
-        "quantity": 2,
-        "modifiers": [],
-        "quick_notes": [
-          "less_ice"
-        ],
-        "note": "Không ống hút"
-      }
-    ],
-    "customer": {
-      "id": 789
-    },
-    "order_type": "dine_in",
-    "table": {
-      "id": 5
-    },
-    "coupons": []
-  },
+  "pos_session_id": "01J...",
+  "expected_revision": 12,
+  "client_operation_id": "cashier-20260822-abc123",
   "payment": {
     "method": "cash"
   }
 }
 ```
+
+The browser does not submit an authoritative cart snapshot. The server loads
+the identified cart from the authenticated WooCommerce session.
 
 ---
 
@@ -58,6 +42,10 @@ Authenticate
 Authorize
  ↓
 Validate request
+ ↓
+Load WooCommerce session cart
+ ↓
+Verify pos_session_id + expected_revision
  ↓
 Validate cart
  ↓
@@ -329,6 +317,9 @@ Reconstruct cart
 
 Historical prices MUST NOT be copied as authoritative current prices.
 
+The reconstructed cart is written into a logical WooCommerce session cart and
+returned with `pos_session_id` and a new revision.
+
 ---
 
 # 14. Receipt
@@ -348,6 +339,8 @@ Relevant codes:
 ```text
 empty_cart
 invalid_cart
+cart_session_not_found
+cart_revision_conflict
 out_of_stock
 invalid_variation
 invalid_coupon
@@ -364,21 +357,24 @@ unauthorized
 
 # 16. Duplicate Checkout Protection
 
-Checkout should use an idempotency/client-operation identifier when practical.
+Checkout MUST use an idempotency/client-operation identifier.
 
 Example:
 
 ```json
 {
   "client_operation_id": "cashier-20260822-abc123",
-  "cart": {},
+  "pos_session_id": "01J...",
+  "expected_revision": 12,
   "payment": {}
 }
 ```
 
 A repeated request with the same operation identifier should not create another order.
 
-Exact persistence strategy belongs in the application/database implementation.
+The identifier and resulting order ID must be persisted atomically enough to
+survive request retries. A repeated request returns the original result rather
+than creating another order or payment attempt.
 
 ---
 

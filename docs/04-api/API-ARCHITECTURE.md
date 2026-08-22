@@ -117,6 +117,10 @@ Error response:
 
 The HTTP status should also communicate the failure category.
 
+Successful UI endpoints return data projections only. Standard AJAX/REST
+responses must not include rendered component HTML; PHP-owned `<template>`
+blueprints and the client `TemplateRenderer` are responsible for markup.
+
 ---
 
 # 6. Error Categories
@@ -146,6 +150,8 @@ invalid_product
 invalid_variation
 invalid_cart
 empty_cart
+cart_session_not_found
+cart_revision_conflict
 out_of_stock
 invalid_coupon
 invalid_customer
@@ -182,6 +188,10 @@ Example:
 ```
 
 Do not serialize entire WooCommerce objects into the frontend.
+
+Do not serialize HTML fragments. Projection fields may contain display-ready
+plain text such as `price_display` or `stock_label`, but the client must treat
+them as text rather than markup.
 
 ---
 
@@ -246,6 +256,11 @@ Do not load an unbounded historical order dataset into the browser.
 
 Filtering parameters should be validated against documented values.
 
+Cashier category navigation and product-location search are not API filtering
+operations. They operate against the complete `CatalogView` returned by the
+catalog endpoint. Server-side filtering remains available only for endpoints
+and screens whose contracts explicitly require it.
+
 Examples:
 
 ```text
@@ -303,7 +318,8 @@ The frontend:
 - sends valid requests
 - shows loading state
 - handles errors
-- renders responses
+- passes JSON projections to the shared `TemplateRenderer`
+- performs targeted component rendering
 - maintains temporary UI state
 
 The frontend MUST NOT:

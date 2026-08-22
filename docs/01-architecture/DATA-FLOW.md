@@ -47,21 +47,27 @@ WooCommerce Order
 
 ---
 
-# 3. Product Loading
+# 3. Catalog Loading
 
 ```text
-Cashier
+Cashier / Customer Display
   ↓
-Product Query
+Catalog API
   ↓
 WooCommerce
   ↓
-Product DTO/View Data
+CatalogView grouped by category
   ↓
-PHP Template / JS UI
+TemplateRenderer
+  ├──→ Cashier category sections + product cards
+  └──→ Customer Display category menu + product rows
 ```
 
-Product display data may be cached where safe.
+Both screens use the same projection and separate PHP-owned templates. Category
+navigation and Cashier search operate against the loaded CatalogView; they do
+not refetch or replace the full catalog.
+
+Catalog display data may be cached where safe.
 
 Stock and price must be revalidated server-side before checkout.
 
@@ -87,7 +93,11 @@ Cart Service
 Cart State
 ```
 
-The browser may hold temporary cart state for UX, but the checkout endpoint must independently validate it.
+The server explicitly creates the active cart, then loads it from the
+WooCommerce session using an opaque `pos_session_id`. An unknown or expired ID
+fails rather than silently creating a replacement. Product/variation IDs and
+configuration are accepted as input, but the server resolves WooCommerce price
+and returns the canonical cart projection.
 
 ---
 
@@ -96,16 +106,20 @@ The browser may hold temporary cart state for UX, but the checkout endpoint must
 ```text
 UI Action
    ↓
-Cashier State
+Cart API + expected_revision
    ↓
-Cart Mutation
+CartService
    ↓
-Updated Cart Projection
+WooCommerce session cart
+   ↓
+Updated Cart Projection + revision
    ├──→ Cashier Cart UI
    └──→ Customer Display Sync
 ```
 
-The same cart representation should be reused rather than each screen reconstructing totals independently.
+Cashier stores only the latest projection. After a successful mutation it
+broadcasts that same server-confirmed projection to Customer Display. Neither
+screen reconstructs prices or totals independently.
 
 ---
 
@@ -159,6 +173,10 @@ Cashier
 Checkout Request
    ↓
 Authorization
+   ↓
+Load WooCommerce session cart
+   ↓
+Verify pos_session_id + expected_revision
    ↓
 Cart Validation
    ↓
@@ -234,14 +252,19 @@ The exact bank/payment verification mechanism is not fully specified and must be
 ```text
 Cashier
   ↓
-State Change
+Server-confirmed State Change
   ↓
-BroadcastChannel
+BroadcastChannel(coffeepos:<pos_session_id>)
   ↓
 Customer Display
   ↓
 Render Projection
 ```
+
+On startup or reconnect, Customer Display requests a full snapshot. Cashier
+responds with its latest server-confirmed projection. Every state message
+contains the matching `pos_session_id` and monotonic `revision`; stale or
+foreign-session messages are ignored.
 
 Examples of synchronization events:
 
@@ -452,6 +475,10 @@ Before shift close
 ```
 
 Do not assume a product state loaded five minutes ago is still authoritative for checkout.
+
+Checkout loads the cart from the WooCommerce session and revalidates its
+WooCommerce prices, stock, coupon, and customer context. It does not accept a
+browser-owned cart as the order source.
 
 ---
 

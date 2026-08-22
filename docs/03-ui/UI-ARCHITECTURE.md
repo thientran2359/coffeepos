@@ -27,11 +27,16 @@ Shared UI components must have stable contracts.
 
 # 2. UI Principles
 
-## 2.1 Server-rendered HTML
+## 2.1 PHP-owned templates
 
-PHP templates are the authoritative HTML structure.
+PHP templates are the authoritative HTML structure. PHP renders the static
+screen shell and emits native `<template>` blueprints for dynamic components.
 
-The frontend MUST NOT rebuild the whole screen from JavaScript strings.
+AJAX/REST responses contain JSON projections. The shared `TemplateRenderer`
+clones the relevant blueprint and safely binds that JSON into targeted DOM
+regions.
+
+The frontend MUST NOT rebuild screens or components from JavaScript strings.
 
 ## 2.2 Vanilla JavaScript
 
@@ -157,7 +162,9 @@ Specialized POS components:
 
 ```text
 Category Navigation
-Product Grid
+Catalog Category Section
+Product Card
+Product Search Results
 Product Configuration Modal
 Customer Lookup
 Customer Summary
@@ -190,6 +197,9 @@ data-variation-id
 data-cart-item-key
 data-order-id
 data-state
+data-field
+data-attr
+data-key
 ```
 
 Do not overload a single attribute with multiple meanings.
@@ -203,7 +213,7 @@ Prefer event delegation for dynamic lists.
 Example conceptual flow:
 
 ```text
-Product Grid
+Catalog Category Section
     ↓ click
 data-action="select-product"
     ↓
@@ -248,8 +258,10 @@ Cashier Screen
 ├── Main
 │   ├── Menu Panel
 │   │   ├── Search
-│   │   ├── Categories
-│   │   └── Product Grid
+│   │   ├── Sticky Category Navigation
+│   │   └── Catalog Scroll Region
+│   │       └── Category Section[]
+│   │           └── Product Card[]
 │   │
 │   └── Cart Panel
 │       ├── Order Type
@@ -278,16 +290,25 @@ Cashier Screen
 
 ```text
 Customer Display
-├── Header / Brand
-├── Welcome Area
-├── Customer Area
-├── Cart Projection
-├── Total
-├── Payment Projection
-└── Thank You State
+├── Menu Region
+│   ├── Header / Brand
+│   ├── Category Jump Navigation
+│   └── Category Section Grid
+│       └── Read-only Product Row[]
+└── Realtime Cart Region
+    ├── Customer Area
+    ├── Cart Projection
+    ├── Total
+    ├── Payment Projection
+    └── Thank You State
 ```
 
-Customer Display should prioritize readability from several meters away.
+On landscape displays, the menu occupies approximately 68–72% and the cart
+occupies approximately 28–32%. The menu remains visible while cart/payment state
+changes. Customer Display should prioritize readability from several meters
+away.
+
+Cashier and Customer Display catalog details are defined in `CATALOG-UI.md`.
 
 ---
 
@@ -439,9 +460,68 @@ templates/
 
 A reusable structure should live in a reusable component template where practical.
 
+For an AJAX-driven component, its PHP template emits one native `<template>`
+blueprint. Do not maintain parallel PHP-fragment and JavaScript-string versions
+of the same markup.
+
 ---
 
-# 19. DOM Update Strategy
+# 19. Client Template Renderer
+
+CoffeePOS uses one project-owned renderer at the conceptual path:
+
+```text
+assets/js/ui/template-renderer.js
+```
+
+Minimum responsibilities:
+
+```text
+render(templateId, data) -> DocumentFragment
+renderList(templateId, items, target)
+```
+
+Binding contract:
+
+| Marker | Purpose | Rule |
+|---|---|---|
+| `data-field="name"` | Text binding | Assign through `textContent` |
+| `data-attr="data-product-id:id"` | Attribute/property binding | Only documented targets are allowed |
+| `data-key="id"` | Stable list identity | Resolve from the JSON item before insertion |
+
+`data-attr` may contain semicolon-separated mappings. Boolean DOM properties
+such as `disabled`, `hidden`, `checked`, and `selected` must use boolean
+semantics; false removes or disables the corresponding state.
+
+Binding paths may read only own properties from the supplied projection.
+Prototype keys such as `__proto__`, `prototype`, and `constructor` are invalid.
+
+The default attribute allowlist is `data-*`, `aria-*`, `title`, `value`, and
+`alt`, plus the documented boolean properties. URL-bearing attributes such as
+`src` or `href` require an explicitly registered URL validator. Event handler
+attributes (`on*`), `style`, `srcdoc`, and arbitrary attribute names are
+forbidden.
+
+The owning controller supplies a fixed template ID and target element. Neither
+the template ID, target selector, nor binding declarations may come from AJAX
+JSON.
+
+Missing values render as empty text or remove the optional attribute. The
+renderer must reject an unknown template, malformed binding, unsafe attribute,
+or non-object data item with a predictable error.
+
+The renderer does not support raw HTML fields, arbitrary expressions, function
+execution, business rules, or API calls. Display-ready values such as formatted
+money and translated labels come from PHP/static template text or the server
+projection.
+
+Nested lists are rendered explicitly by the owning component controller using
+another named template and target region. Do not add hidden loop or conditional
+syntax to the renderer.
+
+---
+
+# 20. DOM Update Strategy
 
 Prefer targeted updates:
 
@@ -460,9 +540,12 @@ Every click
 
 Full region replacement may be used where it is simpler and safe, but must preserve documented selectors and event behavior.
 
+For JSON-driven regions, full or keyed replacement must still use the shared
+`TemplateRenderer`; it must not interpolate JSON into `innerHTML`.
+
 ---
 
-# 20. UI Contract Rule
+# 21. UI Contract Rule
 
 When a component or selector becomes part of a completed phase, it becomes a project contract.
 
@@ -472,4 +555,3 @@ Changing it requires:
 2. documentation update
 3. consumer update
 4. verification
-

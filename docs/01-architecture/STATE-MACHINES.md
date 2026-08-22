@@ -16,6 +16,9 @@ New states must not be introduced casually.
 
 Cart is an active working context.
 
+The state and its monotonic revision are stored in the WooCommerce session under
+the active `pos_session_id`.
+
 ```text
 EMPTY
   ↓
@@ -365,7 +368,7 @@ Cashier Resets
 
 | State | Authoritative Owner |
 |---|---|
-| Cart draft | Cashier application/session |
+| Cart draft | CartService + WooCommerce session (`pos_session_id`) |
 | WooCommerce order | WooCommerce |
 | Payment result | Server/payment integration |
 | Shift | CoffeePOS server-side shift model |

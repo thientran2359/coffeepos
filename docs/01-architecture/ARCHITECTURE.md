@@ -92,6 +92,7 @@ Responsible for:
 - UI components
 - CSS/SCSS
 - Vanilla JavaScript
+- project-owned TemplateRenderer
 - user interaction
 - local UI state
 - rendering API/service results
@@ -116,6 +117,7 @@ Examples:
 
 ```text
 AddCartItem
+LoadCatalog
 UpdateCartItem
 RemoveCartItem
 ApplyCoupon
@@ -238,6 +240,8 @@ templates/
 
 assets/
 ├── js/
+│   └── ui/
+│       └── template-renderer.js
 ├── css/
 └── images/
 ```
@@ -254,9 +258,11 @@ Allowed:
 Template
 → Presentation helper / application output
 
-JS
+JS Controller
 → REST/AJAX endpoint
-→ UI state
+→ JSON projection
+→ TemplateRenderer
+→ targeted DOM region
 
 REST Controller
 → Application Service
@@ -314,27 +320,56 @@ A screen MAY use shared components.
 
 A screen MUST NOT directly depend on internal DOM structure of another screen.
 
+Cashier and Customer Display share `CatalogView` data but use separate
+PHP-owned templates and screen controllers. A layout change in one screen must
+not require changing the other screen's markup or duplicating catalog logic.
+
 Shared component contracts belong in `COMPONENTS.md`.
+
+Shared catalog projection, category-section navigation, search location, and
+Customer Display menu contracts belong in `docs/03-ui/CATALOG-UI.md`.
 
 Shared state contracts belong in `STATE-MACHINES.md` and `DATA-FLOW.md`.
 
 ---
 
-# 7. Server-Rendered HTML
+# 7. PHP-Owned Templates and JSON Rendering
 
-CoffeePOS uses PHP templates as the authoritative HTML structure.
+CoffeePOS uses a hybrid rendering model. PHP owns all HTML structure, including
+the native `<template>` elements used for dynamic components. AJAX/REST
+endpoints return JSON projections rather than rendered HTML. A single
+project-owned Vanilla JavaScript library, `TemplateRenderer`, clones the PHP
+template and binds the JSON data into a `DocumentFragment`.
+
+```text
+PHP template
+    ↓ emits
+native <template> blueprint
+    ↑                 ↓ cloned by
+AJAX/REST JSON → TemplateRenderer
+                      ↓
+              targeted DOM region
+```
 
 Rules:
 
-- HTML structure belongs in PHP templates.
-- JS attaches behavior to documented selectors.
-- Reusable UI fragments should be PHP templates/components.
-- Data required by a template should be prepared before rendering.
-- Templates should not contain complex business logic.
+- Static screen shells and dynamic component blueprints belong in PHP templates.
+- Each dynamic component has one authoritative PHP-owned markup definition.
+- API responses expose DTO/view JSON and do not include HTML fragments for
+  standard UI updates.
+- `TemplateRenderer` is the only client-side template renderer.
+- The renderer binds text with `textContent`; it does not interpolate raw HTML.
+- `data-field` binds text, `data-attr` binds approved attributes/properties, and
+  `data-key` declares stable list identity.
+- Controllers coordinate nested collections and component state; the renderer
+  does not contain business rules or an expression language.
+- Event delegation uses stable `data-action` hooks after fragments are inserted.
+- Server-side PHP component rendering remains valid for initial or server-only
+  output, but it must not create a second markup definition for an AJAX-driven
+  component.
 
-JavaScript MUST NOT rebuild large sections of the application using embedded HTML strings when an equivalent PHP template/component contract exists.
-
-Small client-only DOM fragments may be generated when explicitly approved and documented, but this is an exception rather than the default architecture.
+Do not use JavaScript HTML/template strings, direct JSON-to-`innerHTML`
+interpolation, or a second template engine such as Handlebars.
 
 ---
 
@@ -351,6 +386,7 @@ core/
 state/
 api/
 ui/
+ui/template-renderer
 components/
 screens/
 sync/
@@ -380,7 +416,7 @@ Examples:
 
 ```text
 Cart editing state
-→ Cashier application
+→ CartService + WooCommerce session, scoped by pos_session_id
 
 Customer display presentation state
 → Customer Display, synchronized from cashier
@@ -395,7 +431,13 @@ Payment state
 → Server/payment integration
 ```
 
-The browser may maintain temporary UI state, but it MUST NOT be the authoritative source for server-critical state.
+The browser may maintain temporary UI state and the latest cart projection, but
+it MUST NOT be the authoritative source for cart contents, prices, totals, or
+other server-critical state.
+
+Each successful cart mutation increments a monotonic `revision` stored with the
+session cart. Mutations that provide an outdated `expected_revision` must fail
+with a conflict and return or allow retrieval of the latest projection.
 
 ---
 
@@ -414,6 +456,11 @@ Customer Display
 ```
 
 The synchronization layer MUST use documented event types and payload contracts.
+
+The channel is scoped by the opaque `pos_session_id`. Cashier broadcasts only
+server-confirmed projections. Customer Display may request a snapshot and
+acknowledge readiness, but it cannot mutate cart, price, payment, or order
+state through `BroadcastChannel`.
 
 Do not allow individual screens to invent their own message structures.
 
@@ -454,10 +501,23 @@ ProductRepository
 VariationRepository
 CustomerRepository
 CouponService
+CartSessionStore
 OrderRepository
 StockService
 RefundService
 ```
+
+WooCommerce product and variation prices are canonical. Cart item creation and
+revalidation resolve price through the WooCommerce integration boundary; price
+values supplied by the browser are ignored. Current CoffeePOS modifiers are
+non-priced configuration. A price-changing choice must use a WooCommerce
+variation or another explicitly approved WooCommerce pricing mechanism.
+
+The Application layer depends on a `CartSessionStoreInterface`; the
+Integration/Infrastructure implementation uses the WooCommerce session API.
+Controllers and domain objects must not call `WC()->session` directly. The
+session adapter owns cart serialization, hydration, namespaced keys, expiry,
+revision checks, and persistence.
 
 These names are conceptual. Phase 00 should choose the final abstractions after checking the installed WooCommerce version and project constraints.
 
@@ -596,4 +656,4 @@ When a new feature does not fit the architecture:
 4. update affected phase/API/database documents
 5. then implement
 
-Junie MUST NOT silently introduce architectural exceptions.
+Codex MUST NOT silently introduce architectural exceptions.

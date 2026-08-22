@@ -56,18 +56,23 @@ Do not expose dangerous or unreasonable values without validation.
 
 ---
 
-# 6. Quick Notes
+# 6. Modifiers and Quick Notes
 
-Admin may manage configured quick-note options if the project implements admin CRUD for them.
+Admin may manage modifier groups/options and configured quick notes.
 
-Each note should have:
+Each definition should have:
 
 ```text
 stable ID
 label
 enabled/disabled
 sort order
+selection rules where applicable
+optional product/category applicability
 ```
+
+These settings do not define price adjustments. Price-changing customer choices
+must be configured as WooCommerce variations.
 
 ---
 

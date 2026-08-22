@@ -79,6 +79,7 @@ Prefer:
 - `async/await`
 - small API clients
 - reusable DOM utilities
+- the shared `TemplateRenderer` for JSON-driven component markup
 
 Avoid:
 
@@ -87,6 +88,8 @@ Avoid:
 - inline event handlers
 - duplicated selectors
 - duplicated API request logic
+- HTML strings or direct JSON interpolation through `innerHTML`
+- component-specific template engines
 
 ---
 
@@ -116,8 +119,25 @@ Templates should primarily:
 
 - receive prepared data
 - render markup
+- emit native `<template>` blueprints for AJAX-driven components
 - escape output
 - expose stable selectors
+
+Dynamic template bindings use:
+
+```text
+data-field
+data-attr
+data-key
+```
+
+JavaScript must populate these templates through the shared `TemplateRenderer`.
+Do not maintain a duplicate JavaScript markup definition for the same component.
+
+When multiple screens consume the same projection, share the API/projection and
+pure navigation utilities, not the screen markup. Cashier and Customer Display
+must use separate PHP templates over the shared `CatalogView` so either layout
+can evolve without conditional branches for the other screen.
 
 Templates should NOT:
 
@@ -137,7 +157,8 @@ Prefer BEM-like naming where appropriate:
 ```text
 dd-pos
 dd-pos__header
-dd-pos__product-grid
+dd-pos__catalog
+dd-pos__category-section
 dd-cart-item
 dd-product-modal
 ```

@@ -51,10 +51,10 @@ This phase MUST NOT implement complete product/cart business logic.
 
 # 2. Prerequisites
 
-Junie MUST read:
+Codex MUST read:
 
 ```text
-JUNIE.md
+AGENTS.md
 
 docs/00-project/PROJECT.md
 docs/00-project/REQUIREMENTS.md
@@ -72,6 +72,7 @@ docs/02-database/WOOCOMMERCE-DATA.md
 
 docs/03-ui/UI-ARCHITECTURE.md
 docs/03-ui/COMPONENTS.md
+docs/03-ui/CATALOG-UI.md
 docs/03-ui/CASHIER-UI.md
 
 docs/04-api/API-ARCHITECTURE.md
@@ -81,7 +82,7 @@ docs/05-phases/PHASE-00.md
 docs/05-phases/PHASE-01.md
 ```
 
-Junie MUST inspect the actual Phase 00 and Phase 01 implementation before modifying UI code.
+Codex MUST inspect the actual Phase 00 and Phase 01 implementation before modifying UI code.
 
 Do not assume class names or template APIs from the documents if the existing implementation already established a different but compatible convention.
 
@@ -98,7 +99,8 @@ Header
 POS navigation foundation
 Search UI
 Category navigation UI
-Product grid shell
+Product catalog shell
+Category section shell
 Product card shell
 Cart panel shell
 Cart item shell
@@ -133,7 +135,7 @@ Do NOT implement:
 Real product querying
 Live product search
 WooCommerce product loading
-Real category filtering
+Real catalog loading and section navigation
 Variation selection logic
 Modifier selection logic
 Quick-note business logic
@@ -202,8 +204,9 @@ CASHIER
 │   │
 │   ├── MENU PANEL
 │   │   ├── Search
-│   │   ├── Categories
-│   │   └── Product Grid
+│   │   ├── Sticky Category Navigation
+│   │   └── Catalog Scroll Region
+│   │       └── Category Section Shell[]
 │   │
 │   └── CART PANEL
 │       ├── Order Type
@@ -273,7 +276,8 @@ The menu panel contains:
 ```text
 Search
 Category Navigation
-Product Grid
+Catalog Scroll Region
+Category Section Shells
 ```
 
 It should remain usable independently of the cart panel.
@@ -287,11 +291,12 @@ The search area must provide:
 ```text
 search input
 clear action where appropriate
-loading state
-empty state
+result panel shell
+empty-result state
 ```
 
-The search UI must be ready for Phase 03 to attach the real product search API.
+The search UI must be ready for Phase 03 to attach the loaded-catalog search
+index and product-location behavior.
 
 ## Current Phase Behavior
 
@@ -314,7 +319,6 @@ Suggested selector:
 ```html
 <input
     data-component="product-search"
-    data-action="search-products"
 >
 ```
 
@@ -330,9 +334,9 @@ loading presentation
 Phase 03 will own:
 
 ```text
-debounced API query
-product results
-search/filter behavior
+CatalogView search index
+product suggestions
+search-to-product scrolling/highlight
 ```
 
 ---
@@ -353,6 +357,9 @@ Phase 02 may use placeholder/mock category labels only for visual verification.
 
 Phase 03 will connect the component to WooCommerce category data.
 
+Category controls are navigation anchors. Phase 03 scrolls the catalog region
+to the matching category section instead of filtering/replacing products.
+
 ---
 
 # 12. Category UI States
@@ -370,9 +377,10 @@ The active category must be visually obvious.
 
 ---
 
-# 13. Product Grid
+# 13. Product Catalog
 
-The product grid is a presentation shell.
+The product catalog is a presentation shell containing category sections and
+product-card collections.
 
 It must support:
 
@@ -384,6 +392,9 @@ error
 ```
 
 It must be able to render multiple Product Card components.
+
+Its stable structure must support a dedicated scroll region, category section
+IDs, and scroll-spy without coupling behavior to visual CSS classes.
 
 Phase 02 does NOT load real products.
 
@@ -814,7 +825,8 @@ Potential properties:
 activeCategory
 searchTerm
 isSearching
-productGridState
+catalogState
+searchResultsState
 cartPanelState
 orderTypeDisplayState
 customerDisplayState
@@ -833,9 +845,9 @@ Prefer semantic `data-action` hooks.
 Examples:
 
 ```text
-search-products
 clear-search
-select-category
+scroll-category
+locate-product
 select-product
 open-customer
 select-order-type
@@ -862,7 +874,9 @@ The following selectors/data attributes should be stable after Phase 02:
 data-screen="cashier"
 data-component="product-search"
 data-component="category-nav"
-data-component="product-grid"
+data-component="catalog-scroll"
+data-component="catalog-section-list"
+data-component="catalog-category-section"
 data-component="product-card"
 data-component="cart-panel"
 data-component="cart-item"
@@ -915,6 +929,7 @@ Templates may:
 
 ```text
 render HTML
+emit native <template> blueprints
 escape output
 render prepared data
 expose selectors
@@ -944,7 +959,8 @@ header.php
 menu-panel.php
     ├── search
     ├── category-nav
-    └── product-grid
+    └── catalog-scroll
+        └── category-section shells
 cart-panel.php
     ├── order-type
     ├── customer
@@ -974,6 +990,10 @@ placeholder cashier/shift display
 ```
 
 Do not query WooCommerce from the template.
+
+Dynamic component blueprints established in this phase must use the shared
+`data-field`, `data-attr`, and `data-key` contract. Phase 03 will bind real
+AJAX/REST JSON through the project-owned `TemplateRenderer`.
 
 ---
 
@@ -1087,8 +1107,8 @@ Do not insert demo products into WooCommerce.
 
 | Component | Phase 02 behavior | Phase 03+ |
 |---|---|---|
-| Search | input/clear UI | real product search |
-| Category | select visual state | real filtering |
+| Search | input/clear UI | local CatalogView suggestions + locate product |
+| Category | select visual state | scroll to category section + scroll-spy |
 | Product Card | select visual state | product configuration |
 | Cart Item | display shell | real cart mutation |
 | Order Type | visual selection | domain state |
@@ -1118,52 +1138,53 @@ Phase 02 is complete when:
 7. Search loading/empty states exist.
 8. Category navigation exists.
 9. Active category state works.
-10. Product grid exists.
-11. Product card shell renders.
-12. Out-of-stock visual state is supported.
+10. Catalog scroll region exists.
+11. Category section shell exists.
+12. Product card shell renders.
+13. Out-of-stock visual state is supported.
 
 ## Cart
 
-13. Cart panel is visible.
-14. Empty cart state is polished.
-15. Cart item shell is available.
-16. Quantity controls exist visually.
-17. Edit/remove actions exist as UI hooks.
-18. Order type selector exists.
-19. Customer summary exists.
-20. Coupon section exists.
-21. Subtotal/discount/total exist.
-22. Checkout control exists.
+14. Cart panel is visible.
+15. Empty cart state is polished.
+16. Cart item shell is available.
+17. Quantity controls exist visually.
+18. Edit/remove actions exist as UI hooks.
+19. Order type selector exists.
+20. Customer summary exists.
+21. Coupon section exists.
+22. Subtotal/discount/total exist.
+23. Checkout control exists.
 
 ## Shared UI
 
-23. Modal foundation works.
-24. Confirm dialog foundation works.
-25. Toast works.
-26. Loading component works.
-27. Empty state works.
-28. Error state works.
+24. Modal foundation works.
+25. Confirm dialog foundation works.
+26. Toast works.
+27. Loading component works.
+28. Empty state works.
+29. Error state works.
 
 ## JavaScript
 
-29. Cashier screen has a dedicated controller.
-30. No monolithic business-logic `pos.js` is introduced.
-31. UI state is separated from domain state.
-32. Stable `data-component`/`data-action` hooks are used.
-33. No product/cart business logic is implemented in JS.
+30. Cashier screen has a dedicated controller.
+31. No monolithic business-logic `pos.js` is introduced.
+32. UI state is separated from domain state.
+33. Stable `data-component`/`data-action` hooks are used.
+34. No product/cart business logic is implemented in JS.
 
 ## Templates
 
-34. HTML structure is defined in PHP templates.
-35. Templates do not query the database.
-36. Templates do not perform business mutations.
-37. Components are reusable where appropriate.
+35. HTML structure is defined in PHP templates.
+36. Templates do not query the database.
+37. Templates do not perform business mutations.
+38. Components are reusable where appropriate.
 
 ## UX
 
-38. Interface is touch-friendly.
-39. Keyboard navigation works for primary controls.
-40. Responsive layout works for the supported POS sizes.
+39. Interface is touch-friendly.
+40. Keyboard navigation works for primary controls.
+41. Responsive layout works for the supported POS sizes.
 
 ---
 
@@ -1317,7 +1338,7 @@ Do not create unused files.
 
 # 57. Existing Phase-00 Compatibility
 
-Junie MUST reuse:
+Codex MUST reuse:
 
 ```text
 TemplateLoader
@@ -1355,7 +1376,7 @@ Do not recreate these concepts in JS with incompatible shapes.
 
 # 59. Forbidden Changes
 
-During Phase 02, Junie MUST NOT:
+During Phase 02, Codex MUST NOT:
 
 - implement ProductService logic again in JS
 - implement CartService logic again in JS
@@ -1413,82 +1434,7 @@ without redesigning the Cashier screen.
 
 ---
 
-# 61. Completion Report
-
-Junie MUST report:
-
-## Changed
-
-All created/modified files.
-
-## Templates
-
-List Cashier templates/components.
-
-## JavaScript
-
-List screen/component modules.
-
-## CSS
-
-List styles created.
-
-## Selectors
-
-List stable `data-component` and `data-action` contracts introduced.
-
-## UI States
-
-List loading/empty/error/disabled states.
-
-## Verification
-
-Report:
-
-```text
-PHP syntax
-JavaScript syntax/build
-Cashier route
-component rendering
-responsive checks
-accessibility checks
-scope checks
-```
-
-Use:
-
-```text
-PASS
-FAIL
-BLOCKED
-```
-
-Do not claim browser verification if it was not actually performed.
-
-## Scope
-
-Explicitly confirm:
-
-```text
-no product API
-no cart business logic
-no checkout
-no order creation
-no payment
-no customer lookup
-no KDS
-no Customer Display
-no Shift
-no Reports
-```
-
-## Issues
-
-List any remaining UI/architecture problems.
-
----
-
-# 62. Final Phase 02 Rule
+# 61. Final Phase 02 Rule
 
 When Phase 02 is complete:
 

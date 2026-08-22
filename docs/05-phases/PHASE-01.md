@@ -44,10 +44,10 @@ This phase MUST NOT implement the Cashier UI workflow.
 
 # 2. Prerequisites
 
-Junie MUST read:
+Codex MUST read:
 
 ```text
-JUNIE.md
+AGENTS.md
 
 docs/00-project/PROJECT.md
 docs/00-project/REQUIREMENTS.md
@@ -74,7 +74,7 @@ docs/04-api/ORDER-API.md
 docs/05-phases/PHASE-00.md
 ```
 
-Junie MUST inspect the actual Phase 00 implementation before starting.
+Codex MUST inspect the actual Phase 00 implementation before starting.
 
 Do not assume the examples in the documents correspond exactly to class names already created.
 
@@ -112,7 +112,7 @@ Do NOT implement:
 
 ```text
 Cashier screen UI
-Product grid UI
+Product catalog UI
 Product modal UI
 Cart UI
 Customer Display UI
@@ -1079,7 +1079,7 @@ TC-27 invalid variation ID
 
 The exact final file names may vary if the existing Phase 00 conventions require it.
 
-Junie SHOULD create a coherent structure similar to:
+Codex SHOULD create a coherent structure similar to:
 
 ```text
 includes/
@@ -1238,61 +1238,7 @@ Even though Phase 01 is mostly application code:
 
 ---
 
-# 47. Completion Report
-
-Junie MUST report:
-
-## Changed
-
-Files created/modified.
-
-## Domain
-
-List implemented domain objects and invariants.
-
-## Application
-
-List services and their responsibilities.
-
-## Integration
-
-List WooCommerce adapters/gateways.
-
-## API
-
-Report any endpoints added.
-
-## Tests
-
-Report unit/integration checks.
-
-## Not Implemented
-
-Explicitly confirm:
-
-```text
-no Cashier UI
-no Cart UI
-no Checkout
-no Payment
-no WooCommerce order creation
-no Customer Display
-no KDS
-no Shift logic
-no Reports
-```
-
-## Issues
-
-Report:
-
-- WooCommerce runtime blockers
-- unresolved architecture questions
-- any assumptions
-
----
-
-# 48. Definition of Done
+# 47. Definition of Done
 
 Phase 01 is complete only when:
 
@@ -1316,7 +1262,7 @@ The code must remain consistent with all architecture documents.
 
 ---
 
-# 49. Final Phase 01 Rule
+# 48. Final Phase 01 Rule
 
 When Phase 01 is complete:
 

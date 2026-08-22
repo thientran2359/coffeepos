@@ -28,10 +28,10 @@ This phase MUST NOT implement the Cashier, Cart, Checkout, Payment, Customer Dis
 
 # 2. Prerequisites
 
-Before starting this phase, Junie MUST read:
+Before starting this phase, Codex MUST read:
 
 ```text
-JUNIE.md
+AGENTS.md
 
 docs/00-project/PROJECT.md
 docs/00-project/REQUIREMENTS.md
@@ -58,9 +58,9 @@ docs/04-api/SYNC-API.md
 featured.txt
 ```
 
-Junie MUST inspect the existing plugin directory before creating or replacing files.
+Codex MUST inspect the existing plugin directory before creating or replacing files.
 
-If the plugin already contains code, Junie must preserve useful existing infrastructure where it is compatible with this architecture.
+If the plugin already contains code, Codex must preserve useful existing infrastructure where it is compatible with this architecture.
 
 Do not perform a blind rewrite.
 
@@ -785,7 +785,7 @@ Do not expose diagnostics publicly to unauthenticated users.
 
 # 34. File Responsibilities
 
-At the end of Phase 00, Junie should be able to explain the purpose of every newly created class.
+At the end of Phase 00, Codex should be able to explain the purpose of every newly created class.
 
 Avoid classes with unclear responsibilities such as:
 
@@ -1099,13 +1099,13 @@ assets/js/... foundation modules
 assets/css/... foundation styles
 ```
 
-Junie must prefer the smallest coherent implementation over creating dozens of empty placeholder classes.
+Codex must prefer the smallest coherent implementation over creating dozens of empty placeholder classes.
 
 ---
 
 # 41. Forbidden Changes
 
-During Phase 00, Junie MUST NOT:
+During Phase 00, Codex MUST NOT:
 
 - implement Cashier functionality
 - implement Cart business logic
@@ -1128,49 +1128,7 @@ During Phase 00, Junie MUST NOT:
 
 ---
 
-# 42. Phase Exit Report
-
-Junie MUST report:
-
-## Changed
-
-All files created/modified.
-
-## Architecture
-
-Explain the implemented foundation structure.
-
-## Database
-
-Report schema/migrations created.
-
-## Routes
-
-Report routes registered.
-
-## REST
-
-Report endpoints registered.
-
-## Security
-
-Report capability/permission/nonce foundations.
-
-## Verification
-
-Report tests/checks performed.
-
-## Not Implemented
-
-Confirm that Phase 01+ business features were not implemented.
-
-## Issues
-
-List architecture conflicts, environment problems, or assumptions that require review.
-
----
-
-# 43. Final Phase 00 Rule
+# 42. Final Phase 00 Rule
 
 When this phase is complete, stop.
 

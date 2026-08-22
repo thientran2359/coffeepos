@@ -16,13 +16,15 @@ Detailed implementation behavior belongs in architecture, domain, UI, API, datab
 
 The cashier MUST provide:
 
-- category filtering
-- an "All" category
+- category-section navigation
+- an "All" action that returns to the start of the catalog
 - product search by name
-- live search behavior
+- live search suggestions that locate a product in the catalog
 - product stock/availability indication
 
-The feature specification explicitly requires visual category filtering and real-time product-name search.
+All POS-visible products MUST remain grouped in category sections. Selecting a
+category scrolls to its section; selecting a search result scrolls to and
+highlights the matching product. Neither action replaces the full catalog.
 
 ## 2.2 Product Types
 
@@ -46,7 +48,8 @@ A product configuration flow SHOULD support:
 
 The feature baseline explicitly requires quick notes such as less ice, no sugar, extra milk, takeaway, and less sweet.
 
-The exact modifier data model must be defined in the domain/database specifications before implementation.
+Modifier definitions and selections MUST use stable IDs. Modifiers do not change
+price; price-changing choices MUST be represented by WooCommerce variations.
 
 ## 2.4 Cart
 
@@ -60,6 +63,10 @@ The cart MUST support:
 - subtotal
 - discount
 - total
+
+The active cart MUST be stored server-side in the WooCommerce session. Product
+and variation prices MUST come from WooCommerce; browser-supplied prices are
+never authoritative.
 
 ## 2.5 Order Type
 
@@ -176,6 +183,9 @@ The system MUST support:
 
 The customer display MUST:
 
+- display a read-only product menu grouped by WooCommerce category
+- display product names and WooCommerce-derived prices
+- keep the menu visible beside the realtime cart on landscape displays
 - synchronize with cashier state in real time
 - display selected items
 - display quantities
@@ -187,6 +197,13 @@ The customer display MUST:
 - display thank-you state after successful payment
 
 The baseline specification requires `BroadcastChannel` for cashier/customer-display synchronization.
+
+Cashier and Customer Display MUST be scoped to the same `pos_session_id`, render
+the same server-confirmed cart revision, recover an initial/full snapshot when
+opened late, and ignore stale or foreign-session messages.
+
+Both screens MUST consume one shared catalog projection while using independent
+screen-specific PHP templates.
 
 ---
 
@@ -358,6 +375,10 @@ The plugin MUST use supported WooCommerce APIs where practical.
 
 Feature code MUST be organized by responsibility and domain.
 
+Shared data/projection contracts MUST remain independent from screen-specific
+markup. Adding or changing one screen must not require duplicating catalog,
+pricing, cart, or synchronization business rules.
+
 ## UI Consistency
 
 Shared UI components MUST use documented selectors and behavior.
@@ -372,7 +393,6 @@ A phase MUST NOT break completed functionality from previous phases.
 
 The feature baseline does not fully specify:
 
-- modifier persistence model
 - exact custom database tables
 - exact REST/AJAX endpoints
 - exact payment-provider integration

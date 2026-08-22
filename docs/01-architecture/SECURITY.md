@@ -69,10 +69,17 @@ The server must resolve/validate:
 
 - product price
 - variation price
-- modifier price
 - discounts
 - coupon effects
 - total
+
+Current CoffeePOS modifiers and quick notes do not affect price. The server must
+ignore any client-supplied modifier price. A choice that changes price must be
+represented by WooCommerce pricing data, normally a product variation.
+
+Cart mutations must load the cart from the authenticated user's WooCommerce
+session, verify the `pos_session_id`, and reject stale `expected_revision`
+values. The public correlation ID must never be treated as authorization.
 
 ---
 
@@ -193,6 +200,11 @@ Never put important business logic directly inside a controller callback.
 Customer Display synchronization must avoid broadcasting sensitive staff/admin information.
 
 Broadcast only data required for customer presentation.
+
+Never broadcast the WordPress authentication cookie, WooCommerce session token,
+REST nonce, or another credential. `pos_session_id` is an opaque correlation ID
+only. Receivers must reject messages for a different session or an older
+revision.
 
 ---
 

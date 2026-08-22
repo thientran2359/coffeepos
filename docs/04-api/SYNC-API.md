@@ -20,17 +20,32 @@ BroadcastChannel is a transport mechanism for presentation synchronization.
 
 It is not a database and not the source of truth for payment/order data.
 
+Catalog data is not broadcast with every cart event. Cashier and Customer
+Display independently load the same `CatalogView` from `GET /catalog`; the sync
+channel carries session/cart/customer/payment presentation state only.
+
 ---
 
 # 2. Channel
 
-Recommended channel name:
+Required channel name:
 
 ```text
-coffeepos
+coffeepos:<pos_session_id>
 ```
 
-If multiple POS instances/screens must coexist on the same origin, the implementation must define a screen/session identity mechanism so messages are not misrouted.
+`pos_session_id` is the opaque logical cart ID returned by the Cart API. It may
+be passed to the Customer Display URL, but it must never contain or expose the
+WooCommerce session token, authentication cookie, or REST nonce.
+
+Cashier and Customer Display must join the same session-scoped channel. A
+receiver must never subscribe to a global unscoped `coffeepos` channel.
+
+This contract supports tabs/windows in the same browser storage partition and
+origin, including a second monitor attached to the cashier device.
+`BroadcastChannel` does not synchronize separate devices or browser profiles;
+that topology requires an additional server transport in a future documented
+architecture change.
 
 ---
 
@@ -44,6 +59,9 @@ All synchronization messages should use a consistent envelope:
   "type": "cart.updated",
   "message_id": "uuid",
   "timestamp": "2026-08-22T12:00:00Z",
+  "pos_session_id": "01J...",
+  "revision": 8,
+  "source_instance_id": "cashier-window-uuid",
   "source": "cashier",
   "target": "customer",
   "payload": {}
@@ -57,10 +75,17 @@ version
 type
 message_id
 timestamp
+pos_session_id
+revision
+source_instance_id
 source
 target
 payload
 ```
+
+`revision` is the monotonic revision returned by the session Cart API. Messages
+that do not represent cart/application state, such as `display.ready`, carry the
+latest revision known by the sender.
 
 ---
 
@@ -69,6 +94,9 @@ payload
 Baseline message types:
 
 ```text
+display.ready
+state.requested
+state.snapshot
 cart.updated
 customer.updated
 checkout.started
@@ -87,6 +115,41 @@ customer.cleared
 ```
 
 New message types must be documented before implementation.
+
+## 4.1 Session Handshake
+
+Customer Display must not wait for the next cart mutation to obtain state.
+
+```text
+Customer Display opens
+        ↓
+display.ready(last_known_revision)
+        ↓
+Cashier sends state.snapshot
+        ↓
+Customer Display renders current state
+```
+
+When Customer Display detects a revision gap or reconnects after an error, it
+sends `state.requested`; Cashier responds with another `state.snapshot`.
+
+`display.ready` and `state.requested` are control messages only. They cannot
+change the cart or another business state.
+
+`state.snapshot` contains the full latest server-confirmed presentation state:
+
+```json
+{
+  "screen_state": "cart",
+  "cart": {},
+  "customer": null,
+  "payment": null
+}
+```
+
+Cashier should send a snapshot whenever Customer Display reports an older
+revision. Customer Display may also recover with `GET /coffeepos/v1/cart` before
+continuing to consume realtime messages.
 
 ---
 
@@ -113,6 +176,14 @@ Payload:
 ```
 
 The Customer Display should render the projection.
+
+Cashier sends this event only after the Cart API successfully stores the
+mutation and returns the incremented canonical projection.
+
+Cashier broadcasts `cart.updated` immediately after every successful add,
+update, remove, clear, coupon, customer, order-type, or table mutation that
+changes the customer-facing projection. Cart synchronization does not use
+polling. Customer Display renders the accepted revision immediately.
 
 ---
 
@@ -247,9 +318,10 @@ Customer Display must:
 
 1. validate message version
 2. validate message type
-3. validate required payload
-4. ignore unsupported messages safely
-5. update presentation state
+3. require the expected `pos_session_id`
+4. validate `revision` and required payload
+5. ignore unsupported, foreign-session, duplicate, or stale messages safely
+6. update presentation state
 
 Do not mutate server-side business state from an incoming BroadcastChannel message.
 
@@ -257,26 +329,24 @@ Do not mutate server-side business state from an incoming BroadcastChannel messa
 
 # 13. Message Ordering
 
-Messages may arrive quickly.
+State ordering is determined by `revision`, not wall-clock timestamp.
 
-The implementation should prevent stale messages from overwriting newer state.
+- accept a state message only when its revision is greater than the last
+  rendered revision
+- allow `state.snapshot` with the same revision only during initial hydration
+- ignore lower revisions
+- when a revision gap is detected, request a new snapshot
 
-At minimum, compare:
-
-```text
-timestamp
-message ordering/session version
-```
-
-The exact mechanism belongs to the sync implementation.
+Timestamp is diagnostic metadata and must not decide which cart state wins.
 
 ---
 
 # 14. Duplicate Messages
 
-Message handlers should be safe against duplicate delivery where practical.
+Message handlers must be safe against duplicate delivery.
 
-`message_id` can be used to ignore duplicate messages within the relevant session.
+Use `message_id` to ignore a repeated message and `revision` to reject repeated
+state. The deduplication cache is local and bounded to the relevant session.
 
 ---
 
@@ -292,6 +362,9 @@ all
 
 Customer Display should ignore messages not addressed to it unless `target = all`.
 
+Every target check occurs after verifying `pos_session_id`. The `target` field
+alone is not sufficient to isolate terminals.
+
 ---
 
 # 16. Failure Handling
@@ -303,7 +376,11 @@ If synchronization is unavailable:
 - cashier continues operating
 - Customer Display may show its last valid state
 - payment authority remains server-side
-- a customer-facing connection state may be displayed
+- Customer Display shows a neutral reconnecting state
+- Customer Display retries the handshake and may fetch the current session cart
+
+After recovery, a full snapshot must be rendered before incremental events are
+accepted again.
 
 ---
 
@@ -322,6 +399,10 @@ order creation
 inside BroadcastChannel handlers.
 
 Handlers translate an application event into presentation state.
+
+Two-way synchronization means Customer Display may send readiness, snapshot
+requests, and acknowledgements. It does not grant Customer Display authority to
+mutate the cart or confirm payment.
 
 ---
 

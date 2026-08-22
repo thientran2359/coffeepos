@@ -84,6 +84,12 @@ variations
 
 The POS must not assume every product has the same attributes.
 
+`CatalogView` is an application projection, not a new domain aggregate. It
+groups POS-visible WooCommerce products under ordered WooCommerce categories and
+is shared by Cashier and Customer Display. Screen-specific templates decide
+whether a product is interactive, compact, disabled, or hidden without changing
+canonical product identity or price.
+
 ---
 
 # 4. Product Variation
@@ -109,7 +115,9 @@ The UI MUST use product metadata rather than hard-coding attributes such as "Siz
 
 # 5. Modifier / Option
 
-The feature specification requires configurable customer choices such as options/notes, but the exact persistent modifier architecture is not fully defined by the feature source.
+Modifiers are CoffeePOS configuration choices that do not change price in the
+current architecture. Choices that affect price must be modeled as WooCommerce
+variations so WooCommerce remains the pricing source of truth.
 
 Therefore the initial domain concept is:
 
@@ -135,7 +143,10 @@ Milk
 └── Soy
 ```
 
-The final source of modifier configuration and persistence MUST be defined in the database/domain implementation before Phase 03.
+Modifier definitions are stored in CoffeePOS settings with stable group/option
+IDs, labels, selection rules, enabled state, sort order, and optional
+product/category applicability. Product detail projections expose only the
+modifier groups applicable to the selected product.
 
 Modifiers MUST NOT be implemented as arbitrary undocumented post meta.
 
@@ -147,6 +158,9 @@ Cart is a temporary POS domain aggregate.
 
 ```text
 Cart
+├── pos_session_id
+├── revision
+├── currency
 ├── CartItem[]
 ├── CustomerContext
 ├── OrderType
@@ -158,6 +172,11 @@ Cart
 The cart exists before a WooCommerce order is created.
 
 The cart is NOT a WooCommerce order.
+
+The active Cart is stored in the WooCommerce session and addressed by an opaque
+`pos_session_id`. It also has a monotonic `revision` used for concurrency and
+Cashier/Customer Display synchronization. The identifier is not a credential
+and must not expose the WooCommerce session token.
 
 ---
 
@@ -179,6 +198,11 @@ line_total_display
 ```
 
 The final trusted price must be resolved/validated server-side.
+
+The browser does not create a CartItem with an authoritative unit price. The
+application resolves product/variation price through WooCommerce, then creates
+or refreshes the CartItem using that price. Modifier and quick-note selections
+do not alter price.
 
 A cart item may include:
 
@@ -500,6 +524,11 @@ WooCommerce remains outside CoffeePOS domain aggregates and is accessed through 
 - quantity must be positive
 - cart item must identify a purchasable WooCommerce product/variation
 - required variations must be selected
+- active cart must belong to the current WooCommerce session and `pos_session_id`
+- each successful mutation increments the cart revision
+- stale expected revisions must not overwrite newer cart state
+- product/variation price must be resolved through WooCommerce
+- modifiers and quick notes do not change price
 - totals must be validated server-side
 
 ### Order Type
@@ -565,7 +594,6 @@ UI-only state MUST NOT be persisted as domain data.
 
 The source feature specification does not fully define:
 
-- modifier persistence
 - membership/points storage
 - full table management
 - payment-provider abstraction

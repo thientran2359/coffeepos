@@ -30,7 +30,7 @@ Establish the documentation and development rules.
 - define UI architecture
 - define API contracts
 - define coding standards
-- define Junie rules
+- define Codex project instructions
 
 ## No feature implementation
 
@@ -42,7 +42,7 @@ This phase should not implement cashier, checkout, KDS, or reporting functionali
 - domain terminology is defined
 - state transitions are defined
 - data ownership is defined
-- Junie can determine what it is allowed to implement
+- Codex can determine what it is allowed to implement
 
 ---
 
@@ -88,7 +88,7 @@ Build the cashier screen structure.
 - header
 - category navigation
 - search area
-- product grid
+- catalog category sections
 - cart area
 - order type UI
 - customer area
@@ -117,8 +117,10 @@ Implement the core order-entry engine.
 ## Work
 
 - product loading
-- category filtering
+- category-section rendering
+- category scroll navigation and scroll-spy
 - live search
+- search-to-product navigation
 - stock display
 - simple product handling
 - variable product handling
@@ -129,6 +131,8 @@ Implement the core order-entry engine.
 - quick notes
 - custom note
 - add to cart
+- WooCommerce session-backed active cart
+- cart revision/concurrency contract
 - cart item rendering
 - cart item editing
 - quantity changes
@@ -137,6 +141,7 @@ Implement the core order-entry engine.
 - subtotal
 - discount foundation
 - total calculation
+- WooCommerce-owned product/variation pricing
 
 ## Core Flow
 
@@ -218,8 +223,13 @@ Provide the customer-facing display.
 
 - customer display route
 - display shell
+- read-only product menu grouped by category
+- shared CatalogView rendering
 - cashier synchronization
 - BroadcastChannel message contract
+- `pos_session_id` channel isolation
+- revision ordering
+- ready/request/snapshot recovery
 - cart display
 - customer display
 - payment display
@@ -386,7 +396,6 @@ A phase is complete only when:
 3. Relevant tests/checks pass.
 4. No known previous-phase functionality is broken.
 5. Documentation matches the implementation.
-6. Junie's completion report identifies all changes and remaining issues.
 
 ---
 

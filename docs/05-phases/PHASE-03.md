@@ -11,7 +11,7 @@ This is the first phase where the cashier can perform a real product-selection a
 Primary workflow:
 
 ```text
-Product Grid
+Catalog Category Sections
     ↓
 Select Product
     ↓
@@ -39,8 +39,9 @@ Cart Summary
 At the end of this phase:
 
 - real WooCommerce products can be shown in the Cashier
-- categories can filter products
-- live product search works
+- all products are grouped into category sections
+- category navigation scrolls to sections and follows manual scrolling
+- live product search locates and highlights products without replacing catalog
 - simple products can be added
 - variable products can be configured through a modal
 - variations are resolved using the full WooCommerce attribute set
@@ -61,10 +62,10 @@ At the end of this phase:
 
 # 2. Prerequisites
 
-Junie MUST read:
+Codex MUST read:
 
 ```text
-JUNIE.md
+AGENTS.md
 
 docs/00-project/PROJECT.md
 docs/00-project/REQUIREMENTS.md
@@ -82,6 +83,7 @@ docs/02-database/WOOCOMMERCE-DATA.md
 
 docs/03-ui/UI-ARCHITECTURE.md
 docs/03-ui/COMPONENTS.md
+docs/03-ui/CATALOG-UI.md
 docs/03-ui/CASHIER-UI.md
 
 docs/04-api/API-ARCHITECTURE.md
@@ -94,7 +96,7 @@ docs/05-phases/PHASE-01.md
 docs/05-phases/PHASE-02.md
 ```
 
-Junie MUST inspect the actual implementation of:
+Codex MUST inspect the actual implementation of:
 
 ```text
 Phase-00 infrastructure
@@ -115,7 +117,10 @@ Do not recreate contracts that already exist.
 ```text
 Real WooCommerce product loading
 Real category loading
-Live product search
+CatalogView grouped by category
+Category section rendering
+Category scroll navigation and scroll-spy
+Local product search index and product-location behavior
 Product availability display
 Product Card real data
 Simple product selection
@@ -194,25 +199,32 @@ The browser MUST NOT reimplement Phase-01 business rules.
 
 ---
 
-# 5. Product Data Flow
+# 5. Catalog Data Flow
 
-Product list:
+Catalog:
 
 ```text
 Cashier
  ↓
-Product API
+Catalog API
  ↓
-ProductService
+CatalogService
+ ├──→ CategoryGatewayInterface
+ └──→ ProductGatewayInterface
+             ↓
+         WooCommerce
  ↓
-ProductGatewayInterface
+CatalogView(categories → products)
  ↓
-WooCommerce
+TemplateRenderer
  ↓
-ProductView[]
- ↓
-Cashier Product Grid
+Cashier Category Sections
 ```
+
+`CatalogService` and `CatalogView` are screen-neutral application contracts.
+They must not accept a Cashier/Customer Display layout mode or contain markup.
+Category/product ordering and occurrence keys are produced once and reused by
+both screens.
 
 Product detail:
 
@@ -237,10 +249,19 @@ Use the API contract already established in `POS-API.md`.
 Relevant endpoints:
 
 ```text
-GET /coffeepos/v1/products
+GET /coffeepos/v1/catalog
 GET /coffeepos/v1/products/{id}
+```
+
+Supporting generic endpoints may remain available for other use cases:
+
+```text
+GET /coffeepos/v1/products
 GET /coffeepos/v1/categories
 ```
+
+Cashier category clicks and search must not call the supporting filtered
+endpoints.
 
 Do not invent a second product API contract.
 
@@ -250,9 +271,11 @@ REST controllers MUST remain thin.
 
 ---
 
-# 7. Product List
+# 7. Product Catalog
 
-The product grid must load real WooCommerce products.
+Cashier loads the complete POS-visible `CatalogView` and renders every ordered
+category section. `GET /catalog` is the primary screen endpoint; paged product
+and category endpoints remain supporting contracts.
 
 Each product should expose the data needed by the Product Card:
 
@@ -270,6 +293,9 @@ has_variations
 Use `ProductView`.
 
 Do not expose raw WooCommerce product objects.
+
+Category/product grouping must come from `CatalogService`. JavaScript must not
+reconstruct category membership from incomplete or separately paginated data.
 
 ---
 
@@ -291,18 +317,21 @@ Category Click
  ↓
 Update active category
  ↓
-Product query
+Locate category section
  ↓
-Replace product grid
+Scroll section into catalog viewport
 ```
 
 The active category must remain visually selected.
+
+Manual scrolling updates active category through scroll-spy. Category actions
+must not filter, hide, refetch, or rebuild products. `All` scrolls to the start.
 
 ---
 
 # 9. Product Search
 
-Search must be live.
+Search must be live and operate against the complete loaded `CatalogView`.
 
 Recommended flow:
 
@@ -311,14 +340,19 @@ User types
  ↓
 Debounce
  ↓
-Product API request
+Search local catalog index
  ↓
-Loading state
+Suggestion results
  ↓
-Product results
+Select result / Enter
+ ↓
+Scroll to category + product occurrence
+ ↓
+Highlight product + update active category
 ```
 
-Do not request on every keypress without debounce.
+Do not request the Product API on every keypress. Normalize Vietnamese
+diacritics and case for matching.
 
 Recommended initial debounce range:
 
@@ -332,38 +366,34 @@ The exact value may be chosen by implementation.
 
 # 10. Search + Category Interaction
 
-The implementation must define a deterministic rule when both are active.
+Category and search are two navigation paths over the same unchanged catalog.
 
-Recommended:
-
-```text
-search term
-+
-selected category
-→
-server/product query
-```
-
-Clearing search should return to the current selected category rather than blindly resetting the entire menu.
-
-If the API contract cannot support combined filtering, document the limitation rather than inventing client-side filtering of an incomplete product set.
+- Category click locates a category section.
+- Search result locates a specific product occurrence and its category.
+- Selecting a search result updates active category.
+- Clearing search closes suggestions and preserves catalog/scroll position.
+- No-result state appears only in the search result panel.
+- Product selection remains a separate explicit action after navigation.
 
 ---
 
-# 11. Product Loading States
+# 11. Catalog Loading States
 
-The grid must support:
+The catalog must support:
 
 ```text
 initial loading
-search loading
-category loading
-empty result
+refreshing
+empty catalog
 error
 normal
 ```
 
-Avoid visually destroying the entire grid for a small refresh when targeted updates are possible.
+The search suggestion panel separately supports normal, empty, and closed
+states. Searching or category navigation must not put the catalog into a loading
+state because both operate on the loaded `CatalogView`.
+
+Do not clear a previously valid catalog until a refresh succeeds.
 
 ---
 
@@ -640,8 +670,8 @@ Example:
 ```text
 Milk
 ├── Regular
-├── Oat +10k
-└── Soy +10k
+├── Oat
+└── Soy
 ```
 
 The UI must follow the actual group rules provided by the application.
@@ -667,13 +697,12 @@ Selection changes should update:
 
 ```text
 selected modifier state
-display price projection where available
 validation state
 ```
 
-The final authoritative value must come from the application/domain layer.
-
-The browser must not invent modifier pricing.
+Modifiers do not change price in the current architecture. Any option that
+changes price must be configured as a WooCommerce variation. Product/variation
+price remains authoritative through the application/WooCommerce layer.
 
 ---
 
@@ -791,11 +820,15 @@ Flow:
 ```text
 Add
  ↓
-construct configured CartItem input
+send product/configuration + expected_revision
  ↓
-CartService
+Cart API loads WooCommerce session cart
  ↓
-updated CartView
+resolve WooCommerce price + CartService mutation
+ ↓
+save session cart + increment revision
+ ↓
+updated CartView projection
  ↓
 close modal
  ↓
@@ -1139,14 +1172,15 @@ Suggested additions:
 ```text
 assets/js/
 ├── api/
+│   ├── catalog.js
 │   ├── products.js
-│   ├── categories.js
 │   └── cart.js
 │
 ├── components/
 │   ├── product-card.js
-│   ├── product-grid.js
-│   ├── category-nav.js
+│   ├── catalog-renderer.js
+│   ├── category-section-navigator.js
+│   ├── product-search-navigator.js
 │   ├── product-modal.js
 │   ├── variation-selector.js
 │   ├── modifier-selector.js
@@ -1154,6 +1188,9 @@ assets/js/
 │   ├── quantity-control.js
 │   ├── cart-panel.js
 │   └── cart-item.js
+│
+├── ui/
+│   └── template-renderer.js
 │
 ├── state/
 │   └── cashier-store.js
@@ -1173,15 +1210,17 @@ Do not duplicate an existing module.
 The client may maintain a projection of:
 
 ```text
-products
-categories
+catalog view
+catalog search index
 current search
 active category
 product modal state
 cart view
 ```
 
-The cart domain state is still authoritative through the application layer.
+The cart domain state is authoritative in the WooCommerce session through the
+application layer. The client stores only the latest projection, including
+`pos_session_id` and `revision`.
 
 The frontend store MUST NOT invent alternate business rules.
 
@@ -1207,6 +1246,9 @@ The API client should:
 - return application-friendly results
 
 Components should not know raw endpoint URLs.
+
+The API client returns JSON projections. It must not request or accept rendered
+HTML as the normal component response contract.
 
 ---
 
@@ -1236,25 +1278,22 @@ Errors:
 
 Do not introduce a new frontend response shape.
 
+The `data` member contains JSON projections only. It must not contain HTML
+fragments for product, category, variation, or cart rendering.
+
 ---
 
 # 48. API Endpoints Used
 
-At minimum:
+Required session/cart operations:
 
 ```text
+POST /coffeepos/v1/cart/session
+GET /coffeepos/v1/cart
+GET /coffeepos/v1/catalog
 GET /coffeepos/v1/categories
 GET /coffeepos/v1/products
 GET /coffeepos/v1/products/{id}
-```
-
-Cart operations may use an existing endpoint if implemented during Phase 03.
-
-If additional endpoints are required, document them before implementation.
-
-Recommended conceptual operations:
-
-```text
 POST /coffeepos/v1/cart/validate
 POST /coffeepos/v1/cart/items
 PATCH /coffeepos/v1/cart/items/{key}
@@ -1277,7 +1316,18 @@ authoritative price
 payment state
 ```
 
-The API may accept cart configuration/product IDs/quantities and return the server/application projection.
+The API accepts `pos_session_id`, `expected_revision`, product/variation IDs,
+configuration, and quantities. It loads the cart from the WooCommerce session,
+resolves price from WooCommerce, performs the mutation, increments the revision,
+and returns the full canonical projection.
+
+Application code accesses session persistence through
+`CartSessionStoreInterface`. A WooCommerce integration adapter implements that
+contract and owns Cart serialization/hydration. REST controllers and domain
+objects must not call `WC()->session` directly.
+
+Do not accept a browser-owned cart snapshot or client-supplied price as the
+authoritative mutation source.
 
 ---
 
@@ -1289,7 +1339,7 @@ Expected conceptual additions:
 
 ```text
 templates/cashier/
-├── product-grid.php
+├── catalog.php
 ├── product-modal.php
 ├── cart-items.php
 └── ...
@@ -1299,7 +1349,9 @@ And reusable components:
 
 ```text
 templates/components/
+├── catalog-category.php
 ├── product-card.php
+├── product-search-result.php
 ├── cart-item.php
 ├── variation-selector.php
 ├── modifier-group.php
@@ -1309,36 +1361,49 @@ templates/components/
 
 Only create templates actually used.
 
-Do not move product/card HTML into large JavaScript strings.
+PHP templates must emit the native `<template>` blueprints required by dynamic
+lists and nested options. Each dynamic component has one markup definition.
+
+Do not duplicate product, category, variation, modifier, or cart-item markup in
+JavaScript strings or a second PHP fragment used only for AJAX.
 
 ---
 
-# 51. Product Card Rendering
+# 51. Catalog and Product Rendering
 
-Preferred:
+Required flow:
 
 ```text
-PHP template
-    ↓
-ProductView data
-    ↓
-Product Card
+PHP-owned category/product templates + CatalogView JSON
+                         ↓
+                  TemplateRenderer
+                         ↓
+       Category Sections + Product Card fragments
 ```
 
-For subsequent dynamic search/category updates, the implementation may:
+Catalog renders once from the complete grouped projection. Category navigation
+and search locate existing fragments; they do not request or rerender filtered
+product collections.
 
-- re-render a PHP fragment
-- render a tightly scoped client-side view from a documented data structure
+Required template bindings:
 
-PHP templates remain the preferred HTML structure where server fragments are practical.
+```text
+data-field
+data-attr
+data-key
+```
 
-Do not introduce a second templating engine.
+Do not return PHP-rendered HTML fragments for standard catalog updates. Do
+not introduce Handlebars or a component-specific renderer.
 
 ---
 
 # 52. Product Modal HTML
 
 Product Modal structure must be server-defined.
+
+Variation groups, variation options, modifiers, and quick notes received as
+JSON must use named PHP-owned `<template>` blueprints and the shared renderer.
 
 JavaScript may update:
 
@@ -1360,7 +1425,11 @@ Do not build the whole modal as a JavaScript template literal.
 The following should remain stable:
 
 ```text
-data-component="product-grid"
+data-component="catalog-scroll"
+data-component="catalog-section-list"
+data-component="catalog-category-section"
+data-component="catalog-category-products"
+data-component="product-search-results"
 data-component="product-card"
 data-component="product-modal"
 data-component="variation-selector"
@@ -1374,6 +1443,8 @@ data-component="cart-item"
 Actions:
 
 ```text
+scroll-category
+locate-product
 select-product
 select-variation
 select-modifier
@@ -1393,12 +1464,22 @@ Do not use CSS styling classes as the primary JS contract.
 
 # 54. Loading / Error / Empty UX
 
-## Product Grid
+## Product Catalog
 
 ```text
 loading
 empty
 error
+normal
+refreshing
+```
+
+## Search Suggestions
+
+```text
+closed
+results
+empty
 ```
 
 ## Product Modal
@@ -1450,7 +1531,7 @@ variation unavailable
 
 must prevent Add to Cart.
 
-Do not rely only on the initial product-grid stock state.
+Do not rely only on the initial catalog product stock state.
 
 The application must validate availability when necessary.
 
@@ -1498,10 +1579,11 @@ Use:
 ```text
 pending state
 button disabling
-request identity where appropriate
+expected_revision
 ```
 
-Do not create duplicate cart mutations.
+Do not create duplicate cart mutations. A stale mutation must receive
+`cart_revision_conflict`, load the latest projection, and reconcile visibly.
 
 ---
 
@@ -1538,7 +1620,9 @@ Do not:
 
 No new database tables may be created in Phase 03.
 
-Do not persist the active Cart to a custom table.
+Persist the active Cart through the WooCommerce session API under an opaque
+`pos_session_id`; do not create a custom table, WordPress option, browser-owned
+source of truth, or draft WooCommerce order for it.
 
 Suspended Cart belongs to a later phase.
 
@@ -1566,16 +1650,16 @@ Phase 03 is complete when:
 
 ## Product Menu
 
-1. Real WooCommerce categories load.
-2. Active category works.
-3. Real WooCommerce products load.
-4. Product cards show name/image/price.
-5. Product availability is visible.
-6. Live product search works.
-7. Search is debounced.
-8. Search empty state works.
-9. Search error state works.
-10. Category and search interaction is deterministic.
+1. Complete CatalogView loads from real WooCommerce data.
+2. All visible products render in ordered category sections.
+3. Product cards show name/image/price.
+4. Product availability is visible.
+5. Category click scrolls to the matching section without refetch/filtering.
+6. Manual scrolling updates active category without oscillation.
+7. `All` returns to the beginning of the catalog.
+8. Live local search returns product suggestions.
+9. Selecting a result scrolls to and highlights the exact occurrence.
+10. Clear/no-result behavior preserves the complete catalog and scroll position.
 
 ## Simple Product
 
@@ -1597,7 +1681,7 @@ Phase 03 is complete when:
 
 21. Modifier groups render from configuration.
 22. Modifier selection rules are respected.
-23. Modifier price projection updates appropriately.
+23. Modifiers do not alter the WooCommerce product/variation price.
 24. Quick notes can be selected.
 25. Quick notes have stable IDs.
 26. Custom note can be entered.
@@ -1628,9 +1712,30 @@ Phase 03 is complete when:
 ## Reliability
 
 44. Duplicate rapid actions are prevented.
-45. Stale search requests cannot overwrite newer results.
+45. A stale catalog refresh cannot overwrite a newer catalog projection.
 46. Modal stale data cannot overwrite active product state.
 47. Errors preserve user work where possible.
+
+## Template Rendering
+
+48. AJAX/REST component responses contain JSON projections, not HTML fragments.
+49. Category sections, products, variations, and cart lists use the shared `TemplateRenderer`.
+50. Template text bindings do not interpret JSON values as HTML.
+51. Boolean attributes and stable keys follow the documented binding contract.
+52. Unknown or malformed template bindings fail predictably.
+
+## Session Cart
+
+53. A new `pos_session_id` creates an empty WooCommerce session cart.
+54. Cart mutations load and save the server-side session cart.
+55. Every successful mutation increments `revision`.
+56. A stale `expected_revision` is rejected without overwriting newer state.
+57. Client-supplied prices are ignored.
+58. Product and variation prices are resolved from WooCommerce.
+59. The returned projection contains the full cart state needed by Cashier and
+    later Customer Display synchronization.
+60. Session persistence is accessed through `CartSessionStoreInterface`, not
+    directly from REST controllers or domain objects.
 
 ---
 
@@ -1639,13 +1744,13 @@ Phase 03 is complete when:
 ## Product
 
 ```text
-TC-01 load categories
-TC-02 load product list
-TC-03 category filter
-TC-04 live search
-TC-05 empty search result
-TC-06 product load error
-TC-07 out-of-stock product
+TC-01 load grouped CatalogView from WooCommerce
+TC-02 render ordered category sections and all products
+TC-03 category click scrolls without refetch/filtering
+TC-04 manual scroll updates active category
+TC-05 local live search suggestions
+TC-06 result locate/highlight and no-result preserves catalog
+TC-07 catalog load error and out-of-stock presentation
 ```
 
 ## Variation
@@ -1704,6 +1809,28 @@ TC-37 modal stale request
 TC-38 failed cart mutation preserves state
 ```
 
+## Template Rendering
+
+```text
+TC-39 category JSON renders from PHP-owned template
+TC-40 product JSON renders from PHP-owned template
+TC-41 nested variation JSON renders from named templates
+TC-42 CartView JSON renders cart items and stable keys
+TC-43 markup-like JSON values render as text, not HTML
+```
+
+## Session Cart
+
+```text
+TC-44 create and reload WooCommerce session cart
+TC-45 successful mutation increments revision
+TC-46 stale revision returns cart_revision_conflict
+TC-47 separate pos_session_id values do not share cart state
+TC-48 client price is ignored
+TC-49 WooCommerce product/variation price is used
+TC-50 session cart serializes and hydrates without losing item configuration
+```
+
 ---
 
 # 64. Browser Verification
@@ -1716,9 +1843,11 @@ Minimum browser checks:
 
 ```text
 Cashier route opens
-Category click
-Product grid
-Search
+Catalog category sections
+Category click scroll
+Manual-scroll category tracking
+Search suggestions
+Search result locate/highlight
 Simple product add
 Variable product modal
 Variation selection
@@ -1739,96 +1868,14 @@ Do not claim these passed unless actually tested in a browser.
 
 ---
 
-# 65. Completion Report
-
-Junie MUST report:
-
-## Changed
-
-All created/modified files.
-
-## Product
-
-How products/categories/search were connected.
-
-## Variation
-
-How full attribute-set variation resolution is used.
-
-## Modifiers
-
-How modifier configuration is represented.
-
-## Notes
-
-Quick notes/custom note behavior.
-
-## Cart
-
-How CartService/CartView is integrated.
-
-## API
-
-Endpoints created/used.
-
-## UI
-
-New templates/components/modules.
-
-## Selectors
-
-New stable `data-component`/`data-action` contracts.
-
-## Tests
-
-For each relevant test:
-
-```text
-PASS
-FAIL
-BLOCKED
-```
-
-## Browser Verification
-
-List actual browser-tested flows.
-
-## Scope
-
-Explicitly confirm that these were NOT implemented:
-
-```text
-customer lookup
-membership
-dine-in/table business logic
-coupons
-checkout
-payment
-order creation
-Customer Display
-KDS
-Order Queue
-Order History
-Shift
-Reports
-Refund
-Suspended Cart
-```
-
-## Issues
-
-List remaining technical/architecture issues.
-
----
-
-# 66. Definition of Done
+# 65. Definition of Done
 
 Phase 03 is complete only when:
 
 ```text
 Real WooCommerce products
         ↓
-Cashier Product Grid
+Cashier Catalog Category Sections
         ↓
 Product Configuration Modal
         ↓
@@ -1847,7 +1894,7 @@ The implementation must remain compatible with the Phase-01 domain/application c
 
 ---
 
-# 67. Final Phase 03 Rule
+# 66. Final Phase 03 Rule
 
 When Phase 03 is complete:
 

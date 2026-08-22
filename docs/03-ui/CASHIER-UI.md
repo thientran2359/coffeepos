@@ -6,10 +6,10 @@
 
 The Cashier is the primary POS workflow.
 
-The baseline feature specification requires:
+The Cashier workflow requires:
 
-- category filtering
-- live product search
+- category-section navigation
+- live product search that locates products in those sections
 - stock visibility
 - simple and variable products
 - variation modal
@@ -37,8 +37,10 @@ CASHIER
 │
 ├── MENU
 │   ├── Search
-│   ├── Categories
-│   └── Product Grid
+│   ├── Sticky Category Navigation
+│   └── Catalog Scroll Region
+│       └── Category Section[]
+│           └── Product Card[]
 │
 ├── CART
 │   ├── Order Type
@@ -110,37 +112,49 @@ Categories should be data-driven.
 ```text
 click category
 → update active category
-→ load/filter product grid
+→ scroll catalog region to category section
 ```
 
 Active category must have a clear visual state.
+
+Manual catalog scrolling updates the active category through scroll-spy. A
+category click must not hide products, issue another product request, or rebuild
+the catalog. `All` returns to the beginning of the catalog.
 
 ---
 
 # 5. Product Search
 
-Search is live.
+Search is a live catalog locator.
 
 Flow:
 
 ```text
 input
 → debounce
-→ product query
-→ loading state
-→ results
+→ search the loaded CatalogView index
+→ matching suggestions
+→ select result
+→ scroll to and highlight product
 ```
 
 Requirements:
 
 - search by product name
-- preserve current category behavior according to product query contract
-- show empty state
+- normalize case and Vietnamese diacritics
+- include category/product occurrence identity in every result
+- update active category after locating a result
+- show no-result state without replacing the main catalog
 - allow clearing search
+- support keyboard result navigation
 
 ---
 
-# 6. Product Grid
+# 6. Product Catalog Sections
+
+All POS-visible products are grouped by WooCommerce category in one scrollable
+catalog. The shared grouping and navigation contract belongs in
+`CATALOG-UI.md`.
 
 Each product card should show:
 
@@ -153,6 +167,9 @@ variation indicator where useful
 ```
 
 Product availability is visible before selection.
+
+The same product may appear in multiple categories through a unique occurrence
+key while retaining its canonical product ID.
 
 Click behavior:
 
@@ -278,8 +295,8 @@ Example:
 ```text
 Milk
 ○ Regular
-○ Oat +10k
-○ Soy +10k
+○ Oat
+○ Soy
 ```
 
 The final selection rule must follow the configured modifier group:
@@ -294,6 +311,9 @@ maximum
 ```
 
 Those rules must come from the modifier configuration.
+
+Modifiers do not change price. Price-changing choices must be represented by a
+WooCommerce variation and use its WooCommerce price.
 
 ---
 
@@ -378,17 +398,17 @@ Flow:
 ```text
 Add
  ↓
-construct cart item
+send product/configuration + expected_revision
  ↓
-Cart Service
+Cart API / WooCommerce session
  ↓
-cart updated
+server resolves WooCommerce price
  ↓
-close modal
+canonical cart projection + revision
  ↓
 update cart UI
  ↓
-sync customer display
+broadcast same projection to Customer Display
 ```
 
 Do not directly manipulate the final WooCommerce order at this point.
@@ -461,7 +481,9 @@ Discount
 Total
 ```
 
-The UI may update optimistically for responsiveness, but checkout must recalculate/validate trusted totals server-side.
+The UI shows a pending state during a mutation and replaces totals with the
+server-confirmed projection. It must not calculate or broadcast an optimistic
+price/total as confirmed state.
 
 ---
 
@@ -669,28 +691,32 @@ Exact shortcuts should be documented before implementation if enabled.
 
 The Cashier UI is complete for this specification when:
 
-1. Categories can be selected.
-2. Products can be searched live.
-3. Stock state is visible.
-4. Simple products can be selected.
-5. Variable products open a configuration modal.
-6. Required variation choices are enforced.
-7. Variation price/availability updates correctly.
-8. Modifiers can be selected according to configuration.
-9. Quick notes can be selected.
-10. Free-form notes can be entered.
-11. Quantity can be changed.
-12. Configured items can be added to cart.
-13. Existing cart items can be edited.
-14. Cart items can be removed.
-15. Cart can be cleared with confirmation.
-16. Subtotal, discount and total are displayed.
-17. Dine-in and takeaway are selectable.
-18. Dine-in can select a table.
-19. Customer can be guest/member.
-20. Customer can be found by phone.
-21. Coupons can be applied and removed.
-22. Cart can be held and resumed.
-23. Checkout cannot begin with invalid cart state.
-24. Loading and error states are visible.
-25. No critical business decision relies only on client-side state.
+1. All products render in WooCommerce category sections.
+2. Category click scrolls to the matching section without filtering/refetching.
+3. Manual scrolling updates the active category.
+4. Product search returns live local suggestions.
+5. Selecting a search result scrolls to and highlights the exact product.
+6. Search/no-result/clear behavior does not replace the catalog.
+7. Stock state is visible.
+8. Simple products can be selected.
+9. Variable products open a configuration modal.
+10. Required variation choices are enforced.
+11. Variation price/availability updates correctly.
+12. Modifiers can be selected according to configuration.
+13. Quick notes can be selected.
+14. Free-form notes can be entered.
+15. Quantity can be changed.
+16. Configured items can be added to cart.
+17. Existing cart items can be edited.
+18. Cart items can be removed.
+19. Cart can be cleared with confirmation.
+20. Subtotal, discount and total are displayed.
+21. Dine-in and takeaway are selectable.
+22. Dine-in can select a table.
+23. Customer can be guest/member.
+24. Customer can be found by phone.
+25. Coupons can be applied and removed.
+26. Cart can be held and resumed.
+27. Checkout cannot begin with invalid cart state.
+28. Loading and error states are visible.
+29. No critical business decision relies only on client-side state.

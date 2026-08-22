@@ -8,13 +8,34 @@ This document defines reusable UI components and behavior hooks.
 
 Components should be reused rather than independently recreated on each screen.
 
+## Dynamic rendering contract
+
+Repeated components are defined by native `<template>` elements emitted from
+PHP and populated from AJAX/REST JSON by the shared `TemplateRenderer`.
+
+| Component | Template ID | Target | Stable key |
+|---|---|---|---|
+| Category button | `coffeepos-category-button-template` | `data-component="category-list"` | `id` |
+| Catalog category | `coffeepos-catalog-category-template` | `data-component="catalog-section-list"` | `id` |
+| Product card | `coffeepos-product-card-template` | `data-component="catalog-category-products"` | `occurrence_key` |
+| Search result | `coffeepos-product-search-result-template` | `data-component="product-search-results"` | `occurrence_key` |
+| Customer category | `coffeepos-customer-category-template` | `data-component="customer-catalog-sections"` | `id` |
+| Customer product row | `coffeepos-customer-product-row-template` | `data-component="customer-category-products"` | `occurrence_key` |
+| Cart item | `coffeepos-cart-item-template` | `data-component="cart-item-list"` | `item_id` |
+| Variation group | `coffeepos-variation-group-template` | `data-component="variation-selector"` | `name` |
+| Variation option | `coffeepos-variation-option-template` | `data-component="variation-option-list"` | `value` |
+
+Component controllers may manage state and nested rendering, but they must not
+duplicate these structures in JavaScript strings. The JSON fields consumed by a
+template are part of that component's projection contract.
+
 ---
 
 # 2. Product Card
 
 ## Purpose
 
-Represent one sellable WooCommerce product in the cashier grid.
+Represent one sellable WooCommerce product in a Cashier category section.
 
 ## Required display
 
@@ -63,7 +84,7 @@ Clicking an out-of-stock product must not add it directly to the cart.
 
 ## Purpose
 
-Filter products by category.
+Navigate to product category sections in the loaded catalog.
 
 Baseline categories include:
 
@@ -76,6 +97,10 @@ Coffee
 ```
 
 The implementation must load actual WooCommerce categories rather than hard-code all categories.
+
+Clicking a category scrolls the catalog region to its section. Manual scrolling
+updates active state through scroll-spy. Navigation must not filter, hide,
+refetch, or rebuild the catalog.
 
 ## State
 
@@ -96,12 +121,14 @@ Live product search.
 
 Behavior:
 
-- debounce user input
-- show loading state
-- update product grid
-- support empty results
+- search the loaded CatalogView index
+- show matching suggestions
+- support empty results without clearing the catalog
+- scroll to and highlight the selected product occurrence
+- support keyboard navigation
 
-Avoid sending a request for every keystroke.
+Search suggestions use product/category occurrence identity. Search does not
+send a catalog request for every keystroke and never adds a product directly.
 
 ---
 
@@ -182,6 +209,10 @@ Milk
 ```
 
 The exact modifier source and rules are defined by the database/domain documentation.
+
+Modifier options do not display or apply a CoffeePOS price adjustment. A
+price-changing choice belongs in the Variation Selector and uses WooCommerce
+variation pricing.
 
 ---
 
@@ -280,7 +311,8 @@ fees
 
 The exact total breakdown depends on WooCommerce configuration.
 
-The browser display is not authoritative.
+The component renders the latest server-confirmed WooCommerce session cart
+projection. The browser does not calculate authoritative totals.
 
 ---
 
@@ -581,4 +613,3 @@ retry action where possible
 ```
 
 Do not expose stack traces or raw server exceptions.
-

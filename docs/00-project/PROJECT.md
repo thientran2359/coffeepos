@@ -41,7 +41,7 @@ The feature source defines these major functional areas and the required behavio
 12. Provide shift reconciliation.
 13. Provide business reporting.
 
-The feature specification explicitly requires a full-screen POS interface optimized for touch screens, POS terminals, and tablets. It also defines dedicated URL routes for the major POS screens. 
+The feature specification explicitly requires a full-screen POS interface optimized for touch screens, POS terminals, and tablets. It also defines dedicated URL routes for the major POS screens.
 
 ---
 
@@ -67,10 +67,16 @@ It includes:
 - quick stock adjustment
 - checkout
 
+Products are presented as a complete catalog grouped into category sections.
+Category navigation and search locate content by scrolling rather than replacing
+the catalog with filtered grids.
+
 ### Customer Display
 
 The customer display shows:
 
+- read-only product menu grouped by category
+- product names and WooCommerce-derived prices
 - current cart
 - item quantities
 - item prices
@@ -81,6 +87,10 @@ The customer display shows:
 - thank-you state
 
 The feature specification requires real-time synchronization between cashier and customer display through `BroadcastChannel`.
+
+This synchronization is a primary product requirement. The Customer Display
+must show the same server-confirmed cart projection and WooCommerce-derived
+prices as the Cashier, scoped to the same active POS session.
 
 ### KDS
 
@@ -157,13 +167,20 @@ CoffeePOS may add POS-specific metadata or infrastructure where required and doc
 
 ## 5. Frontend Philosophy
 
-CoffeePOS uses server-rendered PHP templates and Vanilla JavaScript.
+CoffeePOS uses PHP-owned templates and Vanilla JavaScript.
 
-The UI should be structured as reusable components rather than large monolithic templates.
+PHP renders each screen shell and defines reusable dynamic component markup in
+native `<template>` elements. AJAX/REST endpoints return JSON projections, and
+the project-owned `TemplateRenderer` clones those templates and binds the JSON
+data into the DOM.
 
-HTML structure belongs to PHP templates.
+The UI should be structured as reusable components rather than large monolithic
+templates. JavaScript controls behavior, state transitions, requests, and
+targeted rendering; it does not own HTML structure or authoritative business
+data.
 
-JavaScript should control behavior and state transitions rather than define the entire HTML application.
+The active cart is stored in the WooCommerce session. Browser cart state is a
+rendering projection, not an independent cart or pricing engine.
 
 ---
 

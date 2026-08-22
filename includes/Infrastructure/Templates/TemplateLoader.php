@@ -40,6 +40,29 @@ final class TemplateLoader
         return $templateFile;
     }
 
+    /**
+     * Render a small PHP-owned UI fragment for targeted browser replacement.
+     *
+     * The fragment data is intentionally local to this call; it is not shared
+     * with screen-template context.
+     */
+    public function renderComponent(string $component, array $data = []): string
+    {
+        $normalizedComponent = sanitize_file_name($component);
+        $templateFile = $this->templatePath . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR . $normalizedComponent . '.php';
+
+        if (! is_readable($templateFile)) {
+            return '';
+        }
+
+        extract($data, EXTR_SKIP);
+
+        ob_start();
+        require $templateFile;
+
+        return (string) ob_get_clean();
+    }
+
     public static function context(): array
     {
         return self::$context;

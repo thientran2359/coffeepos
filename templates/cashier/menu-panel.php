@@ -26,45 +26,11 @@ if (! defined('ABSPATH')) {
     <button type="button" class="coffeepos-chip is-active" data-action="select-category" data-category-id="all" aria-pressed="true">
         <?php esc_html_e('All', 'coffeepos'); ?>
     </button>
-    <button type="button" class="coffeepos-chip" data-action="select-category" data-category-id="coffee" aria-pressed="false">
-        <?php esc_html_e('Coffee', 'coffeepos'); ?>
-    </button>
-    <button type="button" class="coffeepos-chip" data-action="select-category" data-category-id="tea" aria-pressed="false">
-        <?php esc_html_e('Tea', 'coffeepos'); ?>
-    </button>
-    <button type="button" class="coffeepos-chip" data-action="select-category" data-category-id="smoothie" aria-pressed="false">
-        <?php esc_html_e('Smoothie', 'coffeepos'); ?>
-    </button>
-    <button type="button" class="coffeepos-chip" data-action="select-category" data-category-id="snacks" aria-pressed="false">
-        <?php esc_html_e('Snacks', 'coffeepos'); ?>
-    </button>
+    <div data-component="category-list"></div>
 </nav>
 
 <section class="coffeepos-product-grid" data-component="product-grid" data-state="normal" aria-live="polite">
-    <article class="coffeepos-product-card" data-component="product-card" data-product-id="demo-espresso" data-state="normal">
-        <button type="button" class="coffeepos-product-card-button" data-action="select-product">
-            <span class="coffeepos-product-name"><?php esc_html_e('Espresso', 'coffeepos'); ?></span>
-            <span class="coffeepos-product-price">35.000đ</span>
-            <span class="coffeepos-product-meta"><?php esc_html_e('In stock', 'coffeepos'); ?></span>
-        </button>
-    </article>
-
-    <article class="coffeepos-product-card" data-component="product-card" data-product-id="demo-latte" data-state="selected">
-        <button type="button" class="coffeepos-product-card-button" data-action="select-product">
-            <span class="coffeepos-product-name"><?php esc_html_e('Latte', 'coffeepos'); ?></span>
-            <span class="coffeepos-product-price">45.000đ</span>
-            <span class="coffeepos-product-meta"><?php esc_html_e('Variation available', 'coffeepos'); ?></span>
-        </button>
-    </article>
-
-    <article class="coffeepos-product-card" data-component="product-card" data-product-id="demo-cold-brew" data-state="out_of_stock">
-        <button type="button" class="coffeepos-product-card-button" data-action="select-product" disabled>
-            <span class="coffeepos-product-name"><?php esc_html_e('Cold brew', 'coffeepos'); ?></span>
-            <span class="coffeepos-product-price">50.000đ</span>
-            <span class="coffeepos-product-meta"><?php esc_html_e('Out of stock', 'coffeepos'); ?></span>
-        </button>
-    </article>
-
+    <div data-component="product-grid-list"></div>
     <div class="coffeepos-panel-state" data-component="product-grid-empty" hidden>
         <strong><?php esc_html_e('No products found', 'coffeepos'); ?></strong>
         <p><?php esc_html_e('Try another keyword or category.', 'coffeepos'); ?></p>
@@ -74,3 +40,17 @@ if (! defined('ABSPATH')) {
         <strong><?php esc_html_e('Loading products…', 'coffeepos'); ?></strong>
     </div>
 </section>
+
+<template id="coffeepos-category-button-template">
+    <button type="button" class="coffeepos-chip" data-action="select-category" data-key="id" data-attr="data-category-id:id" data-field="name" aria-pressed="false"></button>
+</template>
+
+<template id="coffeepos-product-card-template">
+    <article class="coffeepos-product-card" data-component="product-card" data-key="id" data-attr="data-product-id:id;data-state:state">
+        <button type="button" class="coffeepos-product-card-button" data-action="select-product" data-attr="disabled:is_out_of_stock">
+            <span class="coffeepos-product-name" data-field="name"></span>
+            <span class="coffeepos-product-price" data-field="price_display"></span>
+            <span class="coffeepos-product-meta" data-field="stock_label"></span>
+        </button>
+    </article>
+</template>

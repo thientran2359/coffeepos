@@ -21,125 +21,20 @@ final class AssetLoader
         }
 
         $screen = Router::currentScreen();
-        $version = COFFEEPOS_VERSION;
 
         wp_register_style(
             'coffeepos-app',
             COFFEEPOS_URL . 'assets/css/app.css',
             [],
-            $version
+            COFFEEPOS_VERSION
         );
         wp_enqueue_style('coffeepos-app');
 
         wp_register_script(
-            'coffeepos-core-app',
-            COFFEEPOS_URL . 'assets/js/core/app.js',
-            [],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-core-config',
-            COFFEEPOS_URL . 'assets/js/core/config.js',
-            ['coffeepos-core-app'],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-core-state',
-            COFFEEPOS_URL . 'assets/js/core/state.js',
-            ['coffeepos-core-app'],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-core-http',
-            COFFEEPOS_URL . 'assets/js/core/http.js',
-            ['coffeepos-core-config'],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-ui-toast',
-            COFFEEPOS_URL . 'assets/js/ui/toast.js',
-            ['coffeepos-core-app'],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-ui-modal',
-            COFFEEPOS_URL . 'assets/js/ui/modal.js',
-            ['coffeepos-core-state'],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-component-category-nav',
-            COFFEEPOS_URL . 'assets/js/components/category-nav.js',
-            ['coffeepos-core-app'],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-component-search',
-            COFFEEPOS_URL . 'assets/js/components/search.js',
-            ['coffeepos-core-state'],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-component-order-type',
-            COFFEEPOS_URL . 'assets/js/components/order-type.js',
-            ['coffeepos-core-state'],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-component-cart-panel',
-            COFFEEPOS_URL . 'assets/js/components/cart-panel.js',
-            ['coffeepos-core-state'],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-screen-cashier',
-            COFFEEPOS_URL . 'assets/js/screens/cashier.js',
-            [
-                'coffeepos-ui-toast',
-                'coffeepos-ui-modal',
-                'coffeepos-component-category-nav',
-                'coffeepos-component-search',
-                'coffeepos-component-order-type',
-                'coffeepos-component-cart-panel',
-                'coffeepos-core-http',
-            ],
-            $version,
-            true
-        );
-
-        wp_register_script(
-            'coffeepos-core-bootstrap',
-            COFFEEPOS_URL . 'assets/js/core/bootstrap.js',
-            ['coffeepos-core-config', 'coffeepos-screen-cashier'],
-            $version,
-            true
-        );
-
-        wp_register_script(
             'coffeepos-app',
             COFFEEPOS_URL . 'assets/js/app.js',
-            ['coffeepos-core-bootstrap'],
-            $version,
+            [],
+            COFFEEPOS_VERSION,
             true
         );
 

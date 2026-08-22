@@ -8,6 +8,7 @@ if (! defined('ABSPATH')) {
 
 ?>
 <div class="coffeepos-overlay-root" data-component="overlay-root" aria-live="polite">
+    <?php require COFFEEPOS_PATH . 'templates/components/product-modal.php'; ?>
     <div class="coffeepos-modal" data-component="modal" data-state="closed" hidden>
         <div class="coffeepos-modal-backdrop" data-action="cancel-modal"></div>
         <div class="coffeepos-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="coffeepos-modal-title">

@@ -11,20 +11,7 @@ $files = [
     'cashierMenu' => $pluginRoot . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'cashier' . DIRECTORY_SEPARATOR . 'menu-panel.php',
     'cashierCart' => $pluginRoot . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'cashier' . DIRECTORY_SEPARATOR . 'cart-panel.php',
     'cashierOverlay' => $pluginRoot . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'cashier' . DIRECTORY_SEPARATOR . 'overlay-root.php',
-    'cashierJs' => [
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'app.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'app.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'config.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'state.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'bootstrap.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'ui' . DIRECTORY_SEPARATOR . 'toast.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'ui' . DIRECTORY_SEPARATOR . 'modal.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR . 'category-nav.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR . 'search.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR . 'order-type.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR . 'cart-panel.js',
-        $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'screens' . DIRECTORY_SEPARATOR . 'cashier.js',
-    ],
+    'cashierJs' => $pluginRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'app.js',
 ];
 
 $read = static function (string $path): string {
@@ -64,11 +51,7 @@ foreach (['screenShell', 'cashierContent', 'cashierHeader', 'cashierMenu', 'cash
     $templatesBundle .= "\n" . $read($files[$templateKey]);
 }
 
-$jsBundle = '';
-
-foreach ($files['cashierJs'] as $jsPath) {
-    $jsBundle .= "\n" . $read($jsPath);
-}
+$jsBundle = $read($files['cashierJs']);
 
 $run('Selector contract: cashier root + required components', static function () use ($assert, $templatesBundle): void {
     $selectors = [
@@ -128,7 +111,7 @@ $run('JS action contract: explicit handlers or pending notices', static function
 
 $run('JS foundation state: modal + toast + screen controller', static function () use ($assert, $jsBundle): void {
     $assert(strpos($jsBundle, 'createCashierController') !== false, 'Missing cashier screen controller');
-    $assert(strpos($jsBundle, 'createModalController') !== false, 'Missing modal foundation behavior');
+    $assert(strpos($jsBundle, 'openModal') !== false, 'Missing modal foundation behavior');
     $assert(strpos($jsBundle, 'createToastController') !== false, 'Missing toast foundation behavior');
     $assert(strpos($jsBundle, 'data-screen') !== false, 'Missing screen state binding');
 });

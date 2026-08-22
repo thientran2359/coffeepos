@@ -129,10 +129,8 @@
     border-radius: 999px;
     background: #ffffff;
     color: var(--coffeepos-text);
-    min-height: 44px;
-    padding: 0.55rem 0.9rem;
+    padding: 0.45rem 0.8rem;
     font-size: 0.85rem;
-    line-height: 1.2;
     cursor: pointer;
 }
 
@@ -182,8 +180,7 @@
     align-items: flex-start;
     gap: 0.2rem;
     width: 100%;
-    min-height: 72px;
-    padding: 0.9rem;
+    padding: 0.8rem;
     border: 0;
     background: transparent;
     text-align: left;
@@ -287,27 +284,15 @@
     gap: 0.35rem;
 }
 
-.coffeepos-cart-item-actions [data-component="cart-item-quantity"] {
-    min-width: 1.75rem;
-    text-align: center;
-}
-
 .coffeepos-btn,
 .coffeepos-btn-icon {
     border: 1px solid var(--coffeepos-border);
     border-radius: 10px;
     background: #ffffff;
     color: var(--coffeepos-text);
-    min-height: 44px;
-    min-width: 44px;
-    padding: 0.55rem 0.85rem;
+    padding: 0.45rem 0.7rem;
     font-size: 0.84rem;
-    line-height: 1.2;
     cursor: pointer;
-}
-
-.coffeepos-btn-icon {
-    padding: 0.55rem;
 }
 
 .coffeepos-btn:disabled,
@@ -335,13 +320,6 @@
     background: #fff2f2;
     border-color: #ffd3d3;
     color: #a11f2d;
-}
-
-.coffeepos-checkout [data-action="checkout"] {
-    min-height: 50px;
-    width: 100%;
-    font-size: 0.95rem;
-    font-weight: 600;
 }
 
 .coffeepos-empty-state {

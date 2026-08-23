@@ -131,6 +131,7 @@ final class AssetLoader
         wp_register_script('coffeepos-component-catalog-renderer', COFFEEPOS_URL . 'assets/js/components/catalog-renderer.js', ['coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-cart-panel', COFFEEPOS_URL . 'assets/js/components/cart-panel.js', ['coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-product-modal', COFFEEPOS_URL . 'assets/js/components/product-modal.js', ['coffeepos-api-client', 'coffeepos-ui-modal', 'coffeepos-ui-template-renderer'], $version, true);
+        wp_register_script('coffeepos-component-cart-context', COFFEEPOS_URL . 'assets/js/components/cart-context.js', ['coffeepos-api-client', 'coffeepos-ui-modal', 'coffeepos-ui-template-renderer'], $version, true);
 
         wp_register_script(
             'coffeepos-component-order-type',
@@ -154,6 +155,7 @@ final class AssetLoader
                 'coffeepos-component-product-card',
                 'coffeepos-component-cart-panel',
                 'coffeepos-component-product-modal',
+                'coffeepos-component-cart-context',
                 'coffeepos-component-order-type',
             ],
             $version,

@@ -22,6 +22,8 @@ final class Settings
 
     public const OPTION_QUICK_NOTES = 'coffeepos_quick_notes';
 
+    public const OPTION_SERVICE_TABLES = 'coffeepos_service_tables';
+
     public function register(): void
     {
         add_action('admin_init', [$this, 'registerSettings']);
@@ -131,6 +133,18 @@ final class Settings
                 'capability' => Capabilities::MANAGE_WOOCOMMERCE,
                 'sanitize' => null,
             ],
+            self::OPTION_SERVICE_TABLES => [
+                'type' => 'array',
+                'default' => [
+                    ['id' => 1, 'label' => 'Table 01', 'enabled' => true, 'sort_order' => 10],
+                    ['id' => 2, 'label' => 'Table 02', 'enabled' => true, 'sort_order' => 20],
+                    ['id' => 3, 'label' => 'Table 03', 'enabled' => true, 'sort_order' => 30],
+                    ['id' => 4, 'label' => 'Table 04', 'enabled' => true, 'sort_order' => 40],
+                    ['id' => 5, 'label' => 'Table 05', 'enabled' => true, 'sort_order' => 50],
+                ],
+                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'sanitize' => null,
+            ],
         ];
     }
 
@@ -159,6 +173,10 @@ final class Settings
 
         if ($optionName === self::OPTION_QUICK_NOTES) {
             return self::sanitizeQuickNotes(is_array($value) ? $value : []);
+        }
+
+        if ($optionName === self::OPTION_SERVICE_TABLES) {
+            return self::sanitizeServiceTables(is_array($value) ? $value : []);
         }
 
         $sanitizeCallback = $definition['sanitize'];
@@ -261,6 +279,35 @@ final class Settings
                 'sort_order' => (int) ($note['sort_order'] ?? 0),
                 'product_ids' => array_values(array_filter(array_map('absint', (array) ($note['product_ids'] ?? [])))),
                 'category_ids' => array_values(array_filter(array_map('absint', (array) ($note['category_ids'] ?? [])))),
+            ];
+        }
+
+        return $sanitized;
+    }
+
+    private static function sanitizeServiceTables(array $tables): array
+    {
+        $sanitized = [];
+        $seen = [];
+
+        foreach ($tables as $table) {
+            if (! is_array($table)) {
+                continue;
+            }
+
+            $id = absint($table['id'] ?? 0);
+            $label = sanitize_text_field((string) ($table['label'] ?? ''));
+
+            if ($id <= 0 || $label === '' || isset($seen[$id])) {
+                continue;
+            }
+
+            $seen[$id] = true;
+            $sanitized[] = [
+                'id' => $id,
+                'label' => $label,
+                'enabled' => ! array_key_exists('enabled', $table) || ! empty($table['enabled']),
+                'sort_order' => (int) ($table['sort_order'] ?? 0),
             ];
         }
 

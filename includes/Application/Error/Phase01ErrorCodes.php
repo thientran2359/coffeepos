@@ -24,7 +24,15 @@ final class Phase01ErrorCodes
 
     public const CUSTOMER_NOT_FOUND = 'customer_not_found';
 
+    public const INVALID_CUSTOMER_PHONE = 'invalid_customer_phone';
+
+    public const CUSTOMER_LOOKUP_FAILED = 'customer_lookup_failed';
+
+    public const CUSTOMER_PHONE_AMBIGUOUS = 'customer_phone_ambiguous';
+
     public const INVALID_CUSTOMER = 'invalid_customer';
+
+    public const INVALID_TABLE = 'invalid_table';
 
     public const INVALID_COUPON = 'invalid_coupon';
 

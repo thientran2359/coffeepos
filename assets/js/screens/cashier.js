@@ -33,7 +33,17 @@
         const search = CoffeePOS.components.createProductSearchController(root, renderer, categoryNav, function (term) {
             store.setSearchTerm(term);
         });
-        const orderType = CoffeePOS.components.createOrderTypeController(root);
+        let contextController = null;
+        const orderType = CoffeePOS.components.createOrderTypeController(root, function (requested) {
+            if (mutationPending) {
+                return;
+            }
+            if (requested === 'dine_in') {
+                contextController.openTables();
+                return;
+            }
+            setServiceContext('takeaway', 0).catch(function () {});
+        });
         let catalogRequest = null;
         let catalogSequence = 0;
         let mutationPending = false;
@@ -86,8 +96,7 @@
             if (!latest) {
                 return false;
             }
-            store.setCart(latest);
-            cartPanel.render(latest);
+            applyCart(latest);
             toast.show(error.message || 'The cart changed and was refreshed.', 'warning');
             return true;
         }
@@ -101,12 +110,11 @@
             cartPanel.setUpdating();
             try {
                 const data = await operation();
-                store.setCart(data.cart);
-                cartPanel.render(data.cart);
+                applyCart(data.cart);
                 return data.cart;
             } catch (error) {
                 if (!reconcileConflict(error)) {
-                    cartPanel.render(store.getState().cart || { items: [] });
+                    applyCart(store.getState().cart || { items: [] });
                     toast.show(error.message || 'The cart could not be updated.', 'error');
                 }
                 throw error;
@@ -119,8 +127,7 @@
             cartPanel.setLoading();
             try {
                 const data = await api.createCartSession();
-                store.setCart(data.cart);
-                cartPanel.render(data.cart);
+                applyCart(data.cart);
             } catch (error) {
                 store.setCartStatus('error');
                 cartPanel.setError();
@@ -166,6 +173,66 @@
             return { pos_session_id: cart.pos_session_id, expected_revision: cart.revision };
         }
 
+        function renderContext(cart) {
+            const customer = cart && cart.customer || { mode: 'guest' };
+            const isGuest = customer.mode === 'guest' || customer.is_guest === true;
+            const customerSummary = root.querySelector('[data-component="customer-summary"]');
+            const customerName = root.querySelector('[data-component="customer-name"]');
+            const customerPhone = root.querySelector('[data-component="customer-phone"]');
+            const membership = root.querySelector('[data-component="customer-membership"]');
+            const removeCustomer = root.querySelector('[data-action="remove-customer"]');
+            const tableLabel = root.querySelector('[data-component="selected-table-label"]');
+            const membershipData = customer.membership;
+
+            setState(customerSummary, isGuest ? 'empty' : 'selected');
+            customerName.textContent = isGuest ? 'Guest customer' : String(customer.display_name || customer.name || 'Customer');
+            customerPhone.textContent = String(customer.phone || '');
+            customerPhone.hidden = isGuest || customerPhone.textContent === '';
+            membership.textContent = membershipData && String(membershipData.status_label || membershipData.tier_label || '');
+            membership.hidden = membership.textContent === '';
+            removeCustomer.hidden = isGuest;
+            orderType.setSelected(cart && cart.order_type || 'takeaway', false);
+            tableLabel.textContent = cart && cart.table && cart.table.table_label
+                ? String(cart.table.table_label)
+                : 'Select table';
+        }
+
+        function applyCart(cart) {
+            store.setCart(cart);
+            cartPanel.render(cart);
+            renderContext(cart);
+        }
+
+        function attachCustomer(customerId) {
+            const cart = store.getState().cart;
+            return mutate(function () {
+                return api.attachCustomer(Object.assign(cartPayload(cart), { customer_id: customerId }));
+            });
+        }
+
+        async function setServiceContext(requestedOrderType, tableId) {
+            const cart = store.getState().cart;
+            orderType.setPending(true);
+            try {
+                return await mutate(function () {
+                    return api.setServiceContext(Object.assign(cartPayload(cart), {
+                        order_type: requestedOrderType,
+                        table_id: tableId
+                    }));
+                });
+            } finally {
+                orderType.setPending(false);
+            }
+        }
+
+        contextController = CoffeePOS.components.createCartContextController(
+            root,
+            renderer,
+            api,
+            attachCustomer,
+            setServiceContext
+        );
+
         function updateQuantity(item, quantity) {
             const cart = store.getState().cart;
             return mutate(function () {
@@ -197,8 +264,12 @@
                 productModal.openEdit(item);
             } else if (action === 'remove-cart-item' && item && cart) {
                 mutate(function () { return api.removeCartItem(item.item_id, cartPayload(cart)); }).catch(function () {});
-            } else if (action === 'open-customer' || action === 'open-table') {
-                modal.open({ title: 'Phase 4', message: 'This workflow belongs to Phase 4.', action: action, state: 'idle' });
+            } else if (action === 'open-customer') {
+                contextController.openCustomer();
+            } else if (action === 'open-table') {
+                contextController.openTables();
+            } else if (action === 'remove-customer' && cart) {
+                mutate(function () { return api.removeCustomer(cartPayload(cart)); }).catch(function () {});
             } else if (action === 'open-coupon') {
                 modal.open({ title: 'Coupon', message: 'Coupon application is not part of Phase 3.', action: action, state: 'idle' });
             }

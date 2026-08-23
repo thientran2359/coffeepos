@@ -38,7 +38,11 @@
                 const trigger = event.target.closest('[data-action="select-order-type"]');
 
                 if (trigger) {
-                    setSelected(trigger.getAttribute('data-order-type'), true);
+                    const requested = trigger.getAttribute('data-order-type') === 'dine_in' ? 'dine_in' : 'takeaway';
+
+                    if (typeof onChange === 'function') {
+                        onChange(requested);
+                    }
                 }
             });
         }
@@ -46,6 +50,14 @@
         return {
             init: function () { setSelected('takeaway', false); },
             setSelected: setSelected,
+            setPending: function (pending) {
+                if (component) {
+                    component.querySelectorAll('[data-action="select-order-type"]').forEach(function (button) {
+                        button.disabled = pending === true;
+                    });
+                    setState(component, pending === true ? 'updating' : 'normal');
+                }
+            },
             getSelected: function () { return selected; }
         };
     };

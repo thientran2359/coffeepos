@@ -179,9 +179,23 @@ Examples:
 invalid_customer_phone
 customer_not_found
 customer_lookup_failed
+customer_phone_ambiguous
 ```
 
 `customer_not_found` should be a controlled response, not a server exception.
+
+## PUT /coffeepos/v1/cart/customer
+
+Attaches a trusted WooCommerce customer to the active cart. The request contains
+`pos_session_id`, `expected_revision`, and `customer_id`. The server reloads the
+customer and ignores client-supplied customer display data.
+
+## DELETE /coffeepos/v1/cart/customer
+
+Returns the active cart to guest mode using `pos_session_id` and
+`expected_revision`.
+
+Both operations increment the cart revision and return the full `CartView`.
 
 ---
 
@@ -363,6 +377,15 @@ Retrieve selectable service tables when table management is enabled.
 The initial requirements do not define a complete table-management subsystem.
 
 Do not build advanced table CRUD unless required.
+
+## PUT /coffeepos/v1/cart/service-context
+
+Atomically sets the service context using `pos_session_id`,
+`expected_revision`, `order_type`, and, for dine-in, `table_id`.
+
+`dine_in` requires a valid enabled table. `takeaway` clears table context in the
+same mutation. The server resolves the table label and returns the full
+incremented `CartView`.
 
 ---
 

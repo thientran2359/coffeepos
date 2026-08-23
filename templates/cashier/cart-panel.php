@@ -30,7 +30,7 @@ if (! defined('ABSPATH')) {
     </div>
     <div class="coffeepos-table-placeholder" data-component="table-placeholder" data-state="hidden" hidden>
         <button type="button" class="coffeepos-btn coffeepos-btn-light" data-action="open-table">
-            <?php esc_html_e('Select table', 'coffeepos'); ?>
+            <span data-component="selected-table-label"><?php esc_html_e('Select table', 'coffeepos'); ?></span>
         </button>
     </div>
 </section>
@@ -39,9 +39,14 @@ if (! defined('ABSPATH')) {
     <div>
         <h3><?php esc_html_e('Customer', 'coffeepos'); ?></h3>
         <p data-component="customer-name"><?php esc_html_e('Guest customer', 'coffeepos'); ?></p>
+        <small data-component="customer-phone" hidden></small>
+        <small data-component="customer-membership" hidden></small>
     </div>
     <button type="button" class="coffeepos-icon-button" data-action="open-customer" title="<?php esc_attr_e('Find customer', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Find customer', 'coffeepos'); ?>">
         <span aria-hidden="true">+</span>
+    </button>
+    <button type="button" class="coffeepos-link-button" data-action="remove-customer" hidden>
+        <?php esc_html_e('Use guest', 'coffeepos'); ?>
     </button>
 </section>
 

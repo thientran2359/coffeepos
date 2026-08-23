@@ -71,12 +71,18 @@ function disabled(bool $disabled): void
 </main>
 <script>window.CoffeePOSConfig = {screen: 'cashier', restBase: '', restNonce: ''};</script>
 <script src="/assets/js/core/app.js"></script>
+<script src="/assets/js/api/client.js"></script>
+<script src="/assets/js/state/cashier-store.js"></script>
 <script src="/assets/js/ui/template-renderer.js"></script>
 <script src="/assets/js/ui/modal.js"></script>
 <script src="/assets/js/ui/toast.js"></script>
 <script src="/assets/js/components/category-nav.js"></script>
 <script src="/assets/js/components/product-search.js"></script>
 <script src="/assets/js/components/product-card.js"></script>
+<script src="/assets/js/components/catalog-renderer.js"></script>
+<script src="/assets/js/components/cart-panel.js"></script>
+<script src="/assets/js/components/product-modal.js"></script>
+<script src="/assets/js/components/cart-context.js"></script>
 <script src="/assets/js/components/order-type.js"></script>
 <script src="/assets/js/screens/cashier.js"></script>
 <script src="/assets/js/app.js"></script>

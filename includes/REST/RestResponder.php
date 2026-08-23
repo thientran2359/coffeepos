@@ -67,6 +67,7 @@ final class RestResponder
         if (in_array($code, [
             Phase01ErrorCodes::INVALID_PRODUCT,
             Phase01ErrorCodes::VARIATION_NOT_FOUND,
+            Phase01ErrorCodes::CUSTOMER_NOT_FOUND,
         ], true)) {
             return 404;
         }

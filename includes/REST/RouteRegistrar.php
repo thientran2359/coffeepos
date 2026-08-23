@@ -50,6 +50,10 @@ final class RouteRegistrar
             self::NAMESPACE . '/cart/validate',
             self::NAMESPACE . '/cart/items',
             self::NAMESPACE . '/cart/items/(?P<item_id>[a-f0-9]{64})',
+            self::NAMESPACE . '/customers/lookup',
+            self::NAMESPACE . '/tables',
+            self::NAMESPACE . '/cart/customer',
+            self::NAMESPACE . '/cart/service-context',
         ];
     }
 

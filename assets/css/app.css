@@ -977,6 +977,33 @@ textarea:focus-visible,
     }
 }
 
+.coffeepos-customer-result {
+    display: grid;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 14px;
+    border: 1px solid var(--coffeepos-border-strong);
+    border-radius: 12px;
+    background: var(--coffeepos-surface, #fff);
+}
+
+.coffeepos-customer-result > span,
+.coffeepos-customer-summary small {
+    display: block;
+    color: var(--coffeepos-muted, #667085);
+}
+
+.coffeepos-table-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.coffeepos-table-option {
+    min-height: 56px;
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

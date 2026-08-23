@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CoffeePOS\Integration\WooCommerce;
 
 use CoffeePOS\Application\Contracts\CustomerGatewayInterface;
+use WC_Customer;
 use WP_User;
 
 final class WooCommerceCustomerGateway implements CustomerGatewayInterface
@@ -15,13 +16,21 @@ final class WooCommerceCustomerGateway implements CustomerGatewayInterface
             return null;
         }
 
-        $user = get_user_by('id', $customerId);
-
-        if (! $user instanceof WP_User) {
+        if (! class_exists(WC_Customer::class)) {
             return null;
         }
 
-        return $this->mapUser($user);
+        try {
+            $customer = new WC_Customer($customerId);
+        } catch (\Throwable $throwable) {
+            return null;
+        }
+
+        if ($customer->get_id() !== $customerId) {
+            return null;
+        }
+
+        return $this->mapCustomer($customer);
     }
 
     public function findByPhone(string $phone): ?array
@@ -33,43 +42,64 @@ final class WooCommerceCustomerGateway implements CustomerGatewayInterface
         }
 
         $users = get_users([
-            'number' => 20,
+            'number' => 50,
             'meta_key' => 'billing_phone',
-            'meta_value' => $phone,
+            // The stored WooCommerce phone may contain spaces or separators.
+            // Narrow by the last digits, then perform an exact normalized match.
+            'meta_value' => substr($normalizedPhone, -4),
             'meta_compare' => 'LIKE',
         ]);
+
+        $matches = [];
 
         foreach ($users as $user) {
             if (! $user instanceof WP_User) {
                 continue;
             }
 
-            $candidate = $this->mapUser($user);
+            $candidate = $this->findById((int) $user->ID);
+
+            if ($candidate === null) {
+                continue;
+            }
 
             if ($this->normalizePhone((string) ($candidate['phone'] ?? '')) !== $normalizedPhone) {
                 continue;
             }
 
-            return $candidate;
+            $matches[] = $candidate;
         }
 
-        return null;
+        if (count($matches) > 1) {
+            return [
+                'ambiguous' => true,
+                'candidates' => array_map(static function (array $customer): array {
+                    return [
+                        'id' => (int) $customer['id'],
+                        'name' => (string) $customer['name'],
+                        'phone' => (string) $customer['phone'],
+                    ];
+                }, $matches),
+            ];
+        }
+
+        return $matches[0] ?? null;
     }
 
-    private function mapUser(WP_User $user): array
+    private function mapCustomer(WC_Customer $customer): array
     {
-        $firstName = (string) get_user_meta($user->ID, 'first_name', true);
-        $lastName = (string) get_user_meta($user->ID, 'last_name', true);
+        $firstName = $customer->get_first_name();
+        $lastName = $customer->get_last_name();
         $displayName = trim($firstName . ' ' . $lastName);
 
         if ($displayName === '') {
-            $displayName = $user->display_name;
+            $displayName = $customer->get_display_name();
         }
 
         return [
-            'id' => (int) $user->ID,
+            'id' => $customer->get_id(),
             'name' => $displayName,
-            'phone' => (string) get_user_meta($user->ID, 'billing_phone', true),
+            'phone' => $customer->get_billing_phone(),
         ];
     }
 

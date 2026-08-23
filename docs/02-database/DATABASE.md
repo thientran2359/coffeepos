@@ -633,6 +633,11 @@ Do not create a custom table until there is a requirement for a full admin CRUD 
 
 Plugin configuration should use the WordPress Options API or an appropriate WooCommerce settings mechanism.
 
+Phase-04 service-table selection uses the `coffeepos_service_tables` option.
+Each entry contains a stable positive integer `id`, display `label`, `enabled`
+state, and `sort_order`. This is selection configuration only; it is not table
+occupancy, reservation, or floor-plan persistence.
+
 Examples:
 
 ```text

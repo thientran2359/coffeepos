@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CoffeePOS\Application\Customer;
 
 use CoffeePOS\Application\Contracts\CustomerGatewayInterface;
+use CoffeePOS\Application\Contracts\MembershipProviderInterface;
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
 use CoffeePOS\Application\Error\Phase01Exception;
 use CoffeePOS\Application\Projection\CustomerView;
@@ -14,9 +15,15 @@ final class CustomerService
 {
     private ?CustomerGatewayInterface $customerGateway;
 
-    public function __construct(?CustomerGatewayInterface $customerGateway = null)
+    private ?MembershipProviderInterface $membershipProvider;
+
+    public function __construct(
+        ?CustomerGatewayInterface $customerGateway = null,
+        ?MembershipProviderInterface $membershipProvider = null
+    )
     {
         $this->customerGateway = $customerGateway;
+        $this->membershipProvider = $membershipProvider;
     }
 
     public function guestContext(): CustomerContext
@@ -64,10 +71,23 @@ final class CustomerService
             );
         }
 
+        $membership = null;
+
+        if ($this->membershipProvider !== null) {
+            try {
+                $membership = $this->normalizeMembership(
+                    $this->membershipProvider->membershipForCustomer($customer)
+                );
+            } catch (\Throwable $throwable) {
+                $membership = null;
+            }
+        }
+
         return CustomerView::member(
             $customerId,
             (string) ($customer['name'] ?? ''),
-            (string) ($customer['phone'] ?? '')
+            (string) ($customer['phone'] ?? ''),
+            $membership
         );
     }
 
@@ -75,17 +95,34 @@ final class CustomerService
     {
         $normalizedPhone = $this->normalizePhone($phone);
 
-        if ($normalizedPhone === '') {
+        if (strlen($normalizedPhone) < 7 || strlen($normalizedPhone) > 15) {
             throw Phase01Exception::withCode(
-                Phase01ErrorCodes::INVALID_CUSTOMER,
-                'Phone number is required for customer lookup.'
+                Phase01ErrorCodes::INVALID_CUSTOMER_PHONE,
+                'Enter a valid phone number.'
             );
         }
 
         if ($this->customerGateway !== null) {
-            $customer = $this->customerGateway->findByPhone($normalizedPhone);
+            try {
+                $customer = $this->customerGateway->findByPhone($normalizedPhone);
+            } catch (Phase01Exception $exception) {
+                throw $exception;
+            } catch (\Throwable $throwable) {
+                throw Phase01Exception::withCode(
+                    Phase01ErrorCodes::CUSTOMER_LOOKUP_FAILED,
+                    'Customer lookup failed.'
+                );
+            }
 
             if ($customer !== null) {
+                if (! empty($customer['ambiguous'])) {
+                    throw Phase01Exception::withCode(
+                        Phase01ErrorCodes::CUSTOMER_PHONE_AMBIGUOUS,
+                        'More than one customer uses this phone number.',
+                        ['candidates' => array_values((array) ($customer['candidates'] ?? []))]
+                    );
+                }
+
                 return $this->projectCustomer($customer);
             }
         }
@@ -114,5 +151,22 @@ final class CustomerService
     private function normalizePhone(string $phone): string
     {
         return preg_replace('/\D+/', '', trim($phone)) ?? '';
+    }
+
+    private function normalizeMembership(?array $membership): ?array
+    {
+        if ($membership === null) {
+            return null;
+        }
+
+        $projection = [];
+
+        foreach (['status_label', 'tier_label', 'points_display', 'balance_display'] as $field) {
+            if (isset($membership[$field]) && is_scalar($membership[$field])) {
+                $projection[$field] = trim((string) $membership[$field]);
+            }
+        }
+
+        return $projection === [] ? null : $projection;
     }
 }

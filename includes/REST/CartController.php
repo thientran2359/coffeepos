@@ -7,13 +7,18 @@ namespace CoffeePOS\REST;
 use CoffeePOS\Application\Cart\CartService;
 use CoffeePOS\Application\Cart\CartSessionService;
 use CoffeePOS\Application\Cart\CartValidationService;
+use CoffeePOS\Application\Contracts\TableProviderInterface;
+use CoffeePOS\Application\Customer\CustomerService;
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
 use CoffeePOS\Application\Error\Phase01Exception;
 use CoffeePOS\Application\Product\ProductConfigurationService;
 use CoffeePOS\Application\Product\ProductService;
 use CoffeePOS\Application\Product\VariationService;
 use CoffeePOS\Infrastructure\Settings\SettingsProductConfigurationProvider;
+use CoffeePOS\Infrastructure\Settings\SettingsTableProvider;
+use CoffeePOS\Infrastructure\Customer\NullMembershipProvider;
 use CoffeePOS\Integration\WooCommerce\WooCommerceCartSessionStore;
+use CoffeePOS\Integration\WooCommerce\WooCommerceCustomerGateway;
 use CoffeePOS\Integration\WooCommerce\WooCommerceMoney;
 use CoffeePOS\Integration\WooCommerce\WooCommerceMoneyFormatter;
 use CoffeePOS\Integration\WooCommerce\WooCommerceProductGateway;
@@ -30,7 +35,16 @@ final class CartController
 
     private WooCommerceMoney $money;
 
-    public function __construct(?CartSessionService $cartSessionService = null, ?WooCommerceMoney $money = null)
+    private CustomerService $customerService;
+
+    private TableProviderInterface $tableProvider;
+
+    public function __construct(
+        ?CartSessionService $cartSessionService = null,
+        ?WooCommerceMoney $money = null,
+        ?CustomerService $customerService = null,
+        ?TableProviderInterface $tableProvider = null
+    )
     {
         $productGateway = new WooCommerceProductGateway();
         $variationGateway = new WooCommerceVariationGateway();
@@ -42,13 +56,20 @@ final class CartController
             new SettingsProductConfigurationProvider()
         );
 
+        $this->customerService = $customerService ?? new CustomerService(
+            new WooCommerceCustomerGateway(),
+            new NullMembershipProvider()
+        );
+        $this->tableProvider = $tableProvider ?? new SettingsTableProvider();
         $this->cartSessionService = $cartSessionService ?? new CartSessionService(
             new WooCommerceCartSessionStore(),
             new CartService(new CartValidationService(), new WooCommerceStockGateway()),
             $productService,
             $variationService,
             $configurationService,
-            new WooCommerceMoneyFormatter()
+            new WooCommerceMoneyFormatter(),
+            $this->customerService,
+            $this->tableProvider
         );
         $this->money = $money ?? new WooCommerceMoney();
     }
@@ -98,6 +119,37 @@ final class CartController
                 'permission_callback' => [$this, 'permissionCheck'],
             ],
         ]);
+
+        register_rest_route($namespace, '/customers/lookup', [[
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => [$this, 'lookupCustomer'],
+            'permission_callback' => [$this, 'permissionCheck'],
+        ]]);
+
+        register_rest_route($namespace, '/tables', [[
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => [$this, 'tables'],
+            'permission_callback' => [$this, 'permissionCheck'],
+        ]]);
+
+        register_rest_route($namespace, '/cart/customer', [
+            [
+                'methods' => 'PUT',
+                'callback' => [$this, 'attachCustomer'],
+                'permission_callback' => [$this, 'permissionCheck'],
+            ],
+            [
+                'methods' => WP_REST_Server::DELETABLE,
+                'callback' => [$this, 'removeCustomer'],
+                'permission_callback' => [$this, 'permissionCheck'],
+            ],
+        ]);
+
+        register_rest_route($namespace, '/cart/service-context', [[
+            'methods' => 'PUT',
+            'callback' => [$this, 'setServiceContext'],
+            'permission_callback' => [$this, 'permissionCheck'],
+        ]]);
     }
 
     public function permissionCheck()
@@ -213,6 +265,70 @@ final class CartController
                 $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
                 $this->revision($payload)
             ));
+        } catch (\Throwable $throwable) {
+            return RestResponder::fromThrowable($throwable);
+        }
+    }
+
+    public function lookupCustomer(WP_REST_Request $request)
+    {
+        try {
+            return RestResponder::success([
+                'customer' => $this->customerService->findByPhone(
+                    sanitize_text_field((string) $request->get_param('phone'))
+                )->toArray(),
+            ]);
+        } catch (\Throwable $throwable) {
+            return RestResponder::fromThrowable($throwable);
+        }
+    }
+
+    public function tables(WP_REST_Request $request)
+    {
+        try {
+            return RestResponder::success(['items' => $this->tableProvider->listAvailable()]);
+        } catch (\Throwable $throwable) {
+            return RestResponder::fromThrowable($throwable);
+        }
+    }
+
+    public function attachCustomer(WP_REST_Request $request)
+    {
+        try {
+            $payload = $this->payload($request);
+            return RestResponder::success(['cart' => $this->cartSessionService->attachCustomer(
+                $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
+                $this->revision($payload),
+                (int) ($payload['customer_id'] ?? 0)
+            )->toArray()]);
+        } catch (\Throwable $throwable) {
+            return RestResponder::fromThrowable($throwable);
+        }
+    }
+
+    public function removeCustomer(WP_REST_Request $request)
+    {
+        try {
+            $payload = $this->payload($request);
+            return RestResponder::success(['cart' => $this->cartSessionService->removeCustomer(
+                $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
+                $this->revision($payload)
+            )->toArray()]);
+        } catch (\Throwable $throwable) {
+            return RestResponder::fromThrowable($throwable);
+        }
+    }
+
+    public function setServiceContext(WP_REST_Request $request)
+    {
+        try {
+            $payload = $this->payload($request);
+            return RestResponder::success(['cart' => $this->cartSessionService->setServiceContext(
+                $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
+                $this->revision($payload),
+                sanitize_key((string) ($payload['order_type'] ?? '')),
+                (int) ($payload['table_id'] ?? 0)
+            )->toArray()]);
         } catch (\Throwable $throwable) {
             return RestResponder::fromThrowable($throwable);
         }

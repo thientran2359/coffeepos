@@ -78,7 +78,8 @@ final class WooCommerceCartSerializer
             $cart->setCustomerContext(CustomerContext::member(
                 (int) $customer['customer_id'],
                 (string) ($customer['phone'] ?? ''),
-                (string) ($customer['display_name'] ?? '')
+                (string) ($customer['display_name'] ?? ''),
+                is_array($customer['membership'] ?? null) ? $customer['membership'] : null
             ));
         }
 

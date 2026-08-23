@@ -6,6 +6,8 @@ namespace CoffeePOS\Application\Cart;
 
 use CoffeePOS\Application\Contracts\CartSessionStoreInterface;
 use CoffeePOS\Application\Contracts\MoneyFormatterInterface;
+use CoffeePOS\Application\Contracts\TableProviderInterface;
+use CoffeePOS\Application\Customer\CustomerService;
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
 use CoffeePOS\Application\Error\Phase01Exception;
 use CoffeePOS\Application\Product\ProductConfigurationService;
@@ -14,6 +16,9 @@ use CoffeePOS\Application\Product\VariationService;
 use CoffeePOS\Application\Projection\CartView;
 use CoffeePOS\Domain\Cart\Cart;
 use CoffeePOS\Domain\Cart\CartItem;
+use CoffeePOS\Domain\Customer\CustomerContext;
+use CoffeePOS\Domain\Order\OrderType;
+use CoffeePOS\Domain\Order\TableContext;
 use CoffeePOS\Domain\Product\ModifierSelection;
 use CoffeePOS\Domain\Product\QuickNoteSelection;
 use CoffeePOS\Domain\Shared\Money;
@@ -32,13 +37,19 @@ final class CartSessionService
 
     private MoneyFormatterInterface $moneyFormatter;
 
+    private ?CustomerService $customerService;
+
+    private ?TableProviderInterface $tableProvider;
+
     public function __construct(
         CartSessionStoreInterface $sessionStore,
         CartService $cartService,
         ProductService $productService,
         VariationService $variationService,
         ProductConfigurationService $configurationService,
-        MoneyFormatterInterface $moneyFormatter
+        MoneyFormatterInterface $moneyFormatter,
+        ?CustomerService $customerService = null,
+        ?TableProviderInterface $tableProvider = null
     ) {
         $this->sessionStore = $sessionStore;
         $this->cartService = $cartService;
@@ -46,6 +57,8 @@ final class CartSessionService
         $this->variationService = $variationService;
         $this->configurationService = $configurationService;
         $this->moneyFormatter = $moneyFormatter;
+        $this->customerService = $customerService;
+        $this->tableProvider = $tableProvider;
     }
 
     public function createSession(string $currency): CartView
@@ -123,6 +136,83 @@ final class CartSessionService
                 'errors' => [],
             ],
         ];
+    }
+
+    public function attachCustomer(string $posSessionId, int $expectedRevision, int $customerId): CartView
+    {
+        if ($this->customerService === null) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CONFIGURATION,
+                'Customer service is not configured.'
+            );
+        }
+
+        $cart = $this->loadForMutation($posSessionId, $expectedRevision);
+        $customer = $this->customerService->findById($customerId)->toArray();
+        $this->cartService->setCustomerContext($cart, CustomerContext::member(
+            (int) $customer['customer_id'],
+            (string) $customer['phone'],
+            (string) $customer['display_name'],
+            is_array($customer['membership'] ?? null) ? $customer['membership'] : null
+        ));
+
+        return $this->persist($cart, $expectedRevision);
+    }
+
+    public function removeCustomer(string $posSessionId, int $expectedRevision): CartView
+    {
+        $cart = $this->loadForMutation($posSessionId, $expectedRevision);
+        $this->cartService->setCustomerContext($cart, CustomerContext::guest());
+
+        return $this->persist($cart, $expectedRevision);
+    }
+
+    public function setServiceContext(
+        string $posSessionId,
+        int $expectedRevision,
+        string $orderType,
+        int $tableId = 0
+    ): CartView {
+        $cart = $this->loadForMutation($posSessionId, $expectedRevision);
+
+        if ($orderType === OrderType::TAKEAWAY) {
+            $this->cartService->setOrderType($cart, OrderType::TAKEAWAY);
+
+            return $this->persist($cart, $expectedRevision);
+        }
+
+        if ($orderType !== OrderType::DINE_IN) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_ORDER_TYPE,
+                'Invalid order type.',
+                ['order_type' => $orderType]
+            );
+        }
+
+        if ($this->tableProvider === null) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CONFIGURATION,
+                'Table provider is not configured.'
+            );
+        }
+
+        $table = $this->tableProvider->findAvailableById($tableId);
+
+        if ($table === null) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_TABLE,
+                'Selected table is unavailable.',
+                ['table_id' => $tableId]
+            );
+        }
+
+        $this->cartService->setOrderType(
+            $cart,
+            OrderType::DINE_IN,
+            TableContext::from((int) $table['id'], (string) $table['label'])
+        );
+
+        return $this->persist($cart, $expectedRevision);
     }
 
     private function load(string $posSessionId): Cart

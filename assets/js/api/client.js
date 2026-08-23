@@ -142,6 +142,21 @@
             },
             clearCart: function (payload) {
                 return client.request('cart', { method: 'DELETE', body: payload });
+            },
+            lookupCustomer: function (phone, signal) {
+                return client.request('customers/lookup' + query({ phone: phone }), { signal: signal });
+            },
+            loadTables: function (signal) {
+                return client.request('tables', { signal: signal });
+            },
+            attachCustomer: function (payload) {
+                return client.request('cart/customer', { method: 'PUT', body: payload });
+            },
+            removeCustomer: function (payload) {
+                return client.request('cart/customer', { method: 'DELETE', body: payload });
+            },
+            setServiceContext: function (payload) {
+                return client.request('cart/service-context', { method: 'PUT', body: payload });
             }
         };
     };

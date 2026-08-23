@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CoffeePOS\Application\Cart;
 
 use CoffeePOS\Application\Contracts\CartSessionStoreInterface;
+use CoffeePOS\Application\Contracts\CartReconstructorInterface;
 use CoffeePOS\Application\Contracts\MoneyFormatterInterface;
 use CoffeePOS\Application\Contracts\TableProviderInterface;
 use CoffeePOS\Application\Customer\CustomerService;
@@ -24,7 +25,7 @@ use CoffeePOS\Domain\Product\ModifierSelection;
 use CoffeePOS\Domain\Product\QuickNoteSelection;
 use CoffeePOS\Domain\Shared\Money;
 
-final class CartSessionService
+final class CartSessionService implements CartReconstructorInterface
 {
     private CartSessionStoreInterface $sessionStore;
 
@@ -65,6 +66,32 @@ final class CartSessionService
     public function createSession(string $currency): CartView
     {
         return $this->project($this->sessionStore->create($currency));
+    }
+
+    /**
+     * Rebuild a fresh logical cart only after every historical line has passed
+     * current product, variation, stock, and configuration validation.
+     */
+    public function reconstruct(string $currency, array $items): CartView
+    {
+        if ($items === []) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::REORDER_FAILED, 'The historical order has no reorderable items.');
+        }
+
+        $cartItems = [];
+        foreach ($items as $input) {
+            if (! is_array($input)) {
+                throw Phase01Exception::withCode(Phase01ErrorCodes::REORDER_FAILED, 'Historical order item data is invalid.');
+            }
+            $cartItems[] = $this->buildCartItem($input);
+        }
+
+        $cart = $this->sessionStore->create($currency);
+        foreach ($cartItems as $cartItem) {
+            $this->cartService->addItem($cart, $cartItem);
+        }
+
+        return $this->project($this->sessionStore->save($cart, 0));
     }
 
     public function getSession(string $posSessionId): CartView

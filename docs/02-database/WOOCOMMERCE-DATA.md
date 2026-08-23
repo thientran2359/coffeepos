@@ -176,6 +176,10 @@ Refunds must use WooCommerce refund functionality.
 
 Do not create a separate CoffeePOS refund ledger as the authoritative refund system.
 
+Phase 10 uses `wc_create_refund`. Bounded `_coffeepos_refund_operations` metadata
+provides request idempotency only; it is not a refund ledger. WooCommerce refund
+objects remain authoritative.
+
 ---
 
 # 11. Order Status
@@ -287,6 +291,9 @@ New Cart
 
 Reorder must not blindly copy historical prices or availability.
 
+`_coffeepos_reorder_operations` is a bounded idempotency pointer to a generated
+POS cart session. It does not store cart contents or historical pricing.
+
 ---
 
 # 19. Reporting
@@ -294,3 +301,12 @@ Reorder must not blindly copy historical prices or availability.
 Where WooCommerce provides suitable queryable order/product data, reporting should use it.
 
 Do not duplicate order totals into a separate report table without a measured performance/data-warehouse requirement.
+
+Phase 11 queries bounded batches of WooCommerce `processing`, `completed`, and
+`refunded` CoffeePOS orders by creation date. Net revenue subtracts canonical
+WooCommerce refunds from the originating order period. Product quantity and
+revenue subtract only item-attributed refund data; amount-only refunds remain
+explicitly unallocated. Monetary aggregates are separated by order currency.
+
+CSV and XLSX exports are generated from the same application ReportView as the
+screen. They are transient response files and add no persistent report storage.

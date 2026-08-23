@@ -83,7 +83,11 @@ final class Router
             return $template;
         }
 
-        if (! Capabilities::currentUserCanAccessPos()) {
+        $canAccess = $screen === 'reports'
+            ? current_user_can(Capabilities::MANAGE_WOOCOMMERCE)
+            : Capabilities::currentUserCanAccessPos();
+
+        if (! $canAccess) {
             wp_die(
                 esc_html__('You are not allowed to access CoffeePOS.', 'coffeepos'),
                 esc_html__('Forbidden', 'coffeepos'),

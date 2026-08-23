@@ -75,6 +75,16 @@ final class AssetLoader
             $appDependencies[] = 'coffeepos-screen-shifts';
         }
 
+        if ($screen === 'order-history') {
+            $this->registerOrderHistoryScripts($version);
+            $appDependencies[] = 'coffeepos-screen-order-history';
+        }
+
+        if ($screen === 'reports') {
+            $this->registerReportScripts($version);
+            $appDependencies[] = 'coffeepos-screen-reports';
+        }
+
         wp_register_script(
             'coffeepos-app',
             COFFEEPOS_URL . 'assets/js/app.js',
@@ -92,6 +102,7 @@ final class AssetLoader
             'posSessionId' => $screen === 'customer' && $pairingValid ? $pairingInput : '',
             'pairingState' => $screen === 'customer' ? ($pairingValid ? 'paired' : ($pairingInput === '' ? 'missing' : 'invalid')) : '',
             'pollIntervalMs' => $screen === 'kds' ? Settings::getKdsPollInterval() : ($screen === 'order-queue' ? Settings::getOrderQueuePollInterval() : 0),
+            'canRefundOrders' => current_user_can(\CoffeePOS\Support\Capabilities::MANAGE_WOOCOMMERCE),
             'i18n' => [
                 'addItem' => __('Add item', 'coffeepos'),
                 'editItem' => __('Edit item', 'coffeepos'),
@@ -253,5 +264,19 @@ final class AssetLoader
     {
         wp_register_script('coffeepos-shifts-api-client', COFFEEPOS_URL . 'assets/js/api/client.js', ['coffeepos-core-app'], $version, true);
         wp_register_script('coffeepos-screen-shifts', COFFEEPOS_URL . 'assets/js/screens/shifts.js', ['coffeepos-shifts-api-client'], $version, true);
+    }
+
+    private function registerOrderHistoryScripts(string $version): void
+    {
+        wp_register_script('coffeepos-history-api-client', COFFEEPOS_URL . 'assets/js/api/client.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-history-modal', COFFEEPOS_URL . 'assets/js/ui/modal.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-screen-order-history', COFFEEPOS_URL . 'assets/js/screens/order-history.js', ['coffeepos-history-api-client', 'coffeepos-history-modal'], $version, true);
+    }
+
+    private function registerReportScripts(string $version): void
+    {
+        wp_register_script('coffeepos-reports-api-client', COFFEEPOS_URL . 'assets/js/api/client.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-reports-template-renderer', COFFEEPOS_URL . 'assets/js/ui/template-renderer.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-screen-reports', COFFEEPOS_URL . 'assets/js/screens/reports.js', ['coffeepos-reports-api-client', 'coffeepos-reports-template-renderer'], $version, true);
     }
 }

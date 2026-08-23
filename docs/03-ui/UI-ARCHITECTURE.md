@@ -569,3 +569,17 @@ Changing it requires:
 `/pos/shifts/` owns the open, active/reconciliation, and history states. The
 Cashier header consumes only the current ShiftView status and links to that
 screen. Shift totals are server projections and are never calculated by UI.
+## Phase 10 Order History
+
+`/pos/order-history/` owns filter/list, detail, refund, confirm, and print
+surfaces. Repeated rows remain PHP-template-owned. Allowed actions come from
+the server; successful Quick Reorder navigates to Cashier with the returned
+server-side cart session.
+
+## Phase 11 Reports
+
+`/pos/reports/` is a manager-only, independently scrollable application surface.
+It owns date presets/custom range, KPI cards, payment composition, product
+rankings, peak hours, data-quality warnings, and CSV/XLSX export states. Server
+ReportView values are rendered through PHP-owned native templates and the shared
+TemplateRenderer; the browser does not recalculate financial totals.

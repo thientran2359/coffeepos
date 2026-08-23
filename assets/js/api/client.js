@@ -86,7 +86,46 @@
             return envelope.data;
         }
 
-        return { request: request };
+        async function download(path, signal) {
+            const headers = {};
+            if (config.restNonce) {
+                headers['X-WP-Nonce'] = String(config.restNonce);
+            }
+            let response;
+            try {
+                response = await window.fetch(baseUrl + String(path || '').replace(/^\/+/, ''), {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: headers,
+                    signal: signal
+                });
+            } catch (error) {
+                if (error && error.name === 'AbortError') {
+                    throw error;
+                }
+                throw new ApiError('network_error', 'The server could not be reached.', 0, {});
+            }
+
+            if (!response.ok) {
+                let envelope = null;
+                try {
+                    envelope = await response.json();
+                } catch (ignored) {
+                    envelope = null;
+                }
+                const responseError = envelope && envelope.error && typeof envelope.error === 'object' ? envelope.error : {};
+                throw new ApiError(responseError.code || 'request_failed', responseError.message || 'The download failed.', response.status, responseError.details || {});
+            }
+
+            const disposition = String(response.headers.get('Content-Disposition') || '');
+            const match = disposition.match(/filename="?([^";]+)"?/i);
+            return {
+                blob: await response.blob(),
+                filename: match ? match[1] : 'coffeepos-report'
+            };
+        }
+
+        return { request: request, download: download };
     };
 
     CoffeePOS.api.createPosApi = function (client) {
@@ -212,6 +251,24 @@
             },
             loadShiftHistory: function (limit) {
                 return client.request('shifts/history' + query({ limit: limit || 50 }));
+            },
+            loadOrderHistory: function (filters, signal) {
+                return client.request('orders' + query(filters || {}), { signal: signal });
+            },
+            loadOrderDetail: function (orderId, signal) {
+                return client.request('orders/' + encodeURIComponent(String(orderId)), { signal: signal });
+            },
+            refundOrder: function (orderId, payload) {
+                return client.request('orders/' + encodeURIComponent(String(orderId)) + '/refund', { method: 'POST', body: payload });
+            },
+            reorderOrder: function (orderId, payload) {
+                return client.request('orders/' + encodeURIComponent(String(orderId)) + '/reorder', { method: 'POST', body: payload });
+            },
+            loadSalesReport: function (filters, signal) {
+                return client.request('reports/sales' + query(filters || {}), { signal: signal });
+            },
+            downloadSalesReport: function (filters, signal) {
+                return client.download('reports/sales/export' + query(filters || {}), signal);
             }
         };
     };

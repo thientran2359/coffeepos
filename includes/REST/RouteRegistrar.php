@@ -20,6 +20,10 @@ final class RouteRegistrar
 
     private ShiftController $shiftController;
 
+    private OrderHistoryController $orderHistoryController;
+
+    private ReportController $reportController;
+
     private static array $registeredRoutes = [];
 
     public function __construct(
@@ -28,7 +32,9 @@ final class RouteRegistrar
         ?CartController $cartController = null,
         ?CheckoutController $checkoutController = null,
         ?OperationalOrderController $operationalOrderController = null,
-        ?ShiftController $shiftController = null
+        ?ShiftController $shiftController = null,
+        ?OrderHistoryController $orderHistoryController = null,
+        ?ReportController $reportController = null
     )
     {
         $this->healthController = $healthController ?? new HealthController();
@@ -37,6 +43,8 @@ final class RouteRegistrar
         $this->checkoutController = $checkoutController ?? new CheckoutController();
         $this->operationalOrderController = $operationalOrderController ?? new OperationalOrderController();
         $this->shiftController = $shiftController ?? new ShiftController();
+        $this->orderHistoryController = $orderHistoryController ?? new OrderHistoryController();
+        $this->reportController = $reportController ?? new ReportController();
     }
 
     public function register(): void
@@ -52,6 +60,8 @@ final class RouteRegistrar
         $this->checkoutController->register(self::NAMESPACE);
         $this->operationalOrderController->register(self::NAMESPACE);
         $this->shiftController->register(self::NAMESPACE);
+        $this->orderHistoryController->register(self::NAMESPACE);
+        $this->reportController->register(self::NAMESPACE);
 
         self::$registeredRoutes = [
             self::NAMESPACE . '/health',
@@ -84,6 +94,12 @@ final class RouteRegistrar
             self::NAMESPACE . '/shifts/open',
             self::NAMESPACE . '/shifts/(?P<id>\\d+)/close',
             self::NAMESPACE . '/shifts/history',
+            self::NAMESPACE . '/orders',
+            self::NAMESPACE . '/orders/(?P<id>\\d+)',
+            self::NAMESPACE . '/orders/(?P<id>\\d+)/refund',
+            self::NAMESPACE . '/orders/(?P<id>\\d+)/reorder',
+            self::NAMESPACE . '/reports/sales',
+            self::NAMESPACE . '/reports/sales/export',
         ];
     }
 

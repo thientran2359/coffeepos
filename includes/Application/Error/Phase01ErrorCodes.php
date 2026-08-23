@@ -77,4 +77,15 @@ final class Phase01ErrorCodes
     public const SHIFT_WRITE_FAILED = 'shift_write_failed';
     public const INVALID_SHIFT_AMOUNT = 'invalid_shift_amount';
     public const INVALID_SHIFT_NOTE = 'invalid_shift_note';
+
+    public const INVALID_ORDER_FILTER = 'invalid_order_filter';
+    public const INVALID_REFUND = 'invalid_refund';
+    public const REFUND_FAILED = 'refund_failed';
+    public const REORDER_FAILED = 'reorder_failed';
+
+    public const INVALID_REPORT_RANGE = 'invalid_report_range';
+    public const REPORT_RANGE_TOO_LARGE = 'report_range_too_large';
+    public const REPORT_QUERY_FAILED = 'report_query_failed';
+    public const REPORT_EXPORT_FAILED = 'report_export_failed';
+    public const REPORT_EXPORT_UNAVAILABLE = 'report_export_unavailable';
 }

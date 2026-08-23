@@ -242,7 +242,7 @@ On authorization or validation failure:
 
 # 17. Security Review Gate
 
-Before Phase 10 completion, review:
+Before Phase 11 completion, review:
 
 - capabilities
 - nonces
@@ -260,3 +260,22 @@ Before Phase 10 completion, review:
 Shift identity and cashier ownership are resolved server-side. Open/close
 mutations use a cashier-scoped database lock, monetary inputs are normalized,
 notes are sanitized, and all derived totals come from WooCommerce transactions.
+## Phase 10 Historical Order Security
+
+History routes accept only CoffeePOS-created WooCommerce orders. Refundable
+balance, state transitions, current product data, and cart reconstruction are
+server-authoritative. Refund additionally requires `manage_woocommerce`;
+refund and reorder use scoped locks and idempotency IDs.
+
+## Phase 11 Reports and Final Capability Matrix
+
+The Reports screen, sales-report REST projection, and CSV/XLSX exports require
+`manage_woocommerce`. The existing POS-access policy remains sufficient for
+Cashier, KDS, Order Queue, Shifts, and non-refund Order History operations.
+Refund and CoffeePOS settings also require `manage_woocommerce`. Customer
+Display remains limited to its documented session-scoped public projection.
+
+Report input is date/limit bounded, WooCommerce queries use supported APIs, and
+money is never summed across currencies. Export downloads require the REST
+nonce and permission callback, use safe filenames and MIME headers, escape CSV
+formula-leading text, and contain no customer contact fields.

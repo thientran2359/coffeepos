@@ -92,11 +92,28 @@ final class RestResponder
         }
 
         if (in_array($code, [
+            Phase01ErrorCodes::REFUND_FAILED,
+            Phase01ErrorCodes::REORDER_FAILED,
+            Phase01ErrorCodes::REPORT_QUERY_FAILED,
+            Phase01ErrorCodes::REPORT_EXPORT_FAILED,
+        ], true)) {
+            return 500;
+        }
+
+        if ($code === Phase01ErrorCodes::REPORT_EXPORT_UNAVAILABLE) {
+            return 503;
+        }
+
+        if (in_array($code, [
             Phase01ErrorCodes::INVALID_CUSTOMER_PHONE,
             Phase01ErrorCodes::INVALID_CUSTOMER_NAME,
             Phase01ErrorCodes::INVALID_CUSTOMER_EMAIL,
             Phase01ErrorCodes::INVALID_SHIFT_AMOUNT,
             Phase01ErrorCodes::INVALID_SHIFT_NOTE,
+            Phase01ErrorCodes::INVALID_ORDER_FILTER,
+            Phase01ErrorCodes::INVALID_REFUND,
+            Phase01ErrorCodes::INVALID_REPORT_RANGE,
+            Phase01ErrorCodes::REPORT_RANGE_TOO_LARGE,
         ], true)) {
             return 400;
         }

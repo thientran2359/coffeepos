@@ -39,6 +39,16 @@
             screenController.init();
         }
 
+        if (screen === 'order-history' && window.CoffeePOS.screens.createOrderHistoryController) {
+            screenController = window.CoffeePOS.screens.createOrderHistoryController(root);
+            screenController.init();
+        }
+
+        if (screen === 'reports' && window.CoffeePOS.screens.createReportsController) {
+            screenController = window.CoffeePOS.screens.createReportsController(root);
+            screenController.init();
+        }
+
         window.CoffeePOS.activeScreen = screenController;
 
         window.dispatchEvent(new CustomEvent('coffeepos:ready', {

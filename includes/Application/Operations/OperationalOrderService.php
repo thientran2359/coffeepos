@@ -109,7 +109,7 @@ final class OperationalOrderService
                 'timestamp' => gmdate('c'),
                 'operations' => $operations,
                 'user_id' => max(0, $userId),
-                'surface' => in_array($surface, ['kds', 'order_queue'], true) ? $surface : 'kds',
+                'surface' => in_array($surface, ['kds', 'order_queue', 'order_history'], true) ? $surface : 'kds',
                 'reason' => trim($reason),
             ]);
             return $this->result($saved);

@@ -363,3 +363,18 @@ Shift routes are handled by `ShiftController` and `ShiftService`. They expose
 only the authenticated cashier's current lifecycle. WooCommerce remains the
 authority for shift sales totals, while the CoffeePOS shift table owns opening,
 closing, and reconciliation inputs.
+## Phase 10 Historical Order Operations
+
+`OrderHistoryController` delegates filtering, detail, refund, cancellation, and
+reorder coordination to application services. WooCommerce adapters own HPOS-
+compatible queries and refund CRUD; CartSessionService owns reconstruction.
+
+## Phase 11 Report Routes
+
+`ReportController` exposes manager-only `GET /reports/sales` and
+`GET /reports/sales/export`. `SalesReportService` normalizes WordPress-timezone
+date ranges and calculates refund-aware, currency-isolated projections from a
+bounded WooCommerce gateway. The export endpoint is the documented binary
+exception to the JSON success envelope; validation and authorization errors
+still use the shared error response. CSV and XLSX reuse the same ReportView.
+The full transport and projection contract is defined in `REPORT-API.md`.

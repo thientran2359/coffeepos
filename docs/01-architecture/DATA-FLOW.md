@@ -343,6 +343,16 @@ Current Cart
 
 The reconstructed cart must be revalidated before checkout.
 
+Phase 10 adds two authoritative mutation branches:
+
+```text
+History Detail -> RefundService -> wc_create_refund -> refreshed Order Detail
+History Detail -> Reorder validation -> fresh POS CartView -> Cashier
+```
+
+Cancellation continues through the Phase 07 operational state service so
+History cannot bypass KDS revision/state rules.
+
 ---
 
 # 15. Order → Shift
@@ -503,6 +513,22 @@ Order Queue → query/projection
 Order History → WooCommerce
 Reports → query/projection
 ```
+
+## Phase 11 Sales Report Flow
+
+```text
+Manager Date Filters
+→ Reports REST Controller
+→ SalesReportService
+→ Bounded HPOS-compatible WooCommerce order batches
+→ Refund-aware, currency-isolated server aggregation
+→ ReportView
+→ Reports UI / shared CSV-XLSX exporter
+```
+
+Report exports reuse the same ReportView and formulas as the screen. No report
+table, client-owned total, or cross-currency sum is introduced. A query/export
+failure returns an error and never exposes partial KPIs as complete.
 
 ## Phase-08 Member Identity Flow
 

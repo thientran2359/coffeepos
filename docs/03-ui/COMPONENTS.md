@@ -647,3 +647,17 @@ retry action where possible
 ```
 
 Do not expose stack traces or raw server exceptions.
+## Phase 10 Order History Components
+
+The History filter bar owns date/status/type/search input. Order cards and
+detail items use native PHP templates. Order Detail exposes only server-allowed
+print, reorder, refund, and cancel actions. Refund and destructive confirmation
+dialogs retain input and expose recoverable error states.
+
+## Phase 11 Report Components
+
+The Report filter bar owns presets, custom inclusive dates, and product ranking
+limit. Currency sections contain KPI cards, payment rows, product rows, and all
+24 hourly buckets. Multi-currency and unallocated-refund warnings remain visible.
+Export controls expose pending and recoverable error states and never bypass the
+manager-only server permission check.

@@ -260,6 +260,10 @@ from the browser.
 
 # 8. Order Detail
 
+Phase 10 implements this route for CoffeePOS-created orders only. The response
+also includes server-derived allowed actions, refunded/refundable totals, shift
+ID, and the Phase 07 operational revision.
+
 ## GET /coffeepos/v1/orders/{id}
 
 Response should include:
@@ -345,6 +349,9 @@ Request concept:
 
 WooCommerce refund APIs remain authoritative.
 
+Phase 10 supports full or amount-based offline refunds with an idempotency key.
+It does not infer item quantities, restock stock, or claim a provider refund.
+
 Do not mark an order refunded merely because the request was submitted.
 
 ---
@@ -374,6 +381,9 @@ Reconstruct cart
 ```
 
 Historical prices MUST NOT be copied as authoritative current prices.
+
+The Phase 10 result is a new Guest/Takeaway CartView and POS session. Customer,
+coupon, table, payment, shift, and historical price context are not copied.
 
 The reconstructed cart is written into a logical WooCommerce session cart and
 returned with `pos_session_id` and a new revision.

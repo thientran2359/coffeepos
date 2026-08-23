@@ -103,6 +103,7 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
         if (! $order) {
             throw Phase01Exception::withCode(Phase01ErrorCodes::ORDER_NOT_FOUND, 'Order was not found.');
         }
+        $this->assertCoffeePosOrder($order);
         return $this->projectOrder($order);
     }
 
@@ -112,6 +113,7 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
         if (! $order) {
             throw Phase01Exception::withCode(Phase01ErrorCodes::ORDER_NOT_FOUND, 'Order was not found.');
         }
+        $this->assertCoffeePosOrder($order);
         $items = [];
         foreach ($order->get_items() as $item) {
             $items[] = [
@@ -149,6 +151,15 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
         }
         $customer = new \WC_Customer($customerId);
         $order->set_address($customer->get_billing(), 'billing');
+    }
+
+    private function assertCoffeePosOrder($order): void
+    {
+        $createdVia = method_exists($order, 'get_created_via') ? (string) $order->get_created_via() : '';
+        $sessionId = (string) $order->get_meta('_coffeepos_pos_session_id', true);
+        if ($createdVia !== 'coffeepos' && $sessionId === '') {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::ORDER_NOT_FOUND, 'CoffeePOS order was not found.');
+        }
     }
 
     private function initializeOperationalMetadata($order): void

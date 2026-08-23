@@ -3,6 +3,7 @@
     const CoffeePOS = window.CoffeePOS || {};
     CoffeePOS.screens = CoffeePOS.screens || {};
     CoffeePOS.screens.createOrderHistoryController = function (root) {
+        const renderer = new CoffeePOS.ui.TemplateRenderer();
         const api = CoffeePOS.api.createPosApi(CoffeePOS.api.createClient());
         const canRefundOrders = !!(window.CoffeePOSConfig && window.CoffeePOSConfig.canRefundOrders);
         const confirmDialog = CoffeePOS.ui.createConfirmDialogController(root);
@@ -16,6 +17,7 @@
         const detailDialog = root.querySelector('[data-component="history-detail-dialog"]');
         const refundDialog = root.querySelector('[data-component="refund-dialog"]');
         const refundForm = root.querySelector('[data-component="refund-form"]');
+        const receiptPrinter = CoffeePOS.components.createReceiptPrinter(root, renderer);
         let page = 1; let pages = 0; let orders = []; let selected = null; let request = null; let pending = false;
 
         function operation(prefix) { return prefix + '-' + (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Date.now() + '-' + Math.random().toString(16).slice(2)); }
@@ -50,7 +52,8 @@
             setField(detailDialog, 'detail-subtotal', order.totals.subtotal.display); setField(detailDialog, 'detail-discount', order.totals.discount.display);
             setField(detailDialog, 'detail-refunded', order.totals.refunded.display); setField(detailDialog, 'detail-total', order.totals.total.display);
             const itemList = detailDialog.querySelector('[data-component="detail-items"]'); itemList.replaceChildren();
-            (order.items || []).forEach(function (item) { const node = detailTemplate.content.firstElementChild.cloneNode(true); setField(node, 'name', item.name); setField(node, 'note', item.note || ''); setField(node, 'quantity', '× ' + item.quantity); setField(node, 'total', item.total.display); itemList.appendChild(node); });
+            (order.items || []).forEach(function (item) { const node = detailTemplate.content.firstElementChild.cloneNode(true); setField(node, 'name', item.name); setField(node, 'quick_notes', item.quick_note_summary || ''); setField(node, 'note', item.note || ''); setField(node, 'quantity', '× ' + item.quantity); setField(node, 'total', item.total.display); itemList.appendChild(node); });
+            const orderNote = detailDialog.querySelector('[data-component="history-order-note"]'); setField(detailDialog, 'detail-order-note', order.order_note || ''); orderNote.hidden = !order.order_note;
             detailDialog.querySelector('[data-action="cancel-history-order"]').hidden = !order.actions.can_cancel;
             detailDialog.querySelector('[data-action="refund-order"]').hidden = !order.actions.can_refund || !canRefundOrders;
             detailDialog.querySelector('[data-action="reorder-order"]').hidden = !order.actions.can_reorder;
@@ -84,11 +87,7 @@
         async function printSelected() {
             if (!selected) { return; }
             try {
-                const data = await api.loadReceipt(selected.id); const receipt = data.receipt; const view = root.querySelector('[data-component="receipt"]');
-                setField(view, 'receipt-store-name', receipt.store.name); setField(view, 'receipt-store-address', receipt.store.address); setField(view, 'receipt-order-number', receipt.order.number); setField(view, 'receipt-total', receipt.totals.total + ' ' + receipt.totals.currency);
-                const container = view.querySelector('[data-component="receipt-items"]'); const template = view.querySelector('#coffeepos-receipt-item-template'); container.replaceChildren();
-                (receipt.items || []).forEach(function (item) { const node = template.content.firstElementChild.cloneNode(true); setField(node, 'name', item.name); setField(node, 'quantity', item.quantity); setField(node, 'total', item.total); setField(node, 'note', item.note); container.appendChild(node); });
-                view.hidden = false; window.print(); view.hidden = true;
+                const data = await api.loadReceipt(selected.id); await receiptPrinter.print(data.receipt);
             } catch (error) { showError(detailDialog.querySelector('[data-component="detail-error"]'), error); }
         }
         function openRefund() { if (!selected) { return; } refundForm.querySelector('[name="amount"]').value = selected.totals.refundable_amount; setField(refundDialog, 'refund-maximum', 'Maximum: ' + selected.totals.refundable.display); refundDialog.querySelector('[data-component="refund-error"]').hidden = true; refundDialog.showModal(); }

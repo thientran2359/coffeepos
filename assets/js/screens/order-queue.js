@@ -10,6 +10,7 @@
         const api = CoffeePOS.api.createPosApi(CoffeePOS.api.createClient());
         const store = CoffeePOS.state.createOrderQueueStore();
         const list = CoffeePOS.components.createOrderQueueList(root, renderer);
+        const receiptPrinter = CoffeePOS.components.createReceiptPrinter(root, renderer);
         const status = root.querySelector('[data-component="order-queue-refresh-status"]');
         const loading = root.querySelector('[data-component="order-queue-loading"]');
         const empty = root.querySelector('[data-component="order-queue-empty"]');
@@ -33,8 +34,7 @@
         async function printReceipt(order) {
             if (!order) { return; }
             try {
-                const data = await api.loadReceipt(order.id); const receipt = data.receipt; const view = root.querySelector('[data-component="receipt"]');
-                view.querySelector('[data-field="receipt-store-name"]').textContent = String(receipt.store.name || ''); view.querySelector('[data-field="receipt-store-address"]').textContent = String(receipt.store.address || ''); view.querySelector('[data-field="receipt-order-number"]').textContent = String(receipt.order.number || ''); view.querySelector('[data-field="receipt-total"]').textContent = String(receipt.totals.total + ' ' + receipt.totals.currency); renderer.renderList('coffeepos-receipt-item-template', receipt.items || [], view.querySelector('[data-component="receipt-items"]')); view.hidden = false; window.print(); view.hidden = true;
+                const data = await api.loadReceipt(order.id); await receiptPrinter.print(data.receipt);
             } catch (error) { toast.show(error.message || 'Receipt could not be loaded.', 'error'); }
         }
         function onClick(event) {

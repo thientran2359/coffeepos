@@ -46,7 +46,10 @@ A product configuration flow SHOULD support:
 - quick notes
 - free-form notes
 
-The feature baseline explicitly requires quick notes such as less ice, no sugar, extra milk, takeaway, and less sweet.
+The feature baseline explicitly requires quick notes. Phase 12 establishes the
+initial administrator-configurable set as `Ít đường`, `Nhiều đường`, `Ít sữa`,
+and `Ít đá`. Quick notes use stable IDs, may be combined, and remain distinct
+from the item's free-form note.
 
 Modifier definitions and selections MUST use stable IDs. Modifiers do not change
 price; price-changing choices MUST be represented by WooCommerce variations.
@@ -181,6 +184,10 @@ Checkout MUST create a standard WooCommerce order containing the required:
 - customer information
 - payment information
 
+The cart MUST also support one order-level note. An order note is separate from
+all item notes, is private to staff by default, and is persisted on the final
+WooCommerce order.
+
 ## 6.4 Receipt
 
 The system MUST support:
@@ -189,6 +196,14 @@ The system MUST support:
 - receipt reprinting
 - reprinting from order history
 - reprinting from order queue
+
+Browser printing MUST use one authoritative receipt projection and one
+PHP-owned receipt template. Printing MUST be blocked until the projection is
+loaded and populated; an empty receipt MUST never be sent to the browser print
+dialog. The receipt includes trusted order, item, total, payment, service, and
+cashier data. Showing the private order note is an administrator setting and is
+disabled by default. Physical printer transport remains a later hardware
+integration concern.
 
 ---
 
@@ -355,12 +370,18 @@ The plugin MUST provide:
 - full-screen POS UI
 - touch-friendly interaction
 - dedicated POS routes
-- WordPress capability checks
+- WordPress-account authentication and capability checks
 - nonce verification
 - secure server-side validation
 
+CoffeePOS MUST NOT implement PIN authentication or store a separate staff
+password. Staff authenticate with WordPress accounts through the WordPress
+authentication API, cookie, and installed authentication hooks. CoffeePOS roles
+are convenience bundles only; granular capabilities remain authoritative.
+
 Baseline routes are:
 
+- `/pos/` (staff login or first authorized landing page)
 - `/pos/cashier`
 - `/pos/kds`
 - `/pos/order-queue`
@@ -370,6 +391,11 @@ Baseline routes are:
 - `/pos/customer`
 
 Exact routing implementation is an architecture concern.
+
+Every staff screen MUST expose a shared, capability-aware navigation component.
+The Customer Display is a paired public projection and MUST NOT expose staff
+navigation. Hiding a link is never authorization; protected routes and actions
+MUST enforce their capability server-side.
 
 ---
 
@@ -414,8 +440,6 @@ The feature baseline does not fully specify:
 - exact payment-provider integration
 - receipt-printer implementation
 - exact membership/points implementation
-- exact permissions matrix
-- exact report query architecture
 - exact plugin directory architecture
 
 These MUST be resolved in the corresponding architecture/database/API/phase documents before implementation.

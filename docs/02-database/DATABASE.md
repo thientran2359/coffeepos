@@ -309,6 +309,27 @@ Do not store sensitive payment credentials.
 
 ---
 
+## `_coffeepos_order_note`
+
+Purpose:
+
+Stores the cashier-entered note for the whole order, distinct from every
+line-item note.
+
+Storage:
+
+WooCommerce private order meta written through WooCommerce CRUD.
+
+Rules:
+
+- sanitized plain text, maximum 2000 characters
+- staff-private and excluded from Customer Display projections
+- displayed on KDS, Order Queue detail, and Order History detail
+- printed only when `coffeepos_receipt_print_order_note` is enabled
+- not copied by quick reorder
+
+---
+
 # 6. Order Item Metadata
 
 Order item metadata is used for information specific to a configured line item.
@@ -341,18 +362,24 @@ Purpose:
 
 Stores structured quick-note selections.
 
-Preferred representation:
+Phase-12 write representation:
 
-JSON array of stable identifiers.
+JSON array of objects containing the stable ID and the label captured at order
+creation time.
 
 Example:
 
 ```json
 [
-  "less_ice",
-  "less_sweet"
+  {"id": "less_ice", "label": "Ít đá"},
+  {"id": "less_sugar", "label": "Ít đường"}
 ]
 ```
+
+Readers MUST also accept the legacy JSON array of string IDs. Quick reorder
+extracts stable IDs from either representation, validates them against the
+current enabled/applicable configuration, and never treats a historical label
+as authoritative current configuration.
 
 The identifiers must be stable and documented by the modifier/quick-note implementation.
 
@@ -684,6 +711,18 @@ Initial decision:
 - modifiers and quick notes do not carry price adjustments
 - store selected stable IDs and captured display labels on order item metadata
 
+The default `coffeepos_quick_notes` value established by Phase 12 is:
+
+| ID | Label |
+|---|---|
+| `less_sugar` | Ít đường |
+| `extra_sugar` | Nhiều đường |
+| `less_milk` | Ít sữa |
+| `less_ice` | Ít đá |
+
+Each entry also stores `enabled`, `sort_order`, and optional product/category
+applicability. Configuration changes do not rewrite historical order metadata.
+
 Do not create a custom table until there is a requirement for a full admin CRUD system with larger relational data.
 
 ---
@@ -714,6 +753,11 @@ POS capabilities/configuration
 
 Do not put operational transaction data in options.
 
+Phase 12 adds the boolean option
+`coffeepos_receipt_print_order_note`, default `false`. It controls only receipt
+projection/rendering and does not change storage or staff-screen visibility of
+the order note.
+
 ---
 
 # 19. User/Staff Data
@@ -732,7 +776,10 @@ to associate:
 - shift
 - order context
 
-Do not create a separate CoffeePOS staff table unless a dedicated staff-management feature is later introduced.
+Phase 12 explicitly continues to use WordPress users, roles, auth cookies, and
+capabilities. It creates no CoffeePOS staff, PIN, password, or login-session
+table. CoffeePOS role/capability registration is configuration managed through
+WordPress APIs, not a second identity store.
 
 ---
 

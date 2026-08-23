@@ -44,15 +44,17 @@ final class OrderHistoryController
         register_rest_route($namespace, '/orders', [['methods' => WP_REST_Server::READABLE, 'callback' => [$this, 'orders'], 'permission_callback' => [$this, 'permissionCheck']]]);
         register_rest_route($namespace, '/orders/(?P<id>\d+)', [['methods' => WP_REST_Server::READABLE, 'callback' => [$this, 'detail'], 'permission_callback' => [$this, 'permissionCheck']]]);
         register_rest_route($namespace, '/orders/(?P<id>\d+)/refund', [['methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'refund'], 'permission_callback' => [$this, 'refundPermissionCheck']]]);
-        register_rest_route($namespace, '/orders/(?P<id>\d+)/reorder', [['methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'reorder'], 'permission_callback' => [$this, 'permissionCheck']]]);
+        register_rest_route($namespace, '/orders/(?P<id>\d+)/reorder', [['methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'reorder'], 'permission_callback' => [$this, 'reorderPermissionCheck']]]);
     }
 
-    public function permissionCheck() { return Capabilities::currentUserCanAccessPos() ? true : ErrorFactory::forbidden('coffeepos_rest_forbidden', __('You are not allowed to access order history.', 'coffeepos')); }
-    public function refundPermissionCheck() { return current_user_can(Capabilities::MANAGE_WOOCOMMERCE) ? true : ErrorFactory::forbidden('coffeepos_refund_forbidden', __('You are not allowed to refund orders.', 'coffeepos')); }
+    public function permissionCheck() { return $this->check(Capabilities::VIEW_ORDER_HISTORY, __('You are not allowed to access order history.', 'coffeepos')); }
+    public function refundPermissionCheck() { return $this->check(Capabilities::REFUND_ORDERS, __('You are not allowed to refund orders.', 'coffeepos')); }
+    public function reorderPermissionCheck() { return $this->check(Capabilities::REORDER_ORDERS, __('You are not allowed to reorder orders.', 'coffeepos')); }
     public function orders(WP_REST_Request $request) { return $this->respond(function () use ($request): array { return $this->service->list($request->get_params()); }); }
     public function detail(WP_REST_Request $request) { return $this->respond(function () use ($request): array { return ['order' => $this->service->detail(absint($request['id']))]; }); }
     public function refund(WP_REST_Request $request) { return $this->respond(function () use ($request): array { $p=$this->payload($request); return ['order'=>$this->service->refund(absint($request['id']),(string)($p['amount']??''),(string)($p['reason']??''),(string)($p['client_operation_id']??''),get_current_user_id())]; }); }
     public function reorder(WP_REST_Request $request) { return $this->respond(function () use ($request): array { $p=$this->payload($request); return $this->service->reorder(absint($request['id']),(string)($p['client_operation_id']??'')); }); }
     private function payload(WP_REST_Request $request): array { $json=$request->get_json_params(); return array_merge($request->get_params(),is_array($json)?$json:[]); }
     private function respond(callable $callback) { try{return RestResponder::success($callback());}catch(\Throwable $e){return RestResponder::fromThrowable($e);} }
+    private function check(string $capability, string $message) { return current_user_can($capability) ? true : ErrorFactory::forbidden('coffeepos_action_forbidden', $message); }
 }

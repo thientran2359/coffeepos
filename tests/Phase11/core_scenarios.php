@@ -98,10 +98,10 @@ $source = static function (string $path) use ($root): string { return (string) f
 $gatewaySource = $source('includes/Integration/WooCommerce/WooCommerceReportOrderGateway.php');
 $assert(strpos($gatewaySource, 'wc_get_orders') !== false && strpos($gatewaySource, "'limit' => self::BATCH_SIZE") !== false && strpos($gatewaySource, '$wpdb') === false, 'TC-16 HPOS/bounded query contract is missing.');
 $controllerSource = $source('includes/REST/ReportController.php');
-$assert(strpos($controllerSource, 'MANAGE_WOOCOMMERCE') !== false && strpos($controllerSource, 'X-CoffeePOS-Binary') !== false, 'TC-17 report authorization/binary transport is missing.');
+$assert(strpos($controllerSource, 'VIEW_REPORTS') !== false && strpos($controllerSource, 'X-CoffeePOS-Binary') !== false, 'TC-17 report authorization/binary transport is missing.');
 $ui = $source('templates/reports/content.php') . $source('assets/js/screens/reports.js');
 $assert(strpos($ui, 'coffeepos-report-currency-template') !== false && strpos($ui, 'TemplateRenderer') !== false && strpos($ui, 'innerHTML') === false, 'TC-18 PHP template ownership failed.');
-$assert(strpos($source('includes/POS/Router.php'), "screen === 'reports'") !== false, 'TC-19 manager-only Reports route guard is missing.');
+$assert(strpos($source('includes/Support/Capabilities.php'), "'reports' => self::VIEW_REPORTS") !== false, 'TC-19 manager-only Reports route guard is missing.');
 $shiftTotalsSource = $source('includes/Integration/WooCommerce/WooCommerceShiftTotalsGateway.php');
 $assert(strpos($shiftTotalsSource, "'limit' => self::BATCH_SIZE") !== false && strpos($shiftTotalsSource, "'limit' => -1") === false, 'TC-20 hardening left shift totals unbounded.');
 

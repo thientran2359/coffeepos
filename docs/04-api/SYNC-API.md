@@ -460,7 +460,8 @@ The finalized snapshot payload is:
 `CartView`. It contains item names/configuration summaries, quantities, display
 prices/totals, safe customer name/membership, privacy-safe `phone_masked`, and
 service context. It excludes full phone, email, customer IDs, custom item notes,
-staff data, credentials, and internal metadata. REST recovery requests
+the Phase-12 private order note, staff data, credentials, and internal metadata.
+REST recovery requests
 `GET /cart?...&view=customer` to receive only this projection.
 
 Ordering rules:

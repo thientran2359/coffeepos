@@ -152,6 +152,7 @@ final class ProductConfigurationService
         }
 
         $normalizedNotes = array_values(array_unique(array_filter(array_map('strval', $quickNotes))));
+        sort($normalizedNotes, SORT_NATURAL | SORT_FLAG_CASE);
         $quickNoteLabels = [];
 
         foreach ($normalizedNotes as $noteId) {
@@ -165,8 +166,6 @@ final class ProductConfigurationService
 
             $quickNoteLabels[] = $noteById[$noteId];
         }
-
-        sort($normalizedNotes, SORT_NATURAL | SORT_FLAG_CASE);
 
         return [
             'modifiers' => $normalizedModifiers,

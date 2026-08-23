@@ -401,3 +401,27 @@ Cashier Resets
 4. UI may request a transition but does not own authorization.
 5. Successful server operations should emit/document the resulting state.
 6. Repeated requests should be handled safely where practical.
+
+---
+
+# 16. Staff Entry UI State
+
+```text
+ANONYMOUS
+  └─ submit valid login form → LOGIN_SUBMITTING
+LOGIN_SUBMITTING
+  ├─ WordPress rejects credentials/auth hook → LOGIN_ERROR → ANONYMOUS
+  └─ WordPress authenticates → AUTHENTICATED
+AUTHENTICATED
+  ├─ has a screen capability → AUTHORIZED_LANDING
+  └─ has no CoffeePOS screen capability → NO_ACCESS
+AUTHORIZED_LANDING
+  ├─ logout → ANONYMOUS
+  └─ WordPress session expires → ANONYMOUS
+NO_ACCESS
+  └─ logout → ANONYMOUS
+```
+
+This is UI/routing state only. The WordPress authentication cookie and
+capability system remain authoritative; CoffeePOS does not persist a parallel
+authentication state machine.

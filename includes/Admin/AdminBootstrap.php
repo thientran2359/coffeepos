@@ -33,7 +33,7 @@ final class AdminBootstrap
             'woocommerce',
             __('CoffeePOS', 'coffeepos'),
             __('CoffeePOS', 'coffeepos'),
-            Capabilities::MANAGE_WOOCOMMERCE,
+            Capabilities::MANAGE_SETTINGS,
             'coffeepos',
             [$this, 'renderOverview']
         );
@@ -41,7 +41,7 @@ final class AdminBootstrap
 
     public function renderOverview(): void
     {
-        if (! current_user_can(Capabilities::MANAGE_WOOCOMMERCE)) {
+        if (! current_user_can(Capabilities::MANAGE_SETTINGS)) {
             wp_die(
                 esc_html__('You are not allowed to access this page.', 'coffeepos'),
                 esc_html__('Forbidden', 'coffeepos'),
@@ -80,6 +80,31 @@ final class AdminBootstrap
         $this->numberSetting(Settings::OPTION_ORDER_QUEUE_POLL_INTERVAL, __('Order Queue polling interval (ms)', 'coffeepos'));
         echo '</tbody></table>';
         submit_button(__('Save operational settings', 'coffeepos'));
+        echo '</form>';
+        echo '<hr><h2>' . esc_html__('Item quick notes', 'coffeepos') . '</h2>';
+        echo '<p>' . esc_html__('Quick notes are structured item options and do not change price. Keep IDs stable after orders use them.', 'coffeepos') . '</p>';
+        echo '<form method="post" action="options.php">';
+        settings_fields(Settings::GROUP);
+        echo '<table class="widefat striped"><thead><tr><th>' . esc_html__('ID', 'coffeepos') . '</th><th>' . esc_html__('Label', 'coffeepos') . '</th><th>' . esc_html__('Product IDs', 'coffeepos') . '</th><th>' . esc_html__('Category IDs', 'coffeepos') . '</th><th>' . esc_html__('Order', 'coffeepos') . '</th><th>' . esc_html__('Enabled', 'coffeepos') . '</th></tr></thead><tbody>';
+        foreach ((array) Settings::get(Settings::OPTION_QUICK_NOTES) as $index => $note) {
+            if (! is_array($note)) { continue; }
+            $prefix = Settings::OPTION_QUICK_NOTES . '[' . (int) $index . ']';
+            echo '<tr><td><input type="text" readonly name="' . esc_attr($prefix . '[id]') . '" value="' . esc_attr((string) ($note['id'] ?? '')) . '"></td>';
+            echo '<td><input type="text" required name="' . esc_attr($prefix . '[label]') . '" value="' . esc_attr((string) ($note['label'] ?? '')) . '"></td>';
+            echo '<td><input type="text" name="' . esc_attr($prefix . '[product_ids]') . '" value="' . esc_attr(implode(', ', array_map('absint', (array) ($note['product_ids'] ?? [])))) . '" placeholder="12, 34"></td>';
+            echo '<td><input type="text" name="' . esc_attr($prefix . '[category_ids]') . '" value="' . esc_attr(implode(', ', array_map('absint', (array) ($note['category_ids'] ?? [])))) . '" placeholder="5, 8"></td>';
+            echo '<td><input type="number" name="' . esc_attr($prefix . '[sort_order]') . '" value="' . esc_attr((string) ($note['sort_order'] ?? 0)) . '"></td>';
+            echo '<td><input type="hidden" name="' . esc_attr($prefix . '[enabled]') . '" value="0"><input type="checkbox" name="' . esc_attr($prefix . '[enabled]') . '" value="1" ' . checked(! empty($note['enabled']), true, false) . '>';
+            echo '</td></tr>';
+        }
+        echo '</tbody></table>';
+        submit_button(__('Save quick notes', 'coffeepos'));
+        echo '</form>';
+        echo '<hr><h2>' . esc_html__('Receipt', 'coffeepos') . '</h2>';
+        echo '<form method="post" action="options.php">';
+        settings_fields(Settings::GROUP);
+        echo '<label><input type="hidden" name="' . esc_attr(Settings::OPTION_RECEIPT_PRINT_ORDER_NOTE) . '" value="0"><input type="checkbox" name="' . esc_attr(Settings::OPTION_RECEIPT_PRINT_ORDER_NOTE) . '" value="1" ' . checked(Settings::shouldPrintOrderNote(), true, false) . '> ' . esc_html__('Print the private order note on receipts', 'coffeepos') . '</label>';
+        submit_button(__('Save receipt settings', 'coffeepos'));
         echo '</form>';
         echo '</div>';
     }

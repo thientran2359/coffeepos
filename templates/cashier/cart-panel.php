@@ -109,6 +109,16 @@ if (! defined('ABSPATH')) {
     </button>
 </section>
 
+<section class="coffeepos-order-note-editor" data-component="order-note-editor" data-state="idle">
+    <label for="coffeepos-order-note"><?php esc_html_e('Order note', 'coffeepos'); ?></label>
+    <textarea id="coffeepos-order-note" data-component="order-note-input" maxlength="2000" rows="2" placeholder="<?php esc_attr_e('Private note for the whole order', 'coffeepos'); ?>"></textarea>
+    <div>
+        <small data-component="order-note-status" role="status"></small>
+        <button type="button" class="coffeepos-link-button" data-action="clear-order-note"><?php esc_html_e('Clear', 'coffeepos'); ?></button>
+        <button type="button" class="coffeepos-btn coffeepos-btn-light" data-action="save-order-note"><?php esc_html_e('Save note', 'coffeepos'); ?></button>
+    </div>
+</section>
+
 <section class="coffeepos-cart-summary" data-component="cart-summary" data-state="normal">
     <div>
         <span><?php esc_html_e('Subtotal', 'coffeepos'); ?></span>

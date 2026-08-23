@@ -70,15 +70,22 @@ final class CheckoutController
         ]]);
         register_rest_route($namespace, '/orders/(?P<id>\d+)/receipt', [[
             'methods' => WP_REST_Server::READABLE, 'callback' => [$this, 'receipt'],
-            'permission_callback' => [$this, 'permissionCheck'],
+            'permission_callback' => [$this, 'receiptPermissionCheck'],
         ]]);
     }
 
     public function permissionCheck()
     {
-        return Capabilities::currentUserCanAccessPos()
+        return current_user_can(Capabilities::ACCESS_CASHIER)
             ? true
             : ErrorFactory::forbidden('coffeepos_rest_forbidden', __('You are not allowed to access CoffeePOS REST endpoints.', 'coffeepos'));
+    }
+
+    public function receiptPermissionCheck()
+    {
+        return current_user_can(Capabilities::REPRINT_RECEIPTS)
+            ? true
+            : ErrorFactory::forbidden('coffeepos_action_forbidden', __('You are not allowed to print receipts.', 'coffeepos'));
     }
 
     public function applicableCoupons(WP_REST_Request $request)

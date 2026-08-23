@@ -352,6 +352,17 @@
                 couponSelector.open();
             } else if (action === 'remove-coupon' && cart) {
                 mutate(function () { return api.removeCoupon(cartPayload(cart)); }).catch(function () {});
+            } else if (action === 'save-order-note' && cart) {
+                const input = root.querySelector('[data-component="order-note-input"]');
+                cartPanel.setOrderNoteStatus('Saving…');
+                mutate(function () { return api.setOrderNote(Object.assign(cartPayload(cart), { note: input.value })); })
+                    .then(function () { cartPanel.setOrderNoteStatus('Saved'); })
+                    .catch(function () { cartPanel.setOrderNoteStatus('Could not save'); });
+            } else if (action === 'clear-order-note' && cart) {
+                cartPanel.setOrderNoteStatus('Saving…');
+                mutate(function () { return api.clearOrderNote(cartPayload(cart)); })
+                    .then(function () { cartPanel.setOrderNoteStatus('Cleared'); })
+                    .catch(function () { cartPanel.setOrderNoteStatus('Could not clear'); });
             } else if (action === 'checkout' && cart) {
                 if (!activeShift) {
                     toast.show('Open a shift before checkout.', 'error');

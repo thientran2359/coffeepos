@@ -547,3 +547,45 @@ Cashier phone input
 Customer creation and cart attachment are separate operations. If attachment
 conflicts after creation, the customer remains valid and the Cashier reconciles
 the cart before retrying attachment.
+
+## Phase-12 Staff Entry Flow
+
+```text
+Anonymous GET /pos/
+→ PHP-owned CoffeePOS login form
+→ nonce-protected POST
+→ wp_signon() + normal WordPress authentication hooks
+→ WordPress auth cookie
+→ resolve exact CoffeePOS capabilities
+→ safe internal first-permitted/return-target redirect
+→ shared capability-aware staff navigation
+```
+
+An authentication failure returns to the login form with a generic error. An
+authorization failure returns a controlled 403. Credentials never pass through
+a CoffeePOS REST endpoint and are never broadcast or persisted by CoffeePOS.
+
+## Phase-12 Notes and Receipt Flow
+
+```text
+Item quick-note IDs + item free text
+→ revisioned cart item mutation
+→ enabled/applicable quick-note validation
+→ WooCommerce order-item metadata with captured labels
+
+Order free-text note
+→ revisioned cart aggregate mutation
+→ private WooCommerce order metadata
+→ KDS/Queue/History staff projections
+
+Authorized print action
+→ receipt endpoint
+→ WooCommerce order + approved CoffeePOS metadata
+→ authoritative ReceiptView
+→ PHP-owned receipt template populated completely
+→ window.print()
+```
+
+The Customer Display projection excludes the private order note. Reorder does
+not copy an old order note. Receipt rendering is never allowed to print while
+the ReceiptView is missing or incomplete.

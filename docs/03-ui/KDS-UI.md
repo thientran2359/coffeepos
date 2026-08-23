@@ -150,6 +150,15 @@ Do not clear existing valid cards merely because one refresh failed.
 
 ---
 
+# 10.1 Order-Level Note
+
+When present, the private order note appears once in the order-card header with
+stronger prominence than line-item notes. Item notes remain attached to their
+own lines. Long notes wrap safely and never inject markup. Customer Display does
+not consume this field.
+
+---
+
 # 11. Acceptance Criteria
 
 1. New orders appear without manual refresh.
@@ -161,3 +170,4 @@ Do not clear existing valid cards merely because one refresh failed.
 7. Preparation state can change with one primary action.
 8. Polling does not create overlapping requests.
 9. Existing cards remain usable during temporary refresh failure.
+10. Order-level and item-level notes remain visually distinct.

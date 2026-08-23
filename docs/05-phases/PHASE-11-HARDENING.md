@@ -43,6 +43,11 @@ affect report generation or exports.
 
 No critical or high-severity finding was identified in this Phase-11 scope.
 
+The `manage_woocommerce` checks recorded here describe the verified Phase-11
+implementation. Phase 12 deliberately migrates CoffeePOS screens and actions to
+the more granular capability matrix defined there; this evidence is historical
+and does not override the Phase-12 authorization contract.
+
 ## 3. Data Integrity Review
 
 - WooCommerce CRUD/query APIs remain the canonical source

@@ -64,6 +64,7 @@ final class Bootstrap
             return;
         }
 
+        Settings::ensureDefaults();
         $this->settings->register();
         $this->adminBootstrap->register();
 

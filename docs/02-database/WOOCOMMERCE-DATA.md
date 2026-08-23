@@ -310,3 +310,19 @@ explicitly unallocated. Monetary aggregates are separated by order currency.
 
 CSV and XLSX exports are generated from the same application ReportView as the
 screen. They are transient response files and add no persistent report storage.
+
+---
+
+# 20. Phase-12 Notes and Staff Ownership
+
+WordPress users remain canonical for staff identity and authentication.
+CoffeePOS stores only the responsible WordPress user ID where the transaction
+requires it; it does not duplicate usernames, password hashes, PINs, roles, or
+authentication sessions.
+
+The order-level note is CoffeePOS private WooCommerce order metadata. Item
+quick-note selections and item free-form notes remain WooCommerce order-item
+metadata. These fields are written through WooCommerce CRUD so HPOS and classic
+storage compatibility are preserved. Receipt, KDS, Queue, and History
+projections read the same canonical order and approved metadata rather than a
+separate receipt or note table.

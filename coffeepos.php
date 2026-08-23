@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CoffeePOS
  * Description: CoffeePOS foundational infrastructure for WooCommerce-powered POS workflows.
- * Version: 0.0.12
+ * Version: 0.0.13
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Author: CoffeePOS
@@ -15,7 +15,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('COFFEEPOS_VERSION', '0.0.12');
+define('COFFEEPOS_VERSION', '0.0.13');
 define('COFFEEPOS_FILE', __FILE__);
 define('COFFEEPOS_PATH', plugin_dir_path(__FILE__));
 define('COFFEEPOS_URL', plugin_dir_url(__FILE__));

@@ -385,6 +385,84 @@ The plugin satisfies the documented requirements and can be evaluated as a produ
 
 ---
 
+# Phase 12 — Staff Access, Workflow Polish & Receipt Completion
+
+## Goal
+
+Complete the daily staff entry and navigation experience, formalize granular
+WordPress-account permissions, and close the remaining cashier note and browser
+receipt gaps.
+
+## Work
+
+- `/pos/` WordPress-account login and authorized landing behavior
+- CoffeePOS role bundles and granular capability matrix
+- capability-aware navigation across all staff screens
+- administrator-configurable item quick-note chips
+- a separate order-level note
+- authoritative, populated browser receipt printing and reprinting
+- documentation, permission migration, and regression coverage
+
+## Exclusions
+
+- PIN or CoffeePOS-owned credentials
+- a custom employee account store
+- loyalty rewards
+- physical receipt-printer drivers
+- automated bank-payment confirmation
+
+## Exit Criteria
+
+Authorized staff can sign in at `/pos/` with their WordPress account, reach
+only permitted screens and operations, use consistent staff navigation, record
+both item and order notes, and print a complete receipt from every documented
+print entry point.
+
+---
+
+# Phase 13 — Production Operations
+
+## Goal
+
+Add the operational controls and observability needed for sustained production
+use after the Phase-12 staff-access foundation.
+
+## Work
+
+The exact production-operations scope and acceptance criteria MUST be defined in
+`docs/05-phases/PHASE-13.md` before implementation.
+
+---
+
+# Phase 14 — Loyalty & Membership Benefits
+
+## Goal
+
+Extend the Phase-08 member identity foundation with approved benefit rules such
+as visit/item rewards and tier-specific offers.
+
+## Work
+
+The earning, redemption, refund, expiry, abuse-prevention, and WooCommerce
+ownership rules MUST be documented before implementation.
+
+---
+
+# Phase 15 — Hardware & Payment Integrations
+
+## Goal
+
+Integrate approved receipt hardware and payment providers without weakening the
+server-authoritative checkout contract.
+
+## Work
+
+Printer transports, device support, payment-provider callbacks, reconciliation,
+secrets, failure states, and certification requirements MUST be documented
+before implementation.
+
+---
+
 # 2. Dependency Map
 
 ```text
@@ -407,6 +485,14 @@ Phase 05
                                         Phase 10
                                            ↓
                                         Phase 11
+                                           ↓
+                                        Phase 12
+                                           ↓
+                                        Phase 13
+                                           ↓
+                                        Phase 14
+                                           ↓
+                                        Phase 15
 ```
 
 The dependency map is conceptual.

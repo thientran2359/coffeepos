@@ -237,20 +237,23 @@ Rules:
 
 # 9. Quick Notes
 
-Examples from the feature baseline:
+Phase-12 default administrator-configurable chips:
 
 ```text
+Ít đường
+Nhiều đường
+Ít sữa
 Ít đá
-Không đá
-Ít ngọt
-Không đường
-Nhiều sữa
-Mang về
 ```
 
 Quick notes must have stable IDs.
 
 Labels may be localized.
+
+Multiple enabled/applicable chips may be selected. A selected chip has visible
+and accessible pressed state. The selected stable IDs are structured item
+configuration; the UI MUST NOT concatenate chip labels into the free-text
+textarea. Edit mode restores both selections and free text independently.
 
 ---
 
@@ -661,3 +664,36 @@ limit. Currency sections contain KPI cards, payment rows, product rows, and all
 24 hourly buckets. Multi-currency and unallocated-refund warnings remain visible.
 Export controls expose pending and recoverable error states and never bypass the
 manager-only server permission check.
+
+## Phase 12 Staff Navigation
+
+The shared Staff Navigation component contains:
+
+```text
+CoffeePOS/home entry
+capability-permitted screen links
+current-screen state
+staff display name
+optional current-shift status
+WordPress logout action
+```
+
+It is present on every staff application screen and absent from Login and
+Customer Display. Collapsing it for tablet layouts must preserve focus order,
+labels, Escape behavior, and access to logout.
+
+## Phase 12 Order Note
+
+The Order Note component is a cart-level textarea with save/clear state. It is
+not inside an item modal and never changes any item's note. It binds to the
+revisioned `CartView.order_note`, supports a maximum of 2000 characters, safely
+retains text after a recoverable error, and exposes saving/saved/error feedback.
+
+## Phase 12 Receipt
+
+The shared Receipt component renders store identity, order/time/cashier,
+customer-safe identity, service context, items and configuration, item notes,
+subtotal, discount/refund/total, payment method, and cash received/change when
+present. The private order note appears only when enabled by the receipt
+setting. Loading, unavailable, and error states block printing. The print action
+is enabled only after the complete ReceiptView has been bound.

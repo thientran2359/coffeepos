@@ -13,11 +13,15 @@ Both endpoints require:
 ```text
 authenticated WordPress user
 valid REST nonce
-manage_woocommerce
+coffeepos_view_reports
 ```
 
 Failure returns `coffeepos_reports_forbidden`. Route or UI visibility is not an
 authorization control.
+
+`manage_woocommerce` was the verified Phase-11 interim permission. Phase 12
+replaces it with the granular capability above; implementation and tests must
+not retain the old capability as an undocumented alternative grant.
 
 ## 3. Sales Report
 

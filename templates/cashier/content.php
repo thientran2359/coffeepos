@@ -9,7 +9,7 @@ if (! defined('ABSPATH')) {
 $cashierView = [
     'brand' => __('CoffeePOS', 'coffeepos'),
     'shift' => __('No shift open', 'coffeepos'),
-    'cashier' => __('Cashier', 'coffeepos'),
+    'cashier' => is_user_logged_in() ? (string) wp_get_current_user()->display_name : __('Cashier', 'coffeepos'),
 ];
 
 ?>

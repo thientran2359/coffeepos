@@ -74,6 +74,11 @@ optional product/category applicability
 These settings do not define price adjustments. Price-changing customer choices
 must be configured as WooCommerce variations.
 
+Phase 12 supplies these editable defaults: `less_sugar`/Ít đường,
+`extra_sugar`/Nhiều đường, `less_milk`/Ít sữa, and `less_ice`/Ít đá. IDs remain
+stable when labels or ordering change. Deleting or disabling a definition does
+not rewrite historical orders.
+
 ---
 
 # 7. Payment Configuration
@@ -89,6 +94,20 @@ Exact VietQR/provider fields belong to payment API documentation.
 Admin screens must use WordPress capabilities.
 
 Do not rely on menu visibility alone.
+
+CoffeePOS settings require `coffeepos_manage_settings`. WordPress user/account
+management remains in the native WordPress Users interface and requires native
+WordPress user-management capabilities. Phase 12 does not add a PIN field,
+password field, employee-account store, or CoffeePOS account editor.
+
+The activation/migration registers the CoffeePOS Cashier, Kitchen, Supervisor,
+and Manager role bundles documented in `SECURITY.md`. Administrator and Shop
+Manager receive all CoffeePOS capabilities for backward compatibility.
+
+Receipt settings include
+`coffeepos_receipt_print_order_note` (boolean, default off). Browser receipt
+layout support is part of Phase 12; physical-printer connection settings remain
+Phase 15.
 
 ---
 

@@ -321,20 +321,20 @@ WooCommerce variation and use its WooCommerce price.
 
 Quick-note buttons should be fast to tap.
 
-Baseline examples:
+Phase-12 default chips:
 
 ```text
+Ít đường
+Nhiều đường
+Ít sữa
 Ít đá
-Không đá
-Ít ngọt
-Không đường
-Nhiều sữa
-Mang về
 ```
 
 Selection should be visibly toggled.
 
-If multiple notes are allowed, the UI must allow multiple selections.
+The UI allows multiple selections. Quick-note IDs remain structured state and
+must not be appended into the custom-note textarea. Editing a cart item restores
+both controls independently.
 
 ---
 
@@ -354,6 +354,20 @@ Làm riêng
 ```
 
 The note belongs to the item.
+
+---
+
+# 13.1 Order Note
+
+The Cashier cart/summary area provides a separate order-level textarea. It does
+not appear in the item configuration modal and does not modify any item note.
+Save and clear are revisioned cart mutations; stale revisions reconcile with the
+returned authoritative CartView. The field supports at most 2000 characters and
+shows saving, saved, and recoverable error feedback.
+
+The order note is private staff context. It is not broadcast to Customer
+Display. Clearing or starting a new cart clears the order note. Quick reorder
+starts with an empty order note.
 
 ---
 

@@ -7,6 +7,8 @@ namespace CoffeePOS\Integration\WooCommerce;
 use CoffeePOS\Application\Contracts\OrderHistoryGatewayInterface;
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
 use CoffeePOS\Application\Error\Phase01Exception;
+use CoffeePOS\Support\Capabilities;
+use CoffeePOS\Infrastructure\Settings\Settings;
 
 final class WooCommerceOrderHistoryGateway implements OrderHistoryGatewayInterface
 {
@@ -117,11 +119,11 @@ final class WooCommerceOrderHistoryGateway implements OrderHistoryGatewayInterfa
                     return is_array($option) ? (string) ($option['id'] ?? '') : '';
                 }, (array) ($group['options'] ?? []))));
             }
-            $quickNotes = json_decode((string) $item->get_meta('_coffeepos_quick_notes', true), true);
+            $quickNotes = $this->quickNoteIds(json_decode((string) $item->get_meta('_coffeepos_quick_notes', true), true));
             $items[] = [
                 'product_id' => (int) $item->get_product_id(), 'variation_id' => (int) $item->get_variation_id(),
                 'quantity' => max(1, (int) $item->get_quantity()), 'modifiers' => $modifiers,
-                'quick_notes' => is_array($quickNotes) ? array_values($quickNotes) : [],
+                'quick_notes' => $quickNotes,
                 'custom_note' => (string) $item->get_meta('_coffeepos_note', true),
             ];
         }
@@ -173,11 +175,27 @@ final class WooCommerceOrderHistoryGateway implements OrderHistoryGatewayInterfa
         $refundable = max(0.0, (float) $order->get_total() - $refunded);
         $items = [];
         foreach ($order->get_items('line_item') as $item) {
+            $quickMetadata = json_decode((string) $item->get_meta('_coffeepos_quick_notes', true), true);
+            $quickLabels = [];
+            $configuredQuickLabels = [];
+            foreach ((array) Settings::get(Settings::OPTION_QUICK_NOTES) as $definition) {
+                if (is_array($definition) && ! empty($definition['id'])) { $configuredQuickLabels[(string) $definition['id']] = (string) ($definition['label'] ?? $definition['id']); }
+            }
+            foreach (is_array($quickMetadata) ? $quickMetadata : [] as $value) {
+                if (is_array($value)) {
+                    $label = trim((string) ($value['label'] ?? $value['id'] ?? ''));
+                } else {
+                    $id = trim((string) $value);
+                    $label = trim((string) ($configuredQuickLabels[$id] ?? $id));
+                }
+                if ($label !== '') { $quickLabels[] = $label; }
+            }
             $items[] = [
                 'id' => (int) $item->get_id(), 'product_id' => (int) $item->get_product_id(), 'variation_id' => (int) $item->get_variation_id(),
                 'name' => wp_strip_all_tags((string) $item->get_name()), 'quantity' => (int) $item->get_quantity(),
                 'subtotal' => $this->money((float) $item->get_subtotal(), $currency), 'total' => $this->money((float) $item->get_total(), $currency),
                 'note' => (string) $item->get_meta('_coffeepos_note', true),
+                'quick_note_summary' => implode(', ', $quickLabels),
             ];
         }
         $customerName = trim((string) $order->get_formatted_billing_full_name());
@@ -192,14 +210,31 @@ final class WooCommerceOrderHistoryGateway implements OrderHistoryGatewayInterfa
             'service' => ['order_type' => in_array($orderType, ['dine_in', 'takeaway'], true) ? $orderType : 'takeaway', 'table_label' => (string) $order->get_meta('_coffeepos_table_label', true)],
             'payment' => ['method' => (string) $order->get_meta('_coffeepos_payment_method', true), 'method_label' => (string) $order->get_payment_method_title()],
             'shift_id' => (int) $order->get_meta('_coffeepos_shift_id', true), 'items' => $items,
+            'order_note' => (string) $order->get_meta('_coffeepos_order_note', true),
             'totals' => [
                 'subtotal' => $this->money((float) $order->get_subtotal(), $currency), 'discount' => $this->money((float) $order->get_discount_total(), $currency),
                 'total' => $this->money((float) $order->get_total(), $currency), 'refunded' => $this->money($refunded, $currency),
                 'refundable' => $this->money($refundable, $currency), 'refundable_amount' => $this->decimal($refundable), 'currency' => $currency,
             ],
             'kds' => ['state' => $kdsState, 'revision' => max(0, (int) $order->get_meta(WooCommerceOperationalOrderGateway::META_REVISION, true))],
-            'actions' => ['can_cancel' => $canCancel, 'can_refund' => $canRefund, 'can_reorder' => $items !== [], 'can_reprint' => true],
+            'actions' => [
+                'can_cancel' => $canCancel && current_user_can(Capabilities::CANCEL_ORDERS),
+                'can_refund' => $canRefund && current_user_can(Capabilities::REFUND_ORDERS),
+                'can_reorder' => $items !== [] && current_user_can(Capabilities::REORDER_ORDERS),
+                'can_reprint' => current_user_can(Capabilities::REPRINT_RECEIPTS),
+            ],
         ];
+    }
+
+    private function quickNoteIds($metadata): array
+    {
+        $ids = [];
+        foreach (is_array($metadata) ? $metadata : [] as $value) {
+            $id = is_array($value) ? (string) ($value['id'] ?? '') : (string) $value;
+            if ($id !== '') { $ids[] = sanitize_key($id); }
+        }
+
+        return array_values(array_unique(array_filter($ids)));
     }
 
     private function operations($order, string $key): array

@@ -345,6 +345,7 @@ Major screen routes are independent surfaces.
 Baseline routes:
 
 ```text
+/pos/
 /pos/cashier
 /pos/customer
 /pos/kds
@@ -355,6 +356,20 @@ Baseline routes:
 ```
 
 Routing implementation must follow architecture/API documentation.
+
+`/pos/` is the staff entry surface. Anonymous users see the PHP-owned WordPress
+account login form; authenticated users are sent to their first permitted
+screen. Login and Customer Display do not render staff navigation.
+
+Cashier, KDS, Order Queue, Order History, Shifts, and Reports render one shared
+Staff Navigation component. It contains only capability-permitted destinations,
+marks the current screen, shows the authenticated staff display name, and
+provides the nonce-protected WordPress logout link. At tablet widths it may use
+a compact/drawer presentation, but all links and logout remain keyboard
+accessible. Direct URL and API authorization remain server responsibilities.
+
+Users with no CoffeePOS screen capability see a safe no-access panel and logout
+at `/pos/` rather than an empty or partially authorized application shell.
 
 ---
 
@@ -579,6 +594,22 @@ server-side cart session.
 ## Phase 11 Reports
 
 `/pos/reports/` is a manager-only, independently scrollable application surface.
+
+## Phase 12 Staff Login, Navigation, Notes, and Receipt
+
+The login shell defines idle, submitting, generic-error, and no-access states.
+It uses semantic labels, password-manager-friendly fields, visible focus, and no
+client-built credential transport.
+
+Item quick-note chips and the item free-text textarea are separate controls.
+The order-note textarea belongs to the cart/order summary and is not shown in
+the item configuration modal. Customer Display excludes the order note.
+
+Receipt markup is owned by one PHP template. Print styling hides the application
+outside the receipt, supports browser/default plus 58 mm and 80 mm-friendly
+layouts, and restores the UI after printing. JavaScript must finish binding a
+successful ReceiptView before invoking `window.print()` and must not duplicate
+receipt markup across repeated prints.
 It owns date presets/custom range, KPI cards, payment composition, product
 rankings, peak hours, data-quality warnings, and CSV/XLSX export states. Server
 ReportView values are rendered through PHP-owned native templates and the shared

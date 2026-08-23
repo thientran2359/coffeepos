@@ -185,6 +185,12 @@
             clearCart: function (payload) {
                 return client.request('cart', { method: 'DELETE', body: payload });
             },
+            setOrderNote: function (payload) {
+                return client.request('cart/order-note', { method: 'PUT', body: payload });
+            },
+            clearOrderNote: function (payload) {
+                return client.request('cart/order-note', { method: 'DELETE', body: payload });
+            },
             lookupCustomer: function (phone, signal) {
                 return client.request('customers/lookup' + query({ phone: phone }), { signal: signal });
             },

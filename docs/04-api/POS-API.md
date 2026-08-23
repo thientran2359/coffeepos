@@ -325,6 +325,35 @@ Removes one item and returns the incremented cart projection.
 Clears the logical cart after confirmation and returns the empty incremented
 projection. It does not destroy the surrounding WooCommerce session.
 
+## PUT /coffeepos/v1/cart/order-note
+
+Creates or replaces the private order-level note.
+
+Request:
+
+```json
+{
+  "pos_session_id": "01J...",
+  "expected_revision": 7,
+  "note": "Giao đồ uống cùng lúc"
+}
+```
+
+The server applies WordPress textarea sanitization, validates a maximum of 2000
+characters, increments the cart revision, and returns the complete Cashier
+CartView. It does not alter item notes.
+
+## DELETE /coffeepos/v1/cart/order-note
+
+Request fields are `pos_session_id` and `expected_revision`. The server clears
+only the order-level note, increments the revision, and returns the complete
+Cashier CartView.
+
+Both mutations require `coffeepos_access_cashier`, normal WordPress REST
+authentication/nonce protection, and the same stale-revision reconciliation as
+other cart mutations. Invalid content returns `invalid_order_note`; an ordinary
+stale mutation returns the existing cart-revision error and current CartView.
+
 ## POST /coffeepos/v1/cart/validate
 
 Purpose:
@@ -538,6 +567,7 @@ customer
 order_type
 table
 coupon
+order_note
 validation
 ```
 
@@ -558,6 +588,10 @@ The final pricing fields should be server-derived when the API is authoritative.
 
 All item prices and totals are resolved from WooCommerce product/variation and
 coupon data. Client-supplied prices and modifier price adjustments are ignored.
+
+`order_note` is present only in authorized staff CartView projections. It is
+excluded from CustomerCartView, customer-display REST recovery, and every
+BroadcastChannel customer snapshot.
 
 ---
 

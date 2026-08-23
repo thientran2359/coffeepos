@@ -14,6 +14,7 @@ final class Router
     public const QUERY_VAR_SCREEN = 'coffeepos_screen';
 
     private const SCREENS = [
+        'entry',
         'cashier',
         'customer',
         'kds',
@@ -33,6 +34,7 @@ final class Router
     public function register(): void
     {
         add_action('init', [self::class, 'registerRewriteRules'], 20);
+        add_action('init', [self::class, 'maybeFlushRewriteRules'], 21);
         add_filter('query_vars', [$this, 'addQueryVars']);
         add_filter('template_include', [$this, 'filterTemplate']);
         add_filter('show_admin_bar', [$this, 'filterAdminBar']);
@@ -63,9 +65,19 @@ final class Router
         );
         add_rewrite_rule(
             '^' . preg_quote($normalizedBase, '/') . '/?$',
-            'index.php?' . self::QUERY_VAR_SCREEN . '=cashier',
+            'index.php?' . self::QUERY_VAR_SCREEN . '=entry',
             'top'
         );
+    }
+
+    public static function maybeFlushRewriteRules(): void
+    {
+        if ((string) get_option('coffeepos_rewrite_version', '') === COFFEEPOS_VERSION) {
+            return;
+        }
+
+        flush_rewrite_rules(false);
+        update_option('coffeepos_rewrite_version', COFFEEPOS_VERSION);
     }
 
     public function addQueryVars(array $vars): array
@@ -83,9 +95,15 @@ final class Router
             return $template;
         }
 
-        $canAccess = $screen === 'reports'
-            ? current_user_can(Capabilities::MANAGE_WOOCOMMERCE)
-            : Capabilities::currentUserCanAccessPos();
+        if ($screen === 'entry') {
+            return $this->entryTemplate($template);
+        }
+
+        if ($screen !== 'customer' && ! is_user_logged_in()) {
+            $this->redirectToEntry(self::routeUrl($screen));
+        }
+
+        $canAccess = $screen === 'customer' || Capabilities::currentUserCanAccessScreen($screen);
 
         if (! $canAccess) {
             wp_die(
@@ -99,6 +117,7 @@ final class Router
             'screen' => $screen,
             'route' => self::routeUrl($screen),
             'rest_namespace' => RouteRegistrar::NAMESPACE,
+            'navigation' => self::navigationItems(),
         ]);
 
         if ($resolvedTemplate === null) {
@@ -133,7 +152,7 @@ final class Router
         return self::SCREENS;
     }
 
-    private static function routeUrl(string $screen): string
+    public static function routeUrl(string $screen = ''): string
     {
         $baseSlug = trim(Settings::getPosBaseSlug(), '/');
 
@@ -141,6 +160,117 @@ final class Router
             $baseSlug = 'pos';
         }
 
-        return home_url('/' . $baseSlug . '/' . $screen . '/');
+        return home_url('/' . $baseSlug . ($screen === '' || $screen === 'entry' ? '/' : '/' . $screen . '/'));
+    }
+
+    public static function navigationItems(): array
+    {
+        $labels = [
+            'cashier' => __('Cashier', 'coffeepos'),
+            'kds' => __('Kitchen Display', 'coffeepos'),
+            'order-queue' => __('Order Queue', 'coffeepos'),
+            'shifts' => __('Shifts', 'coffeepos'),
+            'order-history' => __('Order History', 'coffeepos'),
+            'reports' => __('Reports', 'coffeepos'),
+        ];
+        $items = [];
+
+        foreach ($labels as $screen => $label) {
+            if (Capabilities::currentUserCanAccessScreen($screen)) {
+                $items[] = ['screen' => $screen, 'label' => $label, 'url' => self::routeUrl($screen)];
+            }
+        }
+
+        if (current_user_can(Capabilities::MANAGE_SETTINGS)) {
+            $items[] = [
+                'screen' => 'settings',
+                'label' => __('Settings', 'coffeepos'),
+                'url' => admin_url('admin.php?page=coffeepos'),
+            ];
+        }
+
+        return $items;
+    }
+
+    private function entryTemplate(string $fallback): string
+    {
+        $error = '';
+
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+            $nonce = isset($_POST['coffeepos_nonce']) ? sanitize_text_field(wp_unslash((string) $_POST['coffeepos_nonce'])) : '';
+
+            if (! wp_verify_nonce($nonce, 'coffeepos_staff_login')) {
+                $error = __('Your login form expired. Please try again.', 'coffeepos');
+            } else {
+                $username = isset($_POST['log']) ? sanitize_text_field(wp_unslash((string) $_POST['log'])) : '';
+                $password = isset($_POST['pwd']) ? (string) wp_unslash($_POST['pwd']) : '';
+                $user = wp_signon([
+                    'user_login' => $username,
+                    'user_password' => $password,
+                    'remember' => ! empty($_POST['rememberme']),
+                ], is_ssl());
+
+                if (is_wp_error($user)) {
+                    $error = __('The username/email or password is incorrect.', 'coffeepos');
+                } else {
+                    wp_set_current_user((int) $user->ID);
+                    $target = $this->safeReturnTarget((string) ($_POST['redirect_to'] ?? ''));
+                    $landing = $target !== '' ? $target : $this->firstPermittedRoute();
+                    if ($landing !== '') {
+                        wp_safe_redirect($landing);
+                        exit;
+                    }
+                }
+            }
+        }
+
+        if (is_user_logged_in() && $error === '') {
+            $landing = $this->firstPermittedRoute();
+            if ($landing !== '') {
+                wp_safe_redirect($landing);
+                exit;
+            }
+        }
+
+        $resolved = $this->templateLoader->prepare('login', [
+            'screen' => 'login',
+            'route' => self::routeUrl(),
+            'error' => $error,
+            'no_access' => is_user_logged_in() && ! Capabilities::currentUserCanAccessPos(),
+            'redirect_to' => $this->safeReturnTarget((string) ($_REQUEST['redirect_to'] ?? ''), false),
+        ]);
+
+        return $resolved ?? $fallback;
+    }
+
+    private function firstPermittedRoute(): string
+    {
+        foreach (['cashier', 'kds', 'order-queue', 'shifts', 'order-history', 'reports'] as $screen) {
+            if (Capabilities::currentUserCanAccessScreen($screen)) {
+                return self::routeUrl($screen);
+            }
+        }
+
+        return '';
+    }
+
+    private function redirectToEntry(string $target): void
+    {
+        wp_safe_redirect(add_query_arg('redirect_to', $target, self::routeUrl()));
+        exit;
+    }
+
+    private function safeReturnTarget(string $target, bool $requireCapability = true): string
+    {
+        $target = rawurldecode(wp_unslash($target));
+
+        foreach (Capabilities::screenCapabilities() as $screen => $capability) {
+            $route = self::routeUrl($screen);
+            if (untrailingslashit($target) === untrailingslashit($route) && (! $requireCapability || current_user_can($capability))) {
+                return $route;
+            }
+        }
+
+        return '';
     }
 }

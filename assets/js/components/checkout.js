@@ -8,6 +8,7 @@
         const success = root.querySelector('[data-component="payment-success"]');
         const cashPanel = root.querySelector('[data-component="cash-payment"]');
         const bankPanel = root.querySelector('[data-component="bank-transfer-payment"]');
+        const receiptPrinter = CoffeePOS.components.createReceiptPrinter(root, renderer);
         const total = modal.querySelector('[data-field="payment-total"]');
         const received = modal.querySelector('[data-field="cash-received"]');
         const change = modal.querySelector('[data-field="cash-change"]');
@@ -234,13 +235,7 @@
             if (!result || !result.order || result.payment.state !== 'paid') { return; }
             try {
                 const data = await api.loadReceipt(result.order.id);
-                const receipt = data.receipt; const view = root.querySelector('[data-component="receipt"]');
-                view.querySelector('[data-field="receipt-store-name"]').textContent = String(receipt.store.name || '');
-                view.querySelector('[data-field="receipt-store-address"]').textContent = String(receipt.store.address || '');
-                view.querySelector('[data-field="receipt-order-number"]').textContent = String(receipt.order.number || '');
-                view.querySelector('[data-field="receipt-total"]').textContent = String(receipt.totals.total + ' ' + receipt.totals.currency);
-                renderer.renderList('coffeepos-receipt-item-template', receipt.items || [], view.querySelector('[data-component="receipt-items"]'));
-                view.hidden = false; window.print();
+                await receiptPrinter.print(data.receipt);
             } catch (error) { toast.show(error.message || 'Receipt could not be loaded.', 'error'); }
         }
         function startNewOrder() {

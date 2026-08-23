@@ -8,6 +8,7 @@ use CoffeePOS\Application\Contracts\OrderGatewayInterface;
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
 use CoffeePOS\Application\Error\Phase01Exception;
 use CoffeePOS\Domain\Cart\Cart;
+use CoffeePOS\Infrastructure\Settings\Settings;
 
 final class WooCommerceOrderGateway implements OrderGatewayInterface
 {
@@ -45,7 +46,10 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
                     if ($cartItem->customNote() !== '') {
                         $orderItem->add_meta_data('_coffeepos_note', $cartItem->customNote(), true);
                     }
-                    $orderItem->add_meta_data('_coffeepos_quick_notes', wp_json_encode($cartItem->quickNoteSelection()->notes()), true);
+                    $orderItem->add_meta_data('_coffeepos_quick_notes', wp_json_encode($this->quickNoteMetadata(
+                        $cartItem->quickNoteSelection()->notes(),
+                        (array) ($snapshot['quick_note_labels'] ?? [])
+                    )), true);
                     $orderItem->add_meta_data('_coffeepos_modifiers', wp_json_encode($this->modifierMetadata(
                         $cartItem->modifierSelection()->groups(),
                         (array) ($snapshot['modifier_labels'] ?? [])
@@ -72,6 +76,9 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
             $order->update_meta_data('_coffeepos_operation_id', (string) $context['operation_id']);
             $order->update_meta_data('_coffeepos_operation_fingerprint', (string) $context['fingerprint']);
             $order->update_meta_data('_coffeepos_pos_session_id', $cart->posSessionId());
+            if ($cart->orderNote() !== '') {
+                $order->update_meta_data('_coffeepos_order_note', $cart->orderNote());
+            }
             $order->set_payment_method((string) $context['payment_method'] === 'cash' ? 'cod' : 'bacs');
             $order->set_payment_method_title((string) $context['payment_method'] === 'cash' ? 'Cash' : 'Bank transfer');
             $order->calculate_totals();
@@ -116,22 +123,76 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
         $this->assertCoffeePosOrder($order);
         $items = [];
         foreach ($order->get_items() as $item) {
+            $quantity = max(1, (int) $item->get_quantity());
+            $quickNotes = json_decode((string) $item->get_meta('_coffeepos_quick_notes', true), true);
+            $quickLabels = [];
+            $configuredQuickLabels = [];
+            foreach ((array) Settings::get(Settings::OPTION_QUICK_NOTES) as $definition) {
+                if (is_array($definition) && ! empty($definition['id'])) { $configuredQuickLabels[(string) $definition['id']] = (string) ($definition['label'] ?? $definition['id']); }
+            }
+            foreach (is_array($quickNotes) ? $quickNotes : [] as $quickNote) {
+                $id = is_array($quickNote) ? (string) ($quickNote['id'] ?? '') : (string) $quickNote;
+                $label = is_array($quickNote) ? (string) ($quickNote['label'] ?? '') : '';
+                if ($label === '') { $label = $configuredQuickLabels[$id] ?? $id; }
+                if (trim($label) !== '') { $quickLabels[] = trim($label); }
+            }
+            $modifierData = json_decode((string) $item->get_meta('_coffeepos_modifiers', true), true);
+            $modifierLabels = [];
+            foreach ((array) ($modifierData['groups'] ?? []) as $group) {
+                if (! is_array($group)) { continue; }
+                $options = array_values(array_filter(array_map(static function ($option): string {
+                    return is_array($option) ? trim((string) ($option['label'] ?? '')) : '';
+                }, (array) ($group['options'] ?? []))));
+                if ($options !== []) { $modifierLabels[] = trim((string) ($group['label'] ?? '')) . ': ' . implode(', ', $options); }
+            }
+            $variation = [];
+            foreach ($item->get_formatted_meta_data('') as $meta) {
+                if (strpos((string) ($meta->key ?? ''), '_coffeepos_') === 0) { continue; }
+                $key = wp_strip_all_tags((string) ($meta->display_key ?? ''));
+                $value = wp_strip_all_tags((string) ($meta->display_value ?? ''));
+                if ($value !== '') { $variation[] = ($key !== '' ? $key . ': ' : '') . $value; }
+            }
+            $lineTotal = (float) $item->get_total();
             $items[] = [
-                'name' => $item->get_name(), 'quantity' => $item->get_quantity(),
-                'total' => wc_format_decimal((string) $item->get_total(), wc_get_price_decimals()),
+                'name' => wp_strip_all_tags((string) $item->get_name()), 'quantity' => $quantity,
+                'unit_total' => $this->receiptMoney($lineTotal / $quantity, (string) $order->get_currency()),
+                'total' => $this->receiptMoney($lineTotal, (string) $order->get_currency()),
                 'note' => (string) $item->get_meta('_coffeepos_note', true),
-                'quick_notes' => json_decode((string) $item->get_meta('_coffeepos_quick_notes', true), true) ?: [],
-                'modifiers' => json_decode((string) $item->get_meta('_coffeepos_modifiers', true), true) ?: [],
+                'quick_notes' => $quickLabels,
+                'quick_note_summary' => implode(', ', $quickLabels),
+                'modifiers' => $modifierLabels,
+                'modifier_summary' => implode(' · ', $modifierLabels),
+                'variation_summary' => implode(' · ', $variation),
             ];
         }
+        $currency = (string) $order->get_currency();
+        $cashierId = (int) $order->get_meta('_coffeepos_cashier_id', true);
+        $cashier = $cashierId > 0 ? get_userdata($cashierId) : false;
+        $phone = preg_replace('/\D+/', '', (string) $order->get_billing_phone()) ?? '';
+        $maskedPhone = strlen($phone) > 6 ? substr($phone, 0, 4) . '***' . substr($phone, -3) : $phone;
+        $address = array_filter([
+            (string) get_option('woocommerce_store_address', ''),
+            (string) get_option('woocommerce_store_address_2', ''),
+            (string) get_option('woocommerce_store_city', ''),
+        ]);
+        $orderNote = Settings::shouldPrintOrderNote() ? (string) $order->get_meta('_coffeepos_order_note', true) : '';
         return [
-            'store' => ['name' => get_bloginfo('name'), 'address' => trim((string) get_option('woocommerce_store_address', ''))],
+            'store' => ['name' => get_bloginfo('name'), 'address' => implode(', ', $address)],
             'order' => ['id' => $order->get_id(), 'number' => $order->get_order_number(), 'created_at' => $order->get_date_created() ? $order->get_date_created()->date('c') : ''],
-            'customer' => ['name' => trim($order->get_billing_first_name() . ' ' . $order->get_billing_last_name()), 'phone' => $order->get_billing_phone()],
+            'cashier' => ['id' => $cashierId, 'display_name' => $cashier ? (string) $cashier->display_name : ''],
+            'customer' => ['name' => trim($order->get_billing_first_name() . ' ' . $order->get_billing_last_name()) ?: __('Guest', 'coffeepos'), 'phone_masked' => $maskedPhone],
             'service' => ['order_type' => (string) $order->get_meta('_coffeepos_order_type', true), 'table_label' => (string) $order->get_meta('_coffeepos_table_label', true)],
             'items' => $items,
-            'totals' => ['subtotal' => wc_format_decimal((string) $order->get_subtotal(), wc_get_price_decimals()), 'discount' => wc_format_decimal((string) $order->get_discount_total(), wc_get_price_decimals()), 'total' => wc_format_decimal((string) $order->get_total(), wc_get_price_decimals()), 'currency' => $order->get_currency()],
+            'totals' => [
+                'subtotal' => $this->receiptMoney((float) $order->get_subtotal(), $currency),
+                'discount' => $this->receiptMoney((float) $order->get_discount_total(), $currency),
+                'refunded' => $this->receiptMoney((float) $order->get_total_refunded(), $currency),
+                'total' => $this->receiptMoney((float) $order->get_total(), $currency),
+                'currency' => $currency,
+            ],
             'payment' => $this->paymentProjection($order),
+            'order_note' => $orderNote,
+            'show_order_note' => $orderNote !== '',
         ];
     }
 
@@ -211,6 +272,19 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
         return ['groups' => $result];
     }
 
+    private function quickNoteMetadata(array $ids, array $labels): array
+    {
+        $metadata = [];
+        foreach (array_values($ids) as $index => $id) {
+            $metadata[] = [
+                'id' => (string) $id,
+                'label' => (string) ($labels[$index] ?? $id),
+            ];
+        }
+
+        return $metadata;
+    }
+
     private function projectOrder($order): array
     {
         return [
@@ -232,10 +306,22 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
         $paid = $order->is_paid();
         return [
             'method' => $method, 'state' => $paid ? 'paid' : 'pending',
+            'method_label' => (string) $order->get_payment_method_title(),
             'amount' => wc_format_decimal((string) $order->get_total(), wc_get_price_decimals()),
             'received_amount' => (string) $order->get_meta('_coffeepos_cash_received', true),
             'change' => (string) $order->get_meta('_coffeepos_cash_change', true),
+            'received_display' => (string) $order->get_meta('_coffeepos_cash_received', true) !== '' ? $this->receiptMoney((float) $order->get_meta('_coffeepos_cash_received', true), (string) $order->get_currency())['display'] : '',
+            'change_display' => (string) $order->get_meta('_coffeepos_cash_change', true) !== '' ? $this->receiptMoney((float) $order->get_meta('_coffeepos_cash_change', true), (string) $order->get_currency())['display'] : '',
             'reference' => (string) $order->get_meta('_coffeepos_payment_reference', true),
         ];
+    }
+
+    private function receiptMoney(float $amount, string $currency): array
+    {
+        $raw = wc_format_decimal((string) $amount, wc_get_price_decimals());
+        $html = wc_price($amount, ['currency' => $currency]);
+        $display = html_entity_decode(wp_strip_all_tags((string) $html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return ['amount' => $raw, 'display' => trim(preg_replace('/\s+/u', ' ', $display) ?? $display)];
     }
 }

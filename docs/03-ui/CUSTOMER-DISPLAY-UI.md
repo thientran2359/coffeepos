@@ -311,6 +311,15 @@ If synchronization is interrupted:
 
 ---
 
+## 12.1 Phase-12 Staff Privacy
+
+Customer Display never renders staff navigation or staff login state. The
+private cart/order-level note is excluded from REST recovery, BroadcastChannel
+snapshots, checkout summary, payment dialog, and completion dialog. Item display
+remains limited to the approved customer-safe configuration summary.
+
+---
+
 # 13. Acceptance Criteria
 
 1. A read-only product menu renders from the shared CatalogView.
@@ -333,3 +342,5 @@ If synchronization is interrupted:
 18. Customer Display never calculates or changes WooCommerce-derived prices.
 19. Every successful customer-facing cart mutation is pushed without cart polling.
 20. Cashier and Customer Display render the same accepted cart revision.
+21. Staff navigation, credentials, capabilities, and the private order note are
+    never exposed.

@@ -8,6 +8,7 @@ use CoffeePOS\Application\Contracts\OperationalOrderGatewayInterface;
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
 use CoffeePOS\Application\Error\Phase01Exception;
 use CoffeePOS\Infrastructure\Settings\Settings;
+use CoffeePOS\Support\Capabilities;
 
 final class WooCommerceOperationalOrderGateway implements OperationalOrderGatewayInterface
 {
@@ -154,7 +155,9 @@ final class WooCommerceOperationalOrderGateway implements OperationalOrderGatewa
             'service' => ['order_type' => $orderType, 'table_label' => $tableLabel],
             'service_label' => $serviceLabel,
             'total' => ['amount' => $amount, 'currency' => $currency, 'display' => $this->plainText(wc_price((float) $order->get_total(), ['currency' => $currency]))],
-            'receipt_available' => $eligible,
+            'receipt_available' => $eligible && current_user_can(Capabilities::REPRINT_RECEIPTS),
+            'cancel_allowed' => current_user_can(Capabilities::CANCEL_ORDERS),
+            'order_note' => (string) $order->get_meta('_coffeepos_order_note', true),
             'items' => $items,
             'kds' => [
                 'state' => $state,
@@ -178,8 +181,12 @@ final class WooCommerceOperationalOrderGateway implements OperationalOrderGatewa
             }
         }
         $quick = [];
-        foreach (is_array($quickIds) ? $quickIds : [] as $id) {
-            $quick[] = $quickLabels[(string) $id] ?? (string) $id;
+        foreach (is_array($quickIds) ? $quickIds : [] as $value) {
+            $id = is_array($value) ? (string) ($value['id'] ?? '') : (string) $value;
+            $label = is_array($value) ? (string) ($value['label'] ?? '') : '';
+            if ($id !== '') {
+                $quick[] = $label !== '' ? $label : ($quickLabels[$id] ?? $id);
+            }
         }
         $modifierData = json_decode((string) $item->get_meta('_coffeepos_modifiers', true), true);
         $modifiers = [];

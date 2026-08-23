@@ -23,16 +23,26 @@ final class OperationalOrderController
 
     public function register(string $namespace): void
     {
-        register_rest_route($namespace, '/kds/orders', [['methods' => WP_REST_Server::READABLE, 'callback' => [$this, 'kdsOrders'], 'permission_callback' => [$this, 'permissionCheck']]]);
-        register_rest_route($namespace, '/kds/orders/(?P<id>\d+)/transition', [['methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'transition'], 'permission_callback' => [$this, 'permissionCheck']]]);
-        register_rest_route($namespace, '/order-queue/orders', [['methods' => WP_REST_Server::READABLE, 'callback' => [$this, 'queueOrders'], 'permission_callback' => [$this, 'permissionCheck']]]);
-        register_rest_route($namespace, '/orders/(?P<id>\d+)/complete', [['methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'complete'], 'permission_callback' => [$this, 'permissionCheck']]]);
-        register_rest_route($namespace, '/orders/(?P<id>\d+)/cancel', [['methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'cancel'], 'permission_callback' => [$this, 'permissionCheck']]]);
+        register_rest_route($namespace, '/kds/orders', [['methods' => WP_REST_Server::READABLE, 'callback' => [$this, 'kdsOrders'], 'permission_callback' => [$this, 'kdsPermissionCheck']]]);
+        register_rest_route($namespace, '/kds/orders/(?P<id>\d+)/transition', [['methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'transition'], 'permission_callback' => [$this, 'kdsPermissionCheck']]]);
+        register_rest_route($namespace, '/order-queue/orders', [['methods' => WP_REST_Server::READABLE, 'callback' => [$this, 'queueOrders'], 'permission_callback' => [$this, 'queuePermissionCheck']]]);
+        register_rest_route($namespace, '/orders/(?P<id>\d+)/complete', [['methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'complete'], 'permission_callback' => [$this, 'queuePermissionCheck']]]);
+        register_rest_route($namespace, '/orders/(?P<id>\d+)/cancel', [['methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'cancel'], 'permission_callback' => [$this, 'cancelPermissionCheck']]]);
     }
 
-    public function permissionCheck()
+    public function kdsPermissionCheck()
     {
-        return Capabilities::currentUserCanAccessPos() ? true : ErrorFactory::forbidden('coffeepos_rest_forbidden', __('You are not allowed to access CoffeePOS REST endpoints.', 'coffeepos'));
+        return $this->check(Capabilities::ACCESS_KDS);
+    }
+
+    public function queuePermissionCheck()
+    {
+        return $this->check(Capabilities::ACCESS_ORDER_QUEUE);
+    }
+
+    public function cancelPermissionCheck()
+    {
+        return $this->check(Capabilities::CANCEL_ORDERS);
     }
 
     public function kdsOrders(WP_REST_Request $request)
@@ -66,4 +76,5 @@ final class OperationalOrderController
     private function payload(WP_REST_Request $request): array { $json = $request->get_json_params(); return array_merge($request->get_params(), is_array($json) ? $json : []); }
     private function limit(WP_REST_Request $request): int { return max(1, min(200, absint($request->get_param('limit') ?: 100))); }
     private function respond(callable $callback) { try { return RestResponder::success($callback()); } catch (\Throwable $throwable) { return RestResponder::fromThrowable($throwable); } }
+    private function check(string $capability) { return current_user_can($capability) ? true : ErrorFactory::forbidden('coffeepos_action_forbidden', __('You are not allowed to perform this CoffeePOS operation.', 'coffeepos')); }
 }

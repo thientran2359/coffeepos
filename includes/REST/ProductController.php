@@ -64,7 +64,7 @@ final class ProductController
         register_rest_route($namespace, '/catalog', [[
             'methods' => WP_REST_Server::READABLE,
             'callback' => [$this, 'catalog'],
-            'permission_callback' => [$this, 'permissionCheck'],
+            'permission_callback' => [$this, 'catalogPermissionCheck'],
         ]]);
 
         register_rest_route($namespace, '/products', [[
@@ -94,7 +94,7 @@ final class ProductController
 
     public function permissionCheck()
     {
-        if (Capabilities::currentUserCanAccessPos()) {
+        if (current_user_can(Capabilities::ACCESS_CASHIER)) {
             return true;
         }
 
@@ -102,6 +102,11 @@ final class ProductController
             'coffeepos_rest_forbidden',
             __('You are not allowed to access CoffeePOS REST endpoints.', 'coffeepos')
         );
+    }
+
+    public function catalogPermissionCheck()
+    {
+        return true;
     }
 
     public function catalog(WP_REST_Request $request)

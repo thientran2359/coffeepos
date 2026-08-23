@@ -171,6 +171,28 @@ final class CartSessionService implements CartReconstructorInterface
         ];
     }
 
+    public function setOrderNote(string $posSessionId, int $expectedRevision, string $note): CartView
+    {
+        $length = function_exists('mb_strlen') ? mb_strlen($note) : strlen($note);
+        if ($length > 2000) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_ORDER_NOTE, 'Order note is too long.');
+        }
+
+        $cart = $this->loadForMutation($posSessionId, $expectedRevision);
+        try {
+            $cart->setOrderNote($note);
+        } catch (\InvalidArgumentException $exception) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_ORDER_NOTE, $exception->getMessage());
+        }
+
+        return $this->persist($cart, $expectedRevision);
+    }
+
+    public function clearOrderNote(string $posSessionId, int $expectedRevision): CartView
+    {
+        return $this->setOrderNote($posSessionId, $expectedRevision, '');
+    }
+
     public function attachCustomer(string $posSessionId, int $expectedRevision, int $customerId): CartView
     {
         if ($this->customerService === null) {

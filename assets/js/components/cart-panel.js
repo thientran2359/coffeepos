@@ -24,6 +24,8 @@
         const couponEmpty = root.querySelector('[data-component="coupon-empty"]');
         const couponApplied = root.querySelector('[data-component="coupon-applied"]');
         const couponCode = root.querySelector('[data-component="coupon-code"]');
+        const orderNote = root.querySelector('[data-component="order-note-input"]');
+        const orderNoteStatus = root.querySelector('[data-component="order-note-status"]');
 
         function setStatus(status) {
             setState(panel, status);
@@ -72,6 +74,13 @@
             couponApplied.hidden = !appliedCode;
             couponCode.textContent = String(appliedCode);
 
+            if (orderNote && window.document.activeElement !== orderNote) {
+                orderNote.value = String(cart && cart.order_note || '');
+            }
+            if (orderNoteStatus) {
+                orderNoteStatus.textContent = '';
+            }
+
             const ready = Boolean(cart && cart.validation && cart.validation.checkout_ready);
             checkoutButton.disabled = !ready;
             setState(checkoutRegion, ready ? 'ready' : 'disabled');
@@ -89,7 +98,10 @@
                     clearButton.disabled = true;
                 }
             },
-            setError: function () { setStatus('error'); }
+            setError: function () { setStatus('error'); },
+            setOrderNoteStatus: function (message) {
+                if (orderNoteStatus) { orderNoteStatus.textContent = String(message || ''); }
+            }
         };
     };
 

@@ -37,12 +37,14 @@ final class OrderQueueView
                 'revision' => max(0, (int) ($kds['revision'] ?? 0)),
             ],
             'receipt' => ['available' => ! empty($order['receipt_available'])],
+            'order_note' => (string) ($order['order_note'] ?? ''),
+            'hide_order_note' => trim((string) ($order['order_note'] ?? '')) === '',
             'actions' => [
                 'can_complete' => $state === 'ready',
-                'can_cancel' => in_array($state, ['new', 'preparing'], true),
+                'can_cancel' => (! array_key_exists('cancel_allowed', $order) || ! empty($order['cancel_allowed'])) && in_array($state, ['new', 'preparing'], true),
                 'can_reprint' => ! empty($order['receipt_available']),
                 'hide_complete' => $state !== 'ready',
-                'hide_cancel' => ! in_array($state, ['new', 'preparing'], true),
+                'hide_cancel' => (array_key_exists('cancel_allowed', $order) && empty($order['cancel_allowed'])) || ! in_array($state, ['new', 'preparing'], true),
                 'hide_reprint' => empty($order['receipt_available']),
             ],
         ];

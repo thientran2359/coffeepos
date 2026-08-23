@@ -27,6 +27,9 @@ $contentTemplate = COFFEEPOS_PATH . 'templates/' . sanitize_key($screen) . '/con
     data-coffeepos-route="<?php echo esc_url($route); ?>"
     data-screen="<?php echo esc_attr($screen); ?>"
 >
+    <?php if (! in_array($screen, ['login', 'customer'], true)) : ?>
+        <?php require COFFEEPOS_PATH . 'templates/components/staff-navigation.php'; ?>
+    <?php endif; ?>
     <?php if (is_readable($contentTemplate)) : ?>
         <?php require $contentTemplate; ?>
     <?php else : ?>

@@ -166,6 +166,7 @@ Cart
 ├── OrderType
 ├── TableContext
 ├── CouponContext
+├── order_note
 └── Totals
 ```
 
@@ -177,6 +178,10 @@ The active Cart is stored in the WooCommerce session and addressed by an opaque
 `pos_session_id`. It also has a monotonic `revision` used for concurrency and
 Cashier/Customer Display synchronization. The identifier is not a credential
 and must not expose the WooCommerce session token.
+
+`order_note` is one private, order-level plain-text note. It is revisioned with
+the cart aggregate, is not an item note, and is not projected to the Customer
+Display by default.
 
 ---
 
@@ -336,6 +341,9 @@ POS notes/context
 
 Exact keys and persistence rules belong in `DATABASE.md`.
 
+The Phase-12 order-level note is persisted as `_coffeepos_order_note`. It is
+staff-private by default and is not duplicated onto each order item.
+
 ---
 
 # 14. Order Item
@@ -479,9 +487,16 @@ items
 totals
 payment
 table/order type
+cashier
+created time
+optional private order note
 ```
 
-Receipt printing must use the canonical WooCommerce order data.
+Receipt printing must use the canonical WooCommerce order data plus only the
+documented CoffeePOS order/order-item metadata. One authoritative ReceiptView is
+shared by checkout printing, Order Queue reprinting, and Order History
+reprinting. A receipt may not print until the projection and template are fully
+populated.
 
 ---
 

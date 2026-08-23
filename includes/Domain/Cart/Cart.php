@@ -38,6 +38,8 @@ final class Cart
 
     private int $checkoutOrderId = 0;
 
+    private string $orderNote = '';
+
     private function __construct(string $currency, string $posSessionId = '', int $revision = 0, string $updatedAt = '')
     {
         $this->currency = Money::zero($currency)->currency();
@@ -159,6 +161,22 @@ final class Cart
         return $this->paymentContext;
     }
 
+    public function orderNote(): string
+    {
+        return $this->orderNote;
+    }
+
+    public function setOrderNote(string $orderNote): void
+    {
+        $length = function_exists('mb_strlen') ? mb_strlen($orderNote) : strlen($orderNote);
+
+        if ($length > 2000) {
+            throw new \InvalidArgumentException('Order note is too long.');
+        }
+
+        $this->orderNote = trim($orderNote);
+    }
+
     public function items(): array
     {
         return array_values($this->items);
@@ -253,6 +271,7 @@ final class Cart
     public function clearItems(): void
     {
         $this->items = [];
+        $this->orderNote = '';
     }
 
     public function totalQuantity(): int

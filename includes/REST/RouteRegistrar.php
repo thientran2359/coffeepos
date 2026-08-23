@@ -80,6 +80,7 @@ final class RouteRegistrar
             self::NAMESPACE . '/tables',
             self::NAMESPACE . '/cart/customer',
             self::NAMESPACE . '/cart/service-context',
+            self::NAMESPACE . '/cart/order-note',
             self::NAMESPACE . '/coupons/applicable',
             self::NAMESPACE . '/cart/coupon',
             self::NAMESPACE . '/orders/checkout',

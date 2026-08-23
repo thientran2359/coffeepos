@@ -32,8 +32,10 @@ final class KdsOrderView
                 'completed_at' => $kds['completed_at'] ?? null,
             ],
             'items' => array_values((array) ($order['items'] ?? [])),
+            'order_note' => (string) ($order['order_note'] ?? ''),
             'next_action' => $actions[$state] ?? ['target_state' => '', 'label' => ''],
             'has_action' => isset($actions[$state]),
+            'hide_order_note' => trim((string) ($order['order_note'] ?? '')) === '',
         ];
     }
 }

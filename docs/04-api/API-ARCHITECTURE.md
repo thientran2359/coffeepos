@@ -216,6 +216,16 @@ input validation
 
 The browser must not be trusted to determine access.
 
+Staff authentication is the standard WordPress auth-cookie flow documented in
+`AUTH-ROUTING.md`. CoffeePOS does not expose a REST login endpoint. Endpoint
+permission callbacks check the exact granular CoffeePOS capability for the
+operation; `is_user_logged_in()` alone is never sufficient.
+
+An expired/missing WordPress session returns the shared 401 envelope. A valid
+user lacking the operation capability returns the shared 403 envelope. Route
+navigation visibility and REST authorization use the same capability names but
+remain independently enforced.
+
 ---
 
 # 10. Idempotency

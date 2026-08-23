@@ -47,6 +47,7 @@ final class CartView
             'table' => $cart->tableContext()->toArray(),
             'customer' => CustomerView::fromDomain($cart->customerContext())->toArray(),
             'payment' => PaymentView::fromDomain($cart->paymentContext())->toArray(),
+            'order_note' => $cart->orderNote(),
             'items' => $items,
             'total_quantity' => $cart->totalQuantity(),
             'subtotal_minor' => $subtotalMinor,

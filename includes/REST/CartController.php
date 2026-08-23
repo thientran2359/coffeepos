@@ -88,7 +88,7 @@ final class CartController
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [$this, 'getCart'],
-                'permission_callback' => [$this, 'permissionCheck'],
+                'permission_callback' => [$this, 'getCartPermissionCheck'],
             ],
             [
                 'methods' => WP_REST_Server::DELETABLE,
@@ -158,11 +158,24 @@ final class CartController
             'callback' => [$this, 'setServiceContext'],
             'permission_callback' => [$this, 'permissionCheck'],
         ]]);
+
+        register_rest_route($namespace, '/cart/order-note', [
+            [
+                'methods' => 'PUT',
+                'callback' => [$this, 'setOrderNote'],
+                'permission_callback' => [$this, 'permissionCheck'],
+            ],
+            [
+                'methods' => WP_REST_Server::DELETABLE,
+                'callback' => [$this, 'clearOrderNote'],
+                'permission_callback' => [$this, 'permissionCheck'],
+            ],
+        ]);
     }
 
     public function permissionCheck()
     {
-        if (Capabilities::currentUserCanAccessPos()) {
+        if (current_user_can(Capabilities::ACCESS_CASHIER)) {
             return true;
         }
 
@@ -170,6 +183,15 @@ final class CartController
             'coffeepos_rest_forbidden',
             __('You are not allowed to access CoffeePOS REST endpoints.', 'coffeepos')
         );
+    }
+
+    public function getCartPermissionCheck(WP_REST_Request $request)
+    {
+        if ((string) $request->get_param('view') === 'customer') {
+            return true;
+        }
+
+        return $this->permissionCheck();
     }
 
     public function createSession(WP_REST_Request $request)
@@ -361,6 +383,33 @@ final class CartController
                 $this->revision($payload),
                 sanitize_key((string) ($payload['order_type'] ?? '')),
                 (int) ($payload['table_id'] ?? 0)
+            )->toArray()]);
+        } catch (\Throwable $throwable) {
+            return RestResponder::fromThrowable($throwable);
+        }
+    }
+
+    public function setOrderNote(WP_REST_Request $request)
+    {
+        try {
+            $payload = $this->payload($request);
+            return RestResponder::success(['cart' => $this->cartSessionService->setOrderNote(
+                $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
+                $this->revision($payload),
+                sanitize_textarea_field((string) ($payload['note'] ?? ''))
+            )->toArray()]);
+        } catch (\Throwable $throwable) {
+            return RestResponder::fromThrowable($throwable);
+        }
+    }
+
+    public function clearOrderNote(WP_REST_Request $request)
+    {
+        try {
+            $payload = $this->payload($request);
+            return RestResponder::success(['cart' => $this->cartSessionService->clearOrderNote(
+                $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
+                $this->revision($payload)
             )->toArray()]);
         } catch (\Throwable $throwable) {
             return RestResponder::fromThrowable($throwable);

@@ -396,7 +396,28 @@ returned with `pos_session_id` and a new revision.
 
 Returns receipt data for printing/rendering.
 
-Receipt data should be derived from the WooCommerce order.
+The projection is derived from the authoritative WooCommerce order and approved
+CoffeePOS metadata. It contains:
+
+```text
+order ID and number
+store name/address
+creation time in the WordPress timezone
+cashier display name
+customer-safe display identity
+order type and table
+items, variation, modifiers, quick notes, custom item note
+quantity, unit amount, line amount
+subtotal, discounts, refunds, total, currency
+payment method
+cash received and change when stored
+order note only when receipt setting allows it
+```
+
+Checkout print, Order Queue reprint, and Order History reprint MUST consume this
+same ReceiptView. The endpoint requires `coffeepos_reprint_receipts`. A loading,
+forbidden, missing, or failed projection is an error and MUST NOT open a blank
+print dialog.
 
 ---
 

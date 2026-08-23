@@ -657,3 +657,32 @@ When a new feature does not fit the architecture:
 5. then implement
 
 Codex MUST NOT silently introduce architectural exceptions.
+
+---
+
+# 20. Phase-12 Staff Entry and Routing Boundary
+
+WordPress owns staff identity, credentials, authentication cookies, password
+policy, and account lifecycle. CoffeePOS owns only presentation of the `/pos/`
+entry screen and capability-based routing. No CoffeePOS user table, credential
+store, PIN, or custom authentication session is permitted.
+
+Routing behavior is deterministic:
+
+1. Anonymous `/pos/` requests render the PHP-owned login template.
+2. Authenticated `/pos/` requests redirect to the first permitted staff screen.
+3. Anonymous protected staff-screen requests redirect to `/pos/` with a
+   validated internal return target.
+4. Authenticated users lacking the route capability receive a controlled 403;
+   the router never falls through to an unauthorized screen.
+5. `/pos/customer/` remains the documented paired public projection and is not
+   part of staff login, landing, or navigation.
+
+The first-permitted landing priority is Cashier, KDS, Order Queue, Shifts, Order
+History, then Reports. If no CoffeePOS screen is permitted, `/pos/` renders a
+safe no-access state with logout; it does not redirect to a privileged page.
+
+The Presentation layer adds a login template and one shared staff-navigation
+component. Every staff screen consumes that component. Navigation visibility is
+a projection of server-known capabilities and never replaces route or REST
+authorization.

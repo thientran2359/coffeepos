@@ -146,7 +146,9 @@ duplicate_operation_conflict
 ## 14. Security
 
 - all routes require the existing POS capability and REST nonce
-- refund additionally requires `manage_woocommerce`
+- refund used `manage_woocommerce` in Phase 10; Phase 12 supersedes this with
+  `coffeepos_refund_orders` and independently gates reorder with
+  `coffeepos_reorder_orders`
 - order ownership/scope is checked server-side
 - search/filter input is sanitized and bounded
 - refund amount and refundable balance are server-validated

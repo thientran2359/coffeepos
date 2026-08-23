@@ -45,6 +45,7 @@ final class WooCommerceCartSerializer
             'order_type' => $cart->orderType()->value(),
             'table' => $cart->tableContext()->toArray(),
             'payment' => $cart->paymentContext()->toArray(),
+            'order_note' => $cart->orderNote(),
         ];
     }
 
@@ -97,6 +98,8 @@ final class WooCommerceCartSerializer
                 (int) ($payment['coupon_discount_minor'] ?? 0)
             ));
         }
+
+        $cart->setOrderNote((string) ($payload['order_note'] ?? ''));
 
         $orderType = (string) ($payload['order_type'] ?? OrderType::TAKEAWAY);
 

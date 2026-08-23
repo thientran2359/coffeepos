@@ -40,7 +40,7 @@ final class ShiftController
 
     public function permissionCheck()
     {
-        return Capabilities::currentUserCanAccessPos() ? true : ErrorFactory::forbidden('coffeepos_rest_forbidden', __('You are not allowed to access shifts.', 'coffeepos'));
+        return current_user_can(Capabilities::MANAGE_OWN_SHIFT) ? true : ErrorFactory::forbidden('coffeepos_action_forbidden', __('You are not allowed to access shifts.', 'coffeepos'));
     }
 
     public function current()

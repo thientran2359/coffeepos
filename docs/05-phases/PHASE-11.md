@@ -38,7 +38,7 @@ Before implementation, inspect the contracts in `REQUIREMENTS.md`,
 - Excel `.xlsx` export
 - bounded, HPOS-compatible WooCommerce report queries
 - loading, empty, error, partial-data, and export states
-- final capability matrix and permission audit
+- Phase-11 capability baseline and permission audit
 - nonce, input-validation, output-escaping, and customer-data audit
 - payment, refund, stock, idempotency, and concurrency audit
 - query/performance and asset-loading audit
@@ -266,9 +266,11 @@ introduce a charting framework or construct application markup with strings.
 The screen must scroll independently where content exceeds the viewport and
 must remain keyboard accessible at desktop and tablet widths.
 
-## 16. Final Capability Matrix
+## 16. Phase-11 Capability Baseline
 
-Phase 11 finalizes these production rules:
+Phase 11 establishes this interim authorization baseline. Phase 12 replaces the
+broad access groups with documented granular CoffeePOS capabilities while
+preserving or strengthening every server-side check:
 
 | Surface/operation | Required authorization |
 |---|---|
@@ -371,7 +373,7 @@ Errors must use the shared envelope and must not return partial KPIs as success.
 - [ ] Report queries are bounded, HPOS-compatible, and avoid a duplicate ledger.
 - [ ] The Reports UI defines normal, loading, empty, error, and exporting states.
 - [ ] The Reports screen is responsive, accessible, and scrollable.
-- [ ] The final capability matrix is enforced by routes and endpoints.
+- [ ] The Phase-11 capability baseline is enforced by routes and endpoints.
 - [ ] Security, performance, error, permission, and compatibility audits are
       completed with critical findings resolved.
 - [ ] Prior-phase critical workflows pass regression checks.
@@ -383,6 +385,8 @@ runtime WooCommerce checks, exports, real-browser acceptance, and hardening audi
 evidence agree. No critical or high-severity security/data-integrity defect may
 remain open.
 
-This phase completes the documented roadmap. Completion means CoffeePOS is a
-production-ready foundation within its stated scope; it does not imply external
-security, payment, tax, or accounting certification.
+This phase completes the original reporting and hardening milestone. Completion
+means CoffeePOS is a production-ready foundation within its stated Phase-11
+scope; later roadmap phases may refine staff access, operations, loyalty,
+hardware, and payments without weakening these hardening guarantees. It does
+not imply external security, payment, tax, or accounting certification.

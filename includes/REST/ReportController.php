@@ -43,7 +43,7 @@ final class ReportController
 
     public function permissionCheck()
     {
-        return current_user_can(Capabilities::MANAGE_WOOCOMMERCE)
+        return current_user_can(Capabilities::VIEW_REPORTS)
             ? true
             : ErrorFactory::forbidden('coffeepos_reports_forbidden', __('You are not allowed to view CoffeePOS reports.', 'coffeepos'));
     }

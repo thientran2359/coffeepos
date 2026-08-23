@@ -51,6 +51,7 @@ final class Phase01ErrorCodes
     public const INVALID_CONFIGURATION = 'invalid_configuration';
 
     public const INVALID_CART = 'invalid_cart';
+    public const INVALID_ORDER_NOTE = 'invalid_order_note';
 
     public const CART_SESSION_NOT_FOUND = 'cart_session_not_found';
 

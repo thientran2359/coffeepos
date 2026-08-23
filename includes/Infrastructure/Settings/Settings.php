@@ -29,6 +29,7 @@ final class Settings
     public const OPTION_VIETQR_TEMPLATE = 'coffeepos_vietqr_template';
     public const OPTION_KDS_POLL_INTERVAL = 'coffeepos_kds_poll_interval_ms';
     public const OPTION_ORDER_QUEUE_POLL_INTERVAL = 'coffeepos_order_queue_poll_interval_ms';
+    public const OPTION_RECEIPT_PRINT_ORDER_NOTE = 'coffeepos_receipt_print_order_note';
 
     public function register(): void
     {
@@ -38,7 +39,7 @@ final class Settings
 
     public function groupCapability(): string
     {
-        return Capabilities::MANAGE_WOOCOMMERCE;
+        return Capabilities::MANAGE_SETTINGS;
     }
 
     public function registerSettings(): void
@@ -64,11 +65,25 @@ final class Settings
 
             add_option($optionName, $definition['default']);
         }
+
+        $quickNotes = get_option(self::OPTION_QUICK_NOTES, []);
+        $ids = array_values(array_filter(array_map(static function ($note): string {
+            return is_array($note) ? sanitize_key((string) ($note['id'] ?? '')) : '';
+        }, is_array($quickNotes) ? $quickNotes : [])));
+
+        if ($ids === [] || $ids === ['less_ice', 'no_ice', 'less_sweet', 'no_sugar', 'extra_milk', 'takeaway']) {
+            update_option(self::OPTION_QUICK_NOTES, self::definitions()[self::OPTION_QUICK_NOTES]['default']);
+        }
     }
 
     public static function optionNames(): array
     {
         return array_keys(self::definitions());
+    }
+
+    public static function shouldPrintOrderNote(): bool
+    {
+        return (bool) self::get(self::OPTION_RECEIPT_PRINT_ORDER_NOTE);
     }
 
     public static function get(string $optionName)
@@ -109,44 +124,42 @@ final class Settings
             self::OPTION_POS_BASE_SLUG => [
                 'type' => 'string',
                 'default' => 'pos',
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => 'sanitize_title',
             ],
             self::OPTION_POS_PAGE_ID => [
                 'type' => 'integer',
                 'default' => 0,
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => 'absint',
             ],
             self::OPTION_CUSTOMER_PAGE_ID => [
                 'type' => 'integer',
                 'default' => 0,
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => 'absint',
             ],
             self::OPTION_UNINSTALL_DELETE_DATA => [
                 'type' => 'boolean',
                 'default' => false,
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => null,
             ],
             self::OPTION_MODIFIER_GROUPS => [
                 'type' => 'array',
                 'default' => [],
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => null,
             ],
             self::OPTION_QUICK_NOTES => [
                 'type' => 'array',
                 'default' => [
-                    ['id' => 'less_ice', 'label' => 'Less ice', 'enabled' => true],
-                    ['id' => 'no_ice', 'label' => 'No ice', 'enabled' => true],
-                    ['id' => 'less_sweet', 'label' => 'Less sweet', 'enabled' => true],
-                    ['id' => 'no_sugar', 'label' => 'No sugar', 'enabled' => true],
-                    ['id' => 'extra_milk', 'label' => 'Extra milk', 'enabled' => true],
-                    ['id' => 'takeaway', 'label' => 'Takeaway', 'enabled' => true],
+                    ['id' => 'less_sugar', 'label' => 'Ít đường', 'enabled' => true, 'sort_order' => 10],
+                    ['id' => 'extra_sugar', 'label' => 'Nhiều đường', 'enabled' => true, 'sort_order' => 20],
+                    ['id' => 'less_milk', 'label' => 'Ít sữa', 'enabled' => true, 'sort_order' => 30],
+                    ['id' => 'less_ice', 'label' => 'Ít đá', 'enabled' => true, 'sort_order' => 40],
                 ],
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => null,
             ],
             self::OPTION_SERVICE_TABLES => [
@@ -158,32 +171,36 @@ final class Settings
                     ['id' => 4, 'label' => 'Table 04', 'enabled' => true, 'sort_order' => 40],
                     ['id' => 5, 'label' => 'Table 05', 'enabled' => true, 'sort_order' => 50],
                 ],
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE,
+                'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => null,
             ],
             self::OPTION_VIETQR_BANK_ID => [
                 'type' => 'string', 'default' => '',
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'sanitize_key',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_key',
             ],
             self::OPTION_VIETQR_ACCOUNT_NUMBER => [
                 'type' => 'string', 'default' => '',
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'sanitize_text_field',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_text_field',
             ],
             self::OPTION_VIETQR_ACCOUNT_NAME => [
                 'type' => 'string', 'default' => '',
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'sanitize_text_field',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_text_field',
             ],
             self::OPTION_VIETQR_TEMPLATE => [
                 'type' => 'string', 'default' => 'compact2',
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'sanitize_key',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_key',
             ],
             self::OPTION_KDS_POLL_INTERVAL => [
                 'type' => 'integer', 'default' => 5000,
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'absint',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'absint',
             ],
             self::OPTION_ORDER_QUEUE_POLL_INTERVAL => [
                 'type' => 'integer', 'default' => 5000,
-                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'absint',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'absint',
+            ],
+            self::OPTION_RECEIPT_PRINT_ORDER_NOTE => [
+                'type' => 'boolean', 'default' => false,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
             ],
         ];
     }
@@ -203,7 +220,7 @@ final class Settings
             return get_option($optionName, $definition['default']);
         }
 
-        if ($optionName === self::OPTION_UNINSTALL_DELETE_DATA) {
+        if (in_array($optionName, [self::OPTION_UNINSTALL_DELETE_DATA, self::OPTION_RECEIPT_PRINT_ORDER_NOTE], true)) {
             return (bool) $value;
         }
 
@@ -326,12 +343,19 @@ final class Settings
                 'label' => $label,
                 'enabled' => ! array_key_exists('enabled', $note) || ! empty($note['enabled']),
                 'sort_order' => (int) ($note['sort_order'] ?? 0),
-                'product_ids' => array_values(array_filter(array_map('absint', (array) ($note['product_ids'] ?? [])))),
-                'category_ids' => array_values(array_filter(array_map('absint', (array) ($note['category_ids'] ?? [])))),
+                'product_ids' => self::sanitizeIdList($note['product_ids'] ?? []),
+                'category_ids' => self::sanitizeIdList($note['category_ids'] ?? []),
             ];
         }
 
         return $sanitized;
+    }
+
+    private static function sanitizeIdList($value): array
+    {
+        $values = is_string($value) ? preg_split('/[\s,]+/', $value) : (array) $value;
+
+        return array_values(array_unique(array_filter(array_map('absint', $values ?: []))));
     }
 
     private static function sanitizeServiceTables(array $tables): array

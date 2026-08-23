@@ -31,6 +31,7 @@ if (! defined('ABSPATH')) { exit; }
             <p><strong data-field="payment-reference"></strong></p>
             <p data-field="payment-status"></p>
             <button type="button" class="coffeepos-btn coffeepos-btn-light" data-action="refresh-payment-status" hidden><?php esc_html_e('Refresh status', 'coffeepos'); ?></button>
+            <button type="button" class="coffeepos-btn coffeepos-btn-primary" data-action="start-fresh-order" hidden><?php esc_html_e('Start new order', 'coffeepos'); ?></button>
         </section>
         <p data-component="checkout-error" class="coffeepos-form-error" role="alert" hidden></p>
         <div class="coffeepos-modal-actions">

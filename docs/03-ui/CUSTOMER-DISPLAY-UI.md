@@ -2,6 +2,20 @@
 
 # CoffeePOS Customer Display UI Specification
 
+## Approved checkout overlay revision (2026-08-23)
+
+Opening Cashier checkout opens a centered Customer Display overlay above the
+cart. Cash selection shows the canonical total and asks the customer to hand
+cash to the cashier. Bank selection replaces it with the server-generated
+VietQR and asks the customer to scan it. After the cashier manually confirms
+receipt and checkout succeeds, the overlay shows order success and remains
+visible. Only Cashier's Start new order action and valid `display.reset` close
+success and reveal the new cart.
+
+The Cashier checkout modal never renders the QR image. It shows only the method
+selector, confirmation guidance, and the authorized completion action; the QR
+image is Customer Display-only.
+
 ## 1. Purpose
 
 Customer Display is a separate customer-facing application surface.
@@ -190,9 +204,15 @@ amount due
 VietQR
 payment instruction
 payment pending indicator
+compact item summary
+subtotal/discount/total
 ```
 
 QR must correspond to the current payment context.
+The payment overlay reuses the accepted customer-safe cart projection. It must
+not recalculate line totals, discounts, or totals in the browser. Long item
+lists scroll inside the summary so the payment instruction and QR remain
+visible and usable.
 
 ---
 

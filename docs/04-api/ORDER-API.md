@@ -2,6 +2,24 @@
 
 # CoffeePOS Order API
 
+## Approved pre-order VietQR API (2026-08-23)
+
+`POST /coffeepos/v1/payments/vietqr-preview` accepts only
+`pos_session_id` and `expected_revision`. It reloads and validates the active
+cart, calculates the authoritative total, and returns a customer-safe
+`payment` projection with `state=awaiting_cashier_confirmation`. It creates no
+order and persists no payment transaction. The projection includes a trusted
+`summary.subtotal`, `summary.discount`, and `summary.total`, each with
+`amount_minor` and WooCommerce-formatted `display`, so the Customer Display
+summary is based on the same pricing result as the VietQR amount.
+
+Final bank checkout uses `POST /coffeepos/v1/orders/checkout` with
+`payment.method=bank_transfer` and `payment.confirmed_received=true`. The route
+requires the POS capability; the authorized cashier confirmation is the trusted
+manual input. The server revalidates the same revision, creates one order,
+marks it paid, records cashier/time audit metadata, completes the source cart,
+and returns a fresh cart. Client-supplied totals or paid states remain forbidden.
+
 ## 1. Purpose
 
 This document defines the server contract for turning a POS cart into a WooCommerce order and performing operational order actions.

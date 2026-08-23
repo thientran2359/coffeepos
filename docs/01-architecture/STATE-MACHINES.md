@@ -2,6 +2,19 @@
 
 # CoffeePOS State Machines
 
+## Approved manual bank-transfer presentation (2026-08-23)
+
+```text
+ACTIVE CART -> CHECKOUT OPEN -> AWAITING CASH OR BANK CONFIRMATION
+            -> AUTHORIZED CASHIER COMPLETES -> PAID ORDER -> PAYMENT SUCCESS
+            -> CASHIER STARTS NEW ORDER -> DISPLAY RESET
+```
+
+Selecting bank transfer and generating a VietQR preview do not create an order
+or change the authoritative cart state. Final checkout validates the same cart
+revision. Customer Display success is stable until `display.reset` and does not
+automatically transition to THANK_YOU.
+
 ## 1. Purpose
 
 This document defines permitted states and transitions for major CoffeePOS workflows.

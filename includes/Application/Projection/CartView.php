@@ -37,7 +37,7 @@ final class CartView
             ? $formatter->format($totalMinor, $cart->currency())
             : $totalMinor . ' ' . $cart->currency();
 
-        return new self([
+        $payload = [
             'pos_session_id' => $cart->posSessionId(),
             'revision' => $cart->revision(),
             'updated_at' => $cart->updatedAt(),
@@ -66,7 +66,10 @@ final class CartView
             'validation' => [
                 'checkout_ready' => $cart->hasItems() && $cart->state() === Cart::STATE_ACTIVE,
             ],
-        ]);
+        ];
+        $payload['customer_display'] = CustomerCartView::fromArray($payload);
+
+        return new self($payload);
     }
 
     public function toArray(): array

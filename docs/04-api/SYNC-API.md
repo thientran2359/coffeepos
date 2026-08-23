@@ -2,6 +2,21 @@
 
 # CoffeePOS Synchronization Contract
 
+## Approved manual-bank checkout projection (2026-08-23)
+
+`checkout.started` may be emitted again when Cashier changes the selected
+method. Its customer-safe payload contains `cart` plus `payment.method`,
+`payment.amount`, `payment.currency`, and a presentation `state`. Cash uses
+`state=awaiting_cash`. A server-confirmed pre-order VietQR preview is published
+as `payment.started` with `state=awaiting_cashier_confirmation`, `order=null`,
+and a QR URL restricted to HTTPS `vietqr.app/img`. Its trusted `payment.summary`
+travels with the preview so displayed subtotal/discount/total match the amount
+encoded in that QR.
+
+`sale.completed` is emitted only after the final checkout response contains a
+paid WooCommerce order. Customer Display keeps `payment_success` until a valid
+Cashier `display.reset`; it must not advance on a local timer.
+
 ## 1. Purpose
 
 This document defines the real-time synchronization contract between CoffeePOS application surfaces.
@@ -413,3 +428,74 @@ KDS and Order Queue may later use polling, REST, or another transport.
 Do not force all screen communication through BroadcastChannel.
 
 Use the transport appropriate to each workflow.
+
+---
+
+# 19. Phase-06 Snapshot and Safe Projection
+
+Every Cashier presentation envelope also contains a non-negative
+`workflow_sequence`. It is session-scoped and monotonic for accepted
+presentation events. Cart `revision` remains the only ordering authority for
+cart contents; `workflow_sequence` orders checkout/payment/completion/reset
+without mutating the cart. `state.snapshot` is authoritative hydration and may
+replace both accepted ordering values during initial/recovery handshake.
+
+The finalized snapshot payload is:
+
+```json
+{
+  "screen_state": "idle|cart|checkout|payment_pending|payment_success|thank_you",
+  "workflow_sequence": 4,
+  "cart": {},
+  "customer": null,
+  "payment": null,
+  "order": null
+}
+```
+
+`cart` is the server-defined `customer_display` projection embedded in
+`CartView`. It contains item names/configuration summaries, quantities, display
+prices/totals, safe customer name/membership, and service context. It excludes
+phone, customer IDs, custom item notes, staff data, credentials, and internal
+metadata. REST recovery requests `GET /cart?...&view=customer` to receive only
+this projection.
+
+Ordering rules:
+
+```text
+cart revision lower/equal       -> ignore incremental cart event
+cart revision current + 1       -> accept
+cart revision gap               -> enter recovery and send state.requested
+workflow sequence lower/equal   -> ignore workflow event
+workflow sequence current + 1   -> accept
+workflow sequence gap           -> request state.snapshot
+```
+
+A paid/completed presentation cannot be regressed by pending/failed payment
+payloads even when otherwise well formed.
+
+---
+
+# 20. Phase-06 Session Rollover
+
+`display.reset` is the authenticated Cashier-to-display handoff event. Its
+payload is:
+
+```json
+{
+  "reason": "sale_completed|new_order",
+  "next_pos_session_id": "opaque-id",
+  "next_revision": 0
+}
+```
+
+Only a valid envelope from `source=cashier`, addressed to `customer|all`, on the
+currently paired channel may initiate handoff. The display validates the next
+ID with the shared strict format, closes the old channel, clears deduplication
+and ordering state, opens `coffeepos:<next_pos_session_id>`, registers its
+listener, then sends `display.ready`. Old-channel messages are ignored by the
+new generation. Failure leaves a visible reconnecting state.
+
+QR image URLs are accepted only when parsed as HTTPS, the host is `vietqr.app`,
+and the path is exactly `/img`; data/javascript/blob URLs and credentials in
+URLs are rejected.

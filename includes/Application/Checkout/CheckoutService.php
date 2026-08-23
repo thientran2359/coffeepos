@@ -49,6 +49,9 @@ final class CheckoutService
             }
         }
         $received = $method === 'cash' ? $this->normalizeMoney((string) ($payment['received_amount'] ?? '')) : '';
+        if ($method === 'bank_transfer' && ($payment['confirmed_received'] ?? null) !== true) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_PAYMENT, 'Bank transfer receipt must be explicitly confirmed by the cashier.');
+        }
         $operationId = hash('sha256', $cashierId . '|' . $sessionId . '|' . $clientOperationId);
         $fingerprint = hash('sha256', wp_json_encode([$sessionId, $revision, $method, $received]));
 
@@ -89,19 +92,41 @@ final class CheckoutService
                 'operation_id' => $operationId, 'fingerprint' => $fingerprint,
                 'received_amount' => $this->fromMinor($receivedMinor),
                 'change' => $this->fromMinor($changeMinor),
+                'payment_reference' => $method === 'bank_transfer' ? $this->bankReference($sessionId, $revision) : '',
+                'bank_confirmed_by' => $method === 'bank_transfer' ? $cashierId : 0,
             ]);
             $cart->beginCheckout((int) $order['id']);
             $cart = $this->store->save($cart, $revision);
-            if ($method === 'cash') {
-                $cart->completeCheckout();
-                $this->store->save($cart, $cart->revision());
-                $fresh = $this->store->create($cart->currency());
-                $this->orders->setNextSessionId((int) $order['id'], $fresh->posSessionId());
-                $order['next_pos_session_id'] = $fresh->posSessionId();
-                return $this->resultFromOrder($order, $fresh);
-            }
-            return $this->resultFromOrder($order);
+            $cart->completeCheckout();
+            $this->store->save($cart, $cart->revision());
+            $fresh = $this->store->create($cart->currency());
+            $this->orders->setNextSessionId((int) $order['id'], $fresh->posSessionId());
+            $order['next_pos_session_id'] = $fresh->posSessionId();
+            return $this->resultFromOrder($order, $fresh);
         });
+    }
+
+    public function previewBankTransfer(string $sessionId, int $revision): array
+    {
+        $cart = $this->store->load($sessionId);
+        if ($cart === null) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::CART_SESSION_NOT_FOUND, 'Cart session was not found.');
+        }
+        if ($cart->state() !== Cart::STATE_ACTIVE || ! $cart->hasItems()) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_CART, 'Cart is not ready for bank transfer.');
+        }
+        if ($revision < 0 || $cart->revision() !== $revision) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::CART_REVISION_CONFLICT, 'Cart revision is out of date.', ['current_revision' => $cart->revision(), 'cart' => $this->project($cart)]);
+        }
+        $this->validator->validateCart($cart);
+        $pricing = $this->pricing->calculate($cart, $cart->paymentContext()->couponCode());
+        $payment = $this->bankGateway->initialize([
+            'total' => $this->fromMinor((int) $pricing['total_minor']),
+            'currency' => (string) $pricing['currency'],
+            'reference' => $this->bankReference($sessionId, $revision),
+        ], []);
+        $payment['summary'] = $this->pricingSummary($pricing);
+        return ['payment' => $payment];
     }
 
     public function paymentStatus(int $orderId): array
@@ -154,6 +179,25 @@ final class CheckoutService
     {
         $decimals = function_exists('wc_get_price_decimals') ? wc_get_price_decimals() : 2;
         return number_format($minor / (10 ** $decimals), $decimals, '.', '');
+    }
+
+    private function bankReference(string $sessionId, int $revision): string
+    {
+        return 'POS-' . strtoupper(substr(hash('sha256', $sessionId . '|' . $revision), 0, 12));
+    }
+
+    private function pricingSummary(array $pricing): array
+    {
+        $currency = (string) ($pricing['currency'] ?? '');
+        $summary = [];
+        foreach (['subtotal', 'discount', 'total'] as $key) {
+            $amountMinor = (int) ($pricing[$key . '_minor'] ?? 0);
+            $summary[$key] = [
+                'amount_minor' => $amountMinor,
+                'display' => $this->formatter->format($amountMinor, $currency),
+            ];
+        }
+        return $summary;
     }
 
     private function project(Cart $cart): array

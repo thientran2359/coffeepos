@@ -6,6 +6,7 @@ namespace CoffeePOS\Admin;
 
 use CoffeePOS\Core\Environment;
 use CoffeePOS\Infrastructure\Database\Migrator;
+use CoffeePOS\Infrastructure\Settings\Settings;
 use CoffeePOS\REST\RouteRegistrar;
 use CoffeePOS\Support\Capabilities;
 
@@ -60,6 +61,24 @@ final class AdminBootstrap
         echo '<p>' . esc_html__('Phase-00 foundation is active. Business features are intentionally not implemented in this phase.', 'coffeepos') . '</p>';
         echo '<h2>' . esc_html__('Diagnostics', 'coffeepos') . '</h2>';
         echo '<pre>' . esc_html(wp_json_encode($diagnostics, JSON_PRETTY_PRINT)) . '</pre>';
+        echo '<hr><h2>' . esc_html__('VietQR checkout', 'coffeepos') . '</h2>';
+        echo '<p>' . esc_html__('Used to generate the pre-order QR shown to Cashier and Customer Display. No order is created until the cashier confirms receipt.', 'coffeepos') . '</p>';
+        echo '<form method="post" action="options.php">';
+        settings_fields(Settings::GROUP);
+        echo '<table class="form-table" role="presentation"><tbody>';
+        $this->textSetting(Settings::OPTION_VIETQR_BANK_ID, __('Bank ID', 'coffeepos'), __('Use the bank identifier accepted by vietqr.app.', 'coffeepos'));
+        $this->textSetting(Settings::OPTION_VIETQR_ACCOUNT_NUMBER, __('Account number', 'coffeepos'), __('Letters, numbers, spaces and separators are sanitized before QR generation.', 'coffeepos'));
+        $this->textSetting(Settings::OPTION_VIETQR_ACCOUNT_NAME, __('Account holder', 'coffeepos'), __('Displayed as the VietQR holder value.', 'coffeepos'));
+        echo '</tbody></table>';
+        submit_button(__('Save VietQR settings', 'coffeepos'));
+        echo '</form>';
         echo '</div>';
+    }
+
+    private function textSetting(string $option, string $label, string $description): void
+    {
+        echo '<tr><th scope="row"><label for="' . esc_attr($option) . '">' . esc_html($label) . '</label></th><td>';
+        echo '<input class="regular-text" type="text" id="' . esc_attr($option) . '" name="' . esc_attr($option) . '" value="' . esc_attr((string) Settings::get($option)) . '">';
+        echo '<p class="description">' . esc_html($description) . '</p></td></tr>';
     }
 }

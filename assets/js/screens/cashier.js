@@ -24,6 +24,7 @@
         const store = CoffeePOS.state.createCashierStore();
         const api = CoffeePOS.api.createPosApi(CoffeePOS.api.createClient());
         const toast = CoffeePOS.ui.createToastController(root, renderer);
+        const syncBridge = CoffeePOS.components.createCashierSyncBridge(root, toast);
         const confirmDialog = CoffeePOS.ui.createConfirmDialogController(root);
         const catalogRenderer = CoffeePOS.components.createCatalogRenderer(root, renderer);
         const cartPanel = CoffeePOS.components.createCartPanelController(root, renderer);
@@ -239,8 +240,10 @@
             store.setCart(cart);
             cartPanel.render(cart);
             renderContext(cart);
+            syncBridge.publishCart(cart);
             if (checkoutController) {
                 checkoutController.reconcileCart(cart);
+                checkoutController.resumeCart(cart);
             }
         }
 
@@ -286,7 +289,11 @@
             api,
             function () { return store.getState().cart; },
             applyCart,
-            toast
+            toast,
+            function (type, payload) {
+                if (type === 'checkout.closed') { syncBridge.returnToCart(); return; }
+                syncBridge.publishWorkflow(type, payload);
+            }
         );
 
         function updateQuantity(item, quantity) {

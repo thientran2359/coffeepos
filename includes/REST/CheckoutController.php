@@ -54,6 +54,10 @@ final class CheckoutController
             'methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'checkout'],
             'permission_callback' => [$this, 'permissionCheck'],
         ]]);
+        register_rest_route($namespace, '/payments/vietqr-preview', [[
+            'methods' => WP_REST_Server::CREATABLE, 'callback' => [$this, 'vietQrPreview'],
+            'permission_callback' => [$this, 'permissionCheck'],
+        ]]);
         register_rest_route($namespace, '/orders/(?P<id>\d+)/payment', [[
             'methods' => WP_REST_Server::READABLE, 'callback' => [$this, 'paymentStatus'],
             'permission_callback' => [$this, 'permissionCheck'],
@@ -111,6 +115,17 @@ final class CheckoutController
     public function paymentStatus(WP_REST_Request $request)
     {
         return $this->respond(function () use ($request): array { return $this->checkout->paymentStatus(absint($request->get_param('id'))); });
+    }
+
+    public function vietQrPreview(WP_REST_Request $request)
+    {
+        return $this->respond(function () use ($request): array {
+            $payload = $this->payload($request);
+            return $this->checkout->previewBankTransfer(
+                $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
+                $this->revision($payload)
+            );
+        });
     }
 
     public function receipt(WP_REST_Request $request)

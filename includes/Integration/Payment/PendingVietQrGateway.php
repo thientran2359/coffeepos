@@ -16,21 +16,28 @@ final class PendingVietQrGateway implements PaymentGatewayInterface
         $bank = trim((string) Settings::get(Settings::OPTION_VIETQR_BANK_ID));
         $account = preg_replace('/[^0-9A-Za-z]/', '', (string) Settings::get(Settings::OPTION_VIETQR_ACCOUNT_NUMBER));
         $name = trim((string) Settings::get(Settings::OPTION_VIETQR_ACCOUNT_NAME));
-        $template = trim((string) Settings::get(Settings::OPTION_VIETQR_TEMPLATE)) ?: 'compact2';
-        $reference = 'POS-' . (string) ($order['number'] ?? $order['id'] ?? '');
+        $reference = trim((string) ($order['reference'] ?? ''));
+        if ($reference === '') {
+            $reference = 'POS-' . (string) ($order['number'] ?? $order['id'] ?? '');
+        }
         $available = $bank !== '' && $account !== '';
         $qr = null;
         if ($available) {
-            $base = 'https://img.vietqr.io/image/' . rawurlencode($bank . '-' . $account . '-' . $template) . '.png';
-            $qr = ['image_url' => $base . '?' . http_build_query([
+            $qr = ['image_url' => 'https://vietqr.app/img?' . http_build_query([
+                'acc' => $account,
+                'bank' => $bank,
                 'amount' => (string) ($order['total'] ?? ''),
-                'addInfo' => $reference,
-                'accountName' => $name,
+                'des' => $reference,
+                'holder' => $name,
+                'store' => (string) get_bloginfo('name'),
+                'template' => 'qronly',
+                'showinfo' => 'false',
             ], '', '&', PHP_QUERY_RFC3986)];
         }
         return [
-            'method' => 'bank_transfer', 'state' => 'pending',
+            'method' => 'bank_transfer', 'state' => 'awaiting_cashier_confirmation',
             'amount' => (string) ($order['total'] ?? '0'), 'reference' => $reference,
+            'currency' => (string) ($order['currency'] ?? ''),
             'provider_available' => $available, 'qr' => $qr,
         ];
     }

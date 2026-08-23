@@ -2,6 +2,14 @@
 
 # CoffeePOS Phase 05 — Checkout, Payment & WooCommerce Order
 
+> **Approved manual-bank revision (2026-08-23):** Bank transfer is now a
+> pre-order flow. Selecting it requests a server-generated VietQR preview for
+> the canonical cart revision and creates no WooCommerce order. An authorized
+> cashier manually confirms receipt in the final checkout request; only that
+> request creates and immediately pays the order. This supersedes conflicting
+> provider-only and pending-order language below. The cart remains ACTIVE while
+> the modal prevents editing; final checkout still rejects a stale revision.
+
 ## 1. Objective
 
 Turn the complete Phase-04 WooCommerce session-backed cart into one standard,

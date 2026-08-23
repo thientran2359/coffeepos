@@ -81,11 +81,11 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
                 $order->save();
                 $order->payment_complete('coffeepos-cash-' . $order->get_id());
             } else {
-                $order->set_status('pending');
+                $order->update_meta_data('_coffeepos_payment_reference', (string) ($context['payment_reference'] ?? ''));
+                $order->update_meta_data('_coffeepos_bank_confirmed_by', (int) ($context['bank_confirmed_by'] ?? 0));
+                $order->update_meta_data('_coffeepos_bank_confirmed_at', gmdate('c'));
                 $order->save();
-                $reference = 'POS-' . $order->get_order_number();
-                $order->update_meta_data('_coffeepos_payment_reference', $reference);
-                $order->save();
+                $order->payment_complete('coffeepos-bank-manual-' . $order->get_id());
             }
             return $this->projectOrder($order);
         } catch (Phase01Exception $exception) {

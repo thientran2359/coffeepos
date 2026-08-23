@@ -2,6 +2,19 @@
 
 # CoffeePOS Database Architecture
 
+## Approved manual bank confirmation audit (2026-08-23)
+
+Pre-order VietQR preview is derived from the WooCommerce session cart and is
+not persisted. A manually confirmed bank-transfer order records these approved,
+HPOS-compatible WooCommerce order meta keys through CRUD APIs:
+
+```text
+_coffeepos_bank_confirmed_by
+_coffeepos_bank_confirmed_at
+```
+
+The values are the authorized cashier user ID and UTC confirmation timestamp.
+
 ## 1. Purpose
 
 This document defines the persistent data architecture for CoffeePOS.
@@ -839,3 +852,11 @@ coffeepos_vietqr_template
 These options contain no verification credentials. Incomplete configuration
 keeps a bank-transfer order pending with no QR image. No provider secret,
 payment ledger, or custom Phase-05 table is introduced.
+
+---
+
+# 28. Phase-06 Customer Display Persistence
+
+Customer Display state and sync events are not persisted. Payment success stays
+visible until Cashier sends `display.reset`; no thank-you timeout option or
+client timer owns this transition.

@@ -3,7 +3,7 @@
     const CoffeePOS = window.CoffeePOS || {};
     CoffeePOS.components = CoffeePOS.components || {};
 
-    CoffeePOS.components.createCheckoutController = function (root, renderer, api, getCart, onNewCart, toast) {
+    CoffeePOS.components.createCheckoutController = function (root, renderer, api, getCart, onNewCart, toast, onWorkflow) {
         const modal = root.querySelector('[data-component="checkout-modal"]');
         const success = root.querySelector('[data-component="payment-success"]');
         const cashPanel = root.querySelector('[data-component="cash-payment"]');
@@ -19,6 +19,15 @@
         let result = null;
         let reviewedRevision = -1;
         let statusSequence = 0;
+        let publishedPaymentKey = '';
+        let publishedCompletedOrder = '';
+        let resumedOrderId = 0;
+        let previewSequence = 0;
+        let previewPending = false;
+
+        function notify(type, payload) {
+            if (typeof onWorkflow === 'function') { onWorkflow(type, payload || {}); }
+        }
 
         function decimals() { return Number(window.CoffeePOSConfig && window.CoffeePOSConfig.currencyDecimals || 0); }
         function normalizedTotal(cart) { return (Number(cart.total.amount_minor || 0) / Math.pow(10, decimals())).toFixed(decimals()); }
@@ -41,16 +50,57 @@
                 : 'Received amount is below total.';
             submit.disabled = pending || !Number.isFinite(entered) || entered < due;
         }
+        function customerPayment(cart, state) {
+            return {
+                method: method,
+                state: state,
+                amount: normalizedTotal(cart),
+                currency: String(cart.currency || '')
+            };
+        }
+        async function loadBankPreview(cart) {
+            const sequence = ++previewSequence;
+            previewPending = true; submit.disabled = true; submit.textContent = 'Preparing QR…';
+            try {
+                const data = await api.previewVietQr({ pos_session_id: cart.pos_session_id, expected_revision: cart.revision });
+                if (sequence !== previewSequence || method !== 'bank_transfer' || Number(getCart().revision) !== Number(cart.revision)) { return; }
+                const payment = data.payment;
+                bankPanel.setAttribute('data-state', payment.provider_available ? 'awaiting_confirmation' : 'provider_unavailable');
+                bankPanel.querySelector('[data-field="payment-reference"]').textContent = String(payment.reference || '');
+                const qr = bankPanel.querySelector('[data-component="vietqr"]');
+                qr.hidden = true; qr.querySelector('img').removeAttribute('src');
+                bankPanel.querySelector('[data-field="payment-status"]').textContent = payment.provider_available
+                    ? 'The QR is displayed on Customer Display. Confirm only after the transfer appears in the bank.'
+                    : 'VietQR beneficiary is not configured.';
+                submit.disabled = !payment.provider_available;
+                submit.textContent = 'Confirm received & complete';
+                notify('payment.started', { order: null, payment: payment });
+            } catch (error) {
+                if (sequence !== previewSequence) { return; }
+                errorBox.textContent = error.message || 'VietQR could not be prepared.'; errorBox.hidden = false;
+                submit.disabled = true; submit.textContent = 'Complete checkout';
+            } finally { if (sequence === previewSequence) { previewPending = false; } }
+        }
         function chooseMethod(next) {
             method = next === 'bank_transfer' ? 'bank_transfer' : 'cash';
             modal.querySelectorAll('[data-payment-method]').forEach(function (button) {
                 const active = button.getAttribute('data-payment-method') === method;
                 button.classList.toggle('is-active', active); button.setAttribute('aria-pressed', active ? 'true' : 'false');
             });
+            previewSequence++;
+            previewPending = false;
             cashPanel.hidden = method !== 'cash'; bankPanel.hidden = method !== 'bank_transfer';
             operationId = newOperationId();
-            submit.disabled = pending;
-            preview();
+            result = null; errorBox.hidden = true;
+            const cart = getCart();
+            notify('checkout.started', { cart: cart.customer_display || null, payment: customerPayment(cart, method === 'cash' ? 'awaiting_cash' : 'preparing_qr') });
+            if (method === 'bank_transfer') { loadBankPreview(cart); return; }
+            submit.textContent = 'Complete checkout'; submit.disabled = pending || previewPending; preview();
+        }
+        function setPendingControls(isFrozen) {
+            modal.querySelectorAll('[data-action="close-checkout"]').forEach(function (button) { button.hidden = isFrozen; });
+            const freshOrder = modal.querySelector('[data-action="start-fresh-order"]');
+            if (freshOrder) { freshOrder.hidden = !isFrozen; }
         }
         function open() {
             const cart = getCart();
@@ -59,11 +109,13 @@
             operationId = newOperationId(); result = null; pending = false;
             total.textContent = String(cart.total.display || normalizedTotal(cart));
             received.value = ''; errorBox.hidden = true; submit.hidden = false;
+            setPendingControls(false);
             chooseMethod('cash'); setOpen(modal, true, 'normal'); received.focus();
         }
         function close() {
             if (!pending && !(result && result.payment && result.payment.state === 'pending')) {
                 setOpen(modal, false);
+                notify('checkout.closed');
             }
         }
         function reconcileCart(cart) {
@@ -80,6 +132,7 @@
             modal.setAttribute('data-state', 'submitting');
             const payment = { method: method };
             if (method === 'cash') { payment.received_amount = String(received.value).trim(); }
+            if (method === 'bank_transfer') { payment.confirmed_received = true; }
             try {
                 result = await api.checkout({ pos_session_id: cart.pos_session_id, expected_revision: cart.revision, client_operation_id: operationId, payment: payment });
                 if (result.payment.state === 'paid') {
@@ -94,13 +147,19 @@
         }
         function showPending(data) {
             modal.setAttribute('data-state', 'payment_pending'); submit.hidden = true;
-            bankPanel.hidden = false; bankPanel.setAttribute('data-state', data.payment.provider_available ? 'pending' : 'provider_unavailable');
+            setPendingControls(true);
+            cashPanel.hidden = true; bankPanel.hidden = false;
+            bankPanel.setAttribute('data-state', data.payment.provider_available ? 'pending' : 'provider_unavailable');
             bankPanel.querySelector('[data-field="payment-reference"]').textContent = String(data.payment.reference || '');
             bankPanel.querySelector('[data-field="payment-status"]').textContent = data.payment.provider_available ? 'Payment pending verification.' : 'VietQR beneficiary is not configured. Order remains pending.';
             const qr = bankPanel.querySelector('[data-component="vietqr"]');
-            qr.hidden = !(data.payment.qr && data.payment.qr.image_url);
-            if (!qr.hidden) { qr.querySelector('img').src = data.payment.qr.image_url; }
+            qr.hidden = true; qr.querySelector('img').removeAttribute('src');
             bankPanel.querySelector('[data-action="refresh-payment-status"]').hidden = false;
+            const publishKey = String(data.order.id) + ':' + String(data.payment.state);
+            if (publishedPaymentKey !== publishKey) {
+                publishedPaymentKey = publishKey;
+                notify('payment.started', { order: data.order, payment: data.payment });
+            }
         }
         function showSuccess(data) {
             success.querySelector('[data-field="success-order-number"]').textContent = String(data.order.number);
@@ -108,6 +167,12 @@
             const cashChange = data.payment.change ? 'Change: ' + data.payment.change : '';
             success.querySelector('[data-field="success-change"]').textContent = cashChange;
             setOpen(success, true, 'paid');
+            const orderKey = String(data.order.id);
+            if (publishedCompletedOrder !== orderKey) {
+                publishedCompletedOrder = orderKey;
+                notify('payment.updated', { order: data.order, payment: data.payment });
+                notify('sale.completed', { order: data.order, payment: data.payment });
+            }
         }
         async function refreshStatus() {
             if (!result || !result.order) { return; }
@@ -118,6 +183,42 @@
                 result = current;
                 if (current.payment.state === 'paid') { setOpen(modal, false); showSuccess(current); } else { showPending(current); }
             } catch (error) { toast.show(error.message || 'Payment status could not be refreshed.', 'error'); }
+        }
+        async function resumeCart(cart) {
+            const recoverableState = cart && (cart.state === 'checkout' || cart.state === 'completed');
+            const orderId = recoverableState ? Number(cart.checkout_order_id || 0) : 0;
+            if (orderId <= 0 || (resumedOrderId === orderId && result)) { return; }
+            resumedOrderId = orderId;
+            total.textContent = String(cart.total && cart.total.display || normalizedTotal(cart));
+            received.value = ''; errorBox.hidden = true; submit.hidden = true;
+            cashPanel.hidden = true; bankPanel.hidden = false;
+            setPendingControls(true); setOpen(modal, true, 'recovering');
+            pending = true;
+            try {
+                result = await api.paymentStatus(orderId);
+                if (result.payment && result.payment.state === 'paid') { setOpen(modal, false); showSuccess(result); }
+                else { showPending(result); }
+            } catch (error) {
+                errorBox.textContent = error.message || 'The pending checkout could not be recovered.';
+                errorBox.hidden = false; modal.setAttribute('data-state', 'error');
+            } finally { pending = false; }
+        }
+        async function startFreshOrder() {
+            if (pending) { return; }
+            pending = true;
+            try {
+                const data = await api.createCartSession();
+                notify('display.reset', {
+                    reason: 'new_order',
+                    next_pos_session_id: data.cart.pos_session_id,
+                    next_revision: Number(data.cart.revision) || 0
+                });
+                onNewCart(data.cart);
+                setOpen(modal, false); result = null; resumedOrderId = 0;
+            } catch (error) {
+                errorBox.textContent = error.message || 'A new order could not be started.';
+                errorBox.hidden = false;
+            } finally { pending = false; }
         }
         async function printReceipt() {
             if (!result || !result.order || result.payment.state !== 'paid') { return; }
@@ -133,6 +234,13 @@
             } catch (error) { toast.show(error.message || 'Receipt could not be loaded.', 'error'); }
         }
         function startNewOrder() {
+            if (result && result.next_cart) {
+                notify('display.reset', {
+                    reason: 'new_order',
+                    next_pos_session_id: result.next_cart.pos_session_id,
+                    next_revision: Number(result.next_cart.revision) || 0
+                });
+            }
             if (result && result.next_cart) { onNewCart(result.next_cart); }
             setOpen(success, false); result = null;
         }
@@ -146,10 +254,11 @@
             else if (action === 'cash-exact') { received.value = normalizedTotal(getCart()); received.dispatchEvent(new Event('input')); }
             else if (action === 'submit-checkout') { submitCheckout(); }
             else if (action === 'refresh-payment-status') { refreshStatus(); }
+            else if (action === 'start-fresh-order') { startFreshOrder(); }
             else if (action === 'print-receipt') { printReceipt(); }
             else if (action === 'start-new-order') { startNewOrder(); }
         });
-        return { open: open, reconcileCart: reconcileCart };
+        return { open: open, reconcileCart: reconcileCart, resumeCart: resumeCart };
     };
     window.CoffeePOS = CoffeePOS;
 }(window));

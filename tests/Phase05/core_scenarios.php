@@ -45,13 +45,13 @@ $orders = new class implements OrderGatewayInterface {
     public array $orders = [];
     public int $creates = 0;
     public function findByOperation(string $operationId): ?array { return $this->orders[$operationId] ?? null; }
-    public function create(Cart $cart, array $pricing, array $context): array { $this->creates++; $paid = $context['payment_method'] === 'cash'; return $this->orders[$context['operation_id']] = ['id' => 501, 'number' => '501', 'status' => $paid ? 'processing' : 'pending', 'total' => '85.00', 'currency' => 'VND', 'operation_id' => $context['operation_id'], 'fingerprint' => $context['fingerprint'], 'pos_session_id' => $cart->posSessionId(), 'next_pos_session_id' => '', 'payment' => ['method' => $context['payment_method'], 'state' => $paid ? 'paid' : 'pending', 'amount' => '85.00', 'received_amount' => $context['received_amount'], 'change' => $context['change'], 'reference' => $paid ? '' : 'POS-501']]; }
+    public function create(Cart $cart, array $pricing, array $context): array { $this->creates++; return $this->orders[$context['operation_id']] = ['id' => 501, 'number' => '501', 'status' => 'processing', 'total' => '85.00', 'currency' => 'VND', 'operation_id' => $context['operation_id'], 'fingerprint' => $context['fingerprint'], 'pos_session_id' => $cart->posSessionId(), 'next_pos_session_id' => '', 'payment' => ['method' => $context['payment_method'], 'state' => 'paid', 'amount' => '85.00', 'received_amount' => $context['received_amount'], 'change' => $context['change'], 'reference' => (string) ($context['payment_reference'] ?? '')]]; }
     public function project(int $orderId): array { foreach ($this->orders as $order) { if ($order['id'] === $orderId) { return $order; } } throw new RuntimeException('Missing order'); }
     public function receipt(int $orderId): array { return ['order' => ['id' => $orderId], 'items' => []]; }
     public function setNextSessionId(int $orderId, string $posSessionId): void { foreach ($this->orders as &$order) { if ($order['id'] === $orderId) { $order['next_pos_session_id'] = $posSessionId; } } }
 };
 $bank = new class implements PaymentGatewayInterface {
-    public function initialize(array $order, array $paymentContext): array { return ['method' => 'bank_transfer', 'state' => 'pending', 'amount' => $order['total'], 'reference' => 'POS-' . $order['number'], 'provider_available' => false, 'qr' => null]; }
+    public function initialize(array $order, array $paymentContext): array { return ['method' => 'bank_transfer', 'state' => 'awaiting_cashier_confirmation', 'amount' => $order['total'], 'currency' => $order['currency'], 'reference' => $order['reference'], 'provider_available' => false, 'qr' => null]; }
     public function getStatus(array $order): array { return $this->initialize($order, []); }
     public function verifyCompletion(array $order, array $trustedInput): array { throw Phase01Exception::withCode(Phase01ErrorCodes::PAYMENT_VERIFICATION_FAILED, 'Unavailable'); }
 };
@@ -93,23 +93,32 @@ $test('TC-51 operation ID payload conflict', static function () use ($assert, $c
 
 $bankCart = $store->create('VND');
 $bankCart->addItem(CartItem::create(2, 0, 1, Money::fromMinor(10000, 'VND'), ModifierSelection::empty(), QuickNoteSelection::empty(), '', ['product_name' => 'Tea']));
-$test('TC-29/32/33/55 bank transfer stays pending and freezes cart', static function () use ($assert, $checkout, $bankCart): void {
-    $result = $checkout->checkout($bankCart->posSessionId(), 0, 'operation-bank-001', ['method' => 'bank_transfer'], 9);
-    $assert($result['payment']['state'] === 'pending' && $result['payment']['provider_available'] === false, 'Fallback bank flow implied success.');
-    $assert($bankCart->state() === Cart::STATE_CHECKOUT && $result['next_cart'] === null, 'Pending bank cart lifecycle is wrong.');
+$test('TC-29 pre-order VietQR preview creates no order', static function () use ($assert, $checkout, $bankCart, $orders): void {
+    $creates = $orders->creates;
+    $result = $checkout->previewBankTransfer($bankCart->posSessionId(), 0);
+    $assert($result['payment']['state'] === 'awaiting_cashier_confirmation', 'Preview state is wrong.');
+    $assert(($result['payment']['summary']['total']['amount_minor'] ?? -1) === 10000, 'Preview summary does not match authoritative VietQR pricing.');
+    $assert($orders->creates === $creates && $bankCart->state() === Cart::STATE_ACTIVE, 'Preview created an order or froze the cart.');
 });
-$test('TC-56 frozen checkout cart rejects coupon mutation', static function () use ($assert, $couponService, $bankCart): void {
-    try { $couponService->remove($bankCart->posSessionId(), $bankCart->revision()); }
-    catch (Phase01Exception $error) { $assert($error->errorCode() === Phase01ErrorCodes::INVALID_CART, 'Frozen cart returned wrong error.'); return; }
-    throw new RuntimeException('Frozen cart was mutated.');
+$test('TC-30 bank checkout requires explicit cashier confirmation', static function () use ($assert, $checkout, $bankCart): void {
+    try { $checkout->checkout($bankCart->posSessionId(), 0, 'operation-bank-no-confirm', ['method' => 'bank_transfer'], 9); }
+    catch (Phase01Exception $error) { $assert($error->errorCode() === Phase01ErrorCodes::INVALID_PAYMENT, 'Missing confirmation returned wrong error.'); return; }
+    throw new RuntimeException('Unconfirmed bank transfer created an order.');
+});
+$test('TC-31 confirmed bank transfer creates one paid order', static function () use ($assert, $checkout, $bankCart): void {
+    $result = $checkout->checkout($bankCart->posSessionId(), 0, 'operation-bank-confirmed', ['method' => 'bank_transfer', 'confirmed_received' => true], 9);
+    $assert($result['payment']['state'] === 'paid', 'Manual bank confirmation did not produce a paid order.');
+    $assert($bankCart->state() === Cart::STATE_COMPLETED && $result['next_cart']['state'] === Cart::STATE_ACTIVE, 'Confirmed bank cart finalization failed.');
 });
 
 $test('TC-66/67 PHP templates and client authority boundary', static function () use ($assert): void {
     $root = dirname(__DIR__, 2);
     $coupon = file_get_contents($root . '/templates/components/coupon-selector.php');
     $checkoutJs = file_get_contents($root . '/assets/js/components/checkout.js');
+    $gateway = file_get_contents($root . '/includes/Integration/Payment/PendingVietQrGateway.php');
     $assert(strpos((string) $coupon, 'coffeepos-coupon-option-template') !== false, 'Coupon native template missing.');
     $assert(strpos((string) $checkoutJs, 'payment.received_amount') !== false && strpos((string) $checkoutJs, 'payment.paid') === false, 'Client payment boundary is invalid.');
+    $assert(strpos((string) $gateway, 'https://vietqr.app/img?') !== false, 'Approved VietQR preview URL is missing.');
 });
 
 exit($failures === [] ? 0 : 1);

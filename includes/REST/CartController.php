@@ -178,9 +178,15 @@ final class CartController
     public function getCart(WP_REST_Request $request)
     {
         try {
+            $sessionId = $this->sessionId((string) $request->get_param('pos_session_id'));
+            if ((string) $request->get_param('view') === 'customer') {
+                return RestResponder::success([
+                    'cart' => $this->cartSessionService->getCustomerSession($sessionId),
+                ]);
+            }
             return RestResponder::success([
                 'cart' => $this->cartSessionService->getSession(
-                    $this->sessionId((string) $request->get_param('pos_session_id'))
+                    $sessionId
                 )->toArray(),
             ]);
         } catch (\Throwable $throwable) {

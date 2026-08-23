@@ -14,6 +14,7 @@ use CoffeePOS\Application\Product\ProductConfigurationService;
 use CoffeePOS\Application\Product\ProductService;
 use CoffeePOS\Application\Product\VariationService;
 use CoffeePOS\Application\Projection\CartView;
+use CoffeePOS\Application\Projection\CustomerCartView;
 use CoffeePOS\Domain\Cart\Cart;
 use CoffeePOS\Domain\Cart\CartItem;
 use CoffeePOS\Domain\Customer\CustomerContext;
@@ -69,6 +70,11 @@ final class CartSessionService
     public function getSession(string $posSessionId): CartView
     {
         return $this->project($this->load($posSessionId));
+    }
+
+    public function getCustomerSession(string $posSessionId): array
+    {
+        return CustomerCartView::fromArray($this->getSession($posSessionId)->toArray());
     }
 
     public function addItem(string $posSessionId, int $expectedRevision, array $input): CartView

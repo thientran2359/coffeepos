@@ -125,6 +125,9 @@
             getCart: function (posSessionId) {
                 return client.request('cart' + query({ pos_session_id: posSessionId }));
             },
+            getCustomerCart: function (posSessionId, signal) {
+                return client.request('cart' + query({ pos_session_id: posSessionId, view: 'customer' }), { signal: signal });
+            },
             addCartItem: function (payload) {
                 return client.request('cart/items', { method: 'POST', body: payload });
             },
@@ -169,6 +172,9 @@
             },
             checkout: function (payload) {
                 return client.request('orders/checkout', { method: 'POST', body: payload });
+            },
+            previewVietQr: function (payload) {
+                return client.request('payments/vietqr-preview', { method: 'POST', body: payload });
             },
             paymentStatus: function (orderId, signal) {
                 return client.request('orders/' + encodeURIComponent(String(orderId)) + '/payment', { signal: signal });

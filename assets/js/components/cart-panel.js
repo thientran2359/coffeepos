@@ -18,6 +18,12 @@
         const subtotal = root.querySelector('[data-component="cart-subtotal"]');
         const discount = root.querySelector('[data-component="cart-discount"]');
         const total = root.querySelector('[data-component="cart-total"]');
+        const checkoutButton = root.querySelector('[data-action="checkout"]');
+        const checkoutRegion = root.querySelector('[data-component="checkout"]');
+        const coupon = root.querySelector('[data-component="coupon"]');
+        const couponEmpty = root.querySelector('[data-component="coupon-empty"]');
+        const couponApplied = root.querySelector('[data-component="coupon-applied"]');
+        const couponCode = root.querySelector('[data-component="coupon-code"]');
 
         function setStatus(status) {
             setState(panel, status);
@@ -57,8 +63,18 @@
             }
 
             if (clearButton) {
-                clearButton.disabled = items.length === 0;
+                clearButton.disabled = items.length === 0 || cart.state !== 'active';
             }
+
+            const appliedCode = cart && cart.payment && cart.payment.coupon_code || '';
+            setState(coupon, appliedCode ? 'applied' : 'empty');
+            couponEmpty.hidden = Boolean(appliedCode);
+            couponApplied.hidden = !appliedCode;
+            couponCode.textContent = String(appliedCode);
+
+            const ready = Boolean(cart && cart.validation && cart.validation.checkout_ready);
+            checkoutButton.disabled = !ready;
+            setState(checkoutRegion, ready ? 'ready' : 'disabled');
 
             setStatus(items.length === 0 ? 'empty' : 'normal');
         }

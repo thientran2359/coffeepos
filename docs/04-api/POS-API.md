@@ -513,3 +513,19 @@ The final pricing fields should be server-derived when the API is authoritative.
 
 All item prices and totals are resolved from WooCommerce product/variation and
 coupon data. Client-supplied prices and modifier price adjustments are ignored.
+
+---
+
+# Phase-05 Coupon Operations
+
+```text
+GET    /coffeepos/v1/coupons/applicable?pos_session_id={id}
+POST   /coffeepos/v1/cart/coupon
+DELETE /coffeepos/v1/cart/coupon
+```
+
+The list returns safe `{code,label}` fields only. Mutations require
+`pos_session_id`, `expected_revision`, and `code`, delegate eligibility and
+discount calculation to WooCommerce, increment the single cart revision once,
+and return the complete canonical `CartView`. The client never submits a
+discount or total.

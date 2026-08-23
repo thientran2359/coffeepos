@@ -157,6 +157,24 @@
             },
             setServiceContext: function (payload) {
                 return client.request('cart/service-context', { method: 'PUT', body: payload });
+            },
+            loadApplicableCoupons: function (posSessionId, signal) {
+                return client.request('coupons/applicable' + query({ pos_session_id: posSessionId }), { signal: signal });
+            },
+            applyCoupon: function (payload) {
+                return client.request('cart/coupon', { method: 'POST', body: payload });
+            },
+            removeCoupon: function (payload) {
+                return client.request('cart/coupon', { method: 'DELETE', body: payload });
+            },
+            checkout: function (payload) {
+                return client.request('orders/checkout', { method: 'POST', body: payload });
+            },
+            paymentStatus: function (orderId, signal) {
+                return client.request('orders/' + encodeURIComponent(String(orderId)) + '/payment', { signal: signal });
+            },
+            loadReceipt: function (orderId, signal) {
+                return client.request('orders/' + encodeURIComponent(String(orderId)) + '/receipt', { signal: signal });
             }
         };
     };

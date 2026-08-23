@@ -14,17 +14,21 @@ final class RouteRegistrar
 
     private CartController $cartController;
 
+    private CheckoutController $checkoutController;
+
     private static array $registeredRoutes = [];
 
     public function __construct(
         ?HealthController $healthController = null,
         ?ProductController $productController = null,
-        ?CartController $cartController = null
+        ?CartController $cartController = null,
+        ?CheckoutController $checkoutController = null
     )
     {
         $this->healthController = $healthController ?? new HealthController();
         $this->productController = $productController ?? new ProductController();
         $this->cartController = $cartController ?? new CartController();
+        $this->checkoutController = $checkoutController ?? new CheckoutController();
     }
 
     public function register(): void
@@ -37,6 +41,7 @@ final class RouteRegistrar
         $this->healthController->register(self::NAMESPACE);
         $this->productController->register(self::NAMESPACE);
         $this->cartController->register(self::NAMESPACE);
+        $this->checkoutController->register(self::NAMESPACE);
 
         self::$registeredRoutes = [
             self::NAMESPACE . '/health',
@@ -54,6 +59,11 @@ final class RouteRegistrar
             self::NAMESPACE . '/tables',
             self::NAMESPACE . '/cart/customer',
             self::NAMESPACE . '/cart/service-context',
+            self::NAMESPACE . '/coupons/applicable',
+            self::NAMESPACE . '/cart/coupon',
+            self::NAMESPACE . '/orders/checkout',
+            self::NAMESPACE . '/orders/(?P<id>\\d+)/payment',
+            self::NAMESPACE . '/orders/(?P<id>\\d+)/receipt',
         ];
     }
 

@@ -234,6 +234,14 @@ final class CartSessionService
     {
         $cart = $this->load($posSessionId);
 
+        if ($cart->state() !== Cart::STATE_ACTIVE) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CART,
+                'Cart is frozen for checkout.',
+                ['state' => $cart->state(), 'order_id' => $cart->checkoutOrderId()]
+            );
+        }
+
         if ($expectedRevision < 0 || $cart->revision() !== $expectedRevision) {
             throw Phase01Exception::withCode(
                 Phase01ErrorCodes::CART_REVISION_CONFLICT,

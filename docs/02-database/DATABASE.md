@@ -802,3 +802,40 @@ Deletion policy
 ```
 
 Codex MUST NOT invent persistent storage without this information.
+
+---
+
+# 27. Phase-05 Checkout and VietQR Storage
+
+Phase-05 reserves these WooCommerce order metadata keys. All writes use
+WooCommerce order CRUD methods and remain HPOS-compatible:
+
+```text
+_coffeepos_operation_id
+_coffeepos_operation_fingerprint
+_coffeepos_pos_session_id
+_coffeepos_cash_received
+_coffeepos_cash_change
+_coffeepos_next_pos_session_id
+```
+
+The operation ID is scoped by cashier and POS session. The fingerprint is a
+one-way hash of the session, cart revision, payment method, and normalized
+payment input. Checkout queries WooCommerce orders by operation ID before
+creation and serializes the lookup/create section with a short database
+advisory lock. Cash received/change are fixed decimal strings validated or
+calculated by the server. The source/next session IDs support response-loss
+recovery and are not authorization credentials.
+
+VietQR beneficiary display configuration uses Options API keys:
+
+```text
+coffeepos_vietqr_bank_id
+coffeepos_vietqr_account_number
+coffeepos_vietqr_account_name
+coffeepos_vietqr_template
+```
+
+These options contain no verification credentials. Incomplete configuration
+keeps a bank-transfer order pending with no QR image. No provider secret,
+payment ledger, or custom Phase-05 table is introduced.

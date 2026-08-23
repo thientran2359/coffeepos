@@ -394,3 +394,30 @@ quick notes
 ```
 
 All keys must match `DATABASE.md`.
+
+---
+
+# 18. Phase-05 Finalized Contracts
+
+Checkout persists `_coffeepos_operation_id` and a normalized request hash in
+WooCommerce order metadata, queries through `wc_get_orders()`, and uses a short
+installation-scoped database advisory lock for the lookup/create section. The
+same key with different material input returns
+`duplicate_operation_conflict`.
+
+Paid checkout responses include `next_cart`, a fresh empty `CartView`. Its
+session ID is persisted on the order, so an identical retry returns the same
+fresh session instead of creating another cart.
+
+Read-only recovery routes are:
+
+```text
+GET /coffeepos/v1/orders/{id}/payment
+GET /coffeepos/v1/orders/{id}/receipt
+```
+
+Both require CoffeePOS capability. Payment state is derived from the
+WooCommerce order. The fallback bank-transfer adapter can initialize a
+configured VietQR and report pending/provider-unavailable, but exposes no
+browser operation that can mark an order paid. Receipt data comes only from the
+saved order.

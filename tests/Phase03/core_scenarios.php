@@ -113,6 +113,9 @@ $test('Phase 03 modules are wired and checkout remains disabled', static functio
     foreach (['loadCatalog()', 'createCart()', 'updateCartItem', 'removeCartItem', 'clearCart'] as $operation) {
         $assert(strpos((string) $screen, $operation) !== false, 'Missing Cashier operation: ' . $operation);
     }
+    foreach (['sessionStorage', 'getCart(existingSessionId)', "error.code === 'cart_session_not_found'"] as $recoveryContract) {
+        $assert(strpos((string) $screen, $recoveryContract) !== false, 'Missing reload recovery contract: ' . $recoveryContract);
+    }
     $assert((bool) preg_match('/data-action="checkout"[^>]*disabled/', (string) $cart), 'Checkout must remain disabled.');
 });
 

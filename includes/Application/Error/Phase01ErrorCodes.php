@@ -43,4 +43,17 @@ final class Phase01ErrorCodes
     public const CART_SESSION_NOT_FOUND = 'cart_session_not_found';
 
     public const CART_REVISION_CONFLICT = 'cart_revision_conflict';
+
+    public const EMPTY_CART = 'empty_cart';
+    public const COUPON_NOT_APPLICABLE = 'coupon_not_applicable';
+    public const INVALID_PAYMENT = 'invalid_payment';
+    public const INSUFFICIENT_CASH = 'insufficient_cash';
+    public const ORDER_CREATION_FAILED = 'order_creation_failed';
+    public const PAYMENT_FAILED = 'payment_failed';
+    public const PAYMENT_PENDING = 'payment_pending';
+    public const PAYMENT_PROVIDER_UNAVAILABLE = 'payment_provider_unavailable';
+    public const PAYMENT_VERIFICATION_FAILED = 'payment_verification_failed';
+    public const INVALID_ORDER_STATE = 'invalid_order_state';
+    public const ORDER_NOT_FOUND = 'order_not_found';
+    public const DUPLICATE_OPERATION_CONFLICT = 'duplicate_operation_conflict';
 }

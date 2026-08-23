@@ -23,6 +23,10 @@ final class Settings
     public const OPTION_QUICK_NOTES = 'coffeepos_quick_notes';
 
     public const OPTION_SERVICE_TABLES = 'coffeepos_service_tables';
+    public const OPTION_VIETQR_BANK_ID = 'coffeepos_vietqr_bank_id';
+    public const OPTION_VIETQR_ACCOUNT_NUMBER = 'coffeepos_vietqr_account_number';
+    public const OPTION_VIETQR_ACCOUNT_NAME = 'coffeepos_vietqr_account_name';
+    public const OPTION_VIETQR_TEMPLATE = 'coffeepos_vietqr_template';
 
     public function register(): void
     {
@@ -144,6 +148,22 @@ final class Settings
                 ],
                 'capability' => Capabilities::MANAGE_WOOCOMMERCE,
                 'sanitize' => null,
+            ],
+            self::OPTION_VIETQR_BANK_ID => [
+                'type' => 'string', 'default' => '',
+                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'sanitize_key',
+            ],
+            self::OPTION_VIETQR_ACCOUNT_NUMBER => [
+                'type' => 'string', 'default' => '',
+                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'sanitize_text_field',
+            ],
+            self::OPTION_VIETQR_ACCOUNT_NAME => [
+                'type' => 'string', 'default' => '',
+                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'sanitize_text_field',
+            ],
+            self::OPTION_VIETQR_TEMPLATE => [
+                'type' => 'string', 'default' => 'compact2',
+                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'sanitize_key',
             ],
         ];
     }

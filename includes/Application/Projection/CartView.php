@@ -25,17 +25,24 @@ final class CartView
         }
 
         $subtotalMinor = $cart->subtotal()->amountMinor();
+        $discountMinor = min($subtotalMinor, $cart->paymentContext()->couponDiscountMinor());
+        $totalMinor = max(0, $subtotalMinor - $discountMinor);
         $subtotalDisplay = $formatter !== null
             ? $formatter->format($subtotalMinor, $cart->currency())
             : $subtotalMinor . ' ' . $cart->currency();
-        $zeroDisplay = $formatter !== null
-            ? $formatter->format(0, $cart->currency())
-            : '0 ' . $cart->currency();
+        $discountDisplay = $formatter !== null
+            ? $formatter->format($discountMinor, $cart->currency())
+            : $discountMinor . ' ' . $cart->currency();
+        $totalDisplay = $formatter !== null
+            ? $formatter->format($totalMinor, $cart->currency())
+            : $totalMinor . ' ' . $cart->currency();
 
         return new self([
             'pos_session_id' => $cart->posSessionId(),
             'revision' => $cart->revision(),
             'updated_at' => $cart->updatedAt(),
+            'state' => $cart->state(),
+            'checkout_order_id' => $cart->checkoutOrderId(),
             'order_type' => $cart->orderType()->value(),
             'table' => $cart->tableContext()->toArray(),
             'customer' => CustomerView::fromDomain($cart->customerContext())->toArray(),
@@ -48,16 +55,16 @@ final class CartView
                 'display' => $subtotalDisplay,
             ],
             'discount' => [
-                'amount_minor' => 0,
-                'display' => $zeroDisplay,
+                'amount_minor' => $discountMinor,
+                'display' => $discountDisplay,
             ],
             'total' => [
-                'amount_minor' => $subtotalMinor,
-                'display' => $subtotalDisplay,
+                'amount_minor' => $totalMinor,
+                'display' => $totalDisplay,
             ],
             'currency' => $cart->currency(),
             'validation' => [
-                'checkout_ready' => $cart->hasItems(),
+                'checkout_ready' => $cart->hasItems() && $cart->state() === Cart::STATE_ACTIVE,
             ],
         ]);
     }

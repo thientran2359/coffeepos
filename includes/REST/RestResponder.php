@@ -65,9 +65,18 @@ final class RestResponder
         }
 
         if (in_array($code, [
+            Phase01ErrorCodes::DUPLICATE_OPERATION_CONFLICT,
+            Phase01ErrorCodes::PAYMENT_PENDING,
+            Phase01ErrorCodes::INVALID_ORDER_STATE,
+        ], true)) {
+            return 409;
+        }
+
+        if (in_array($code, [
             Phase01ErrorCodes::INVALID_PRODUCT,
             Phase01ErrorCodes::VARIATION_NOT_FOUND,
             Phase01ErrorCodes::CUSTOMER_NOT_FOUND,
+            Phase01ErrorCodes::ORDER_NOT_FOUND,
         ], true)) {
             return 404;
         }

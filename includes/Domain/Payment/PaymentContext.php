@@ -8,9 +8,12 @@ final class PaymentContext
 {
     private ?string $couponCode;
 
-    private function __construct(?string $couponCode)
+    private int $couponDiscountMinor;
+
+    private function __construct(?string $couponCode, int $couponDiscountMinor = 0)
     {
         $this->couponCode = $couponCode;
+        $this->couponDiscountMinor = max(0, $couponDiscountMinor);
     }
 
     public static function none(): self
@@ -18,7 +21,7 @@ final class PaymentContext
         return new self(null);
     }
 
-    public static function withCoupon(string $couponCode): self
+    public static function withCoupon(string $couponCode, int $discountMinor = 0): self
     {
         $normalized = strtoupper(trim($couponCode));
 
@@ -26,7 +29,7 @@ final class PaymentContext
             throw new \InvalidArgumentException('Coupon code cannot be empty.');
         }
 
-        return new self($normalized);
+        return new self($normalized, $discountMinor);
     }
 
     public function hasCoupon(): bool
@@ -39,10 +42,16 @@ final class PaymentContext
         return $this->couponCode;
     }
 
+    public function couponDiscountMinor(): int
+    {
+        return $this->couponDiscountMinor;
+    }
+
     public function toArray(): array
     {
         return [
             'coupon_code' => $this->couponCode,
+            'coupon_discount_minor' => $this->couponDiscountMinor,
         ];
     }
 }

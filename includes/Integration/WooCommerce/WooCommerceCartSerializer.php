@@ -38,6 +38,8 @@ final class WooCommerceCartSerializer
             'revision' => $cart->revision(),
             'currency' => $cart->currency(),
             'updated_at' => $cart->updatedAt(),
+            'state' => $cart->state(),
+            'checkout_order_id' => $cart->checkoutOrderId(),
             'items' => $items,
             'customer' => $cart->customerContext()->toArray(),
             'order_type' => $cart->orderType()->value(),
@@ -53,6 +55,10 @@ final class WooCommerceCartSerializer
             (string) ($payload['pos_session_id'] ?? ''),
             (int) ($payload['revision'] ?? -1),
             (string) ($payload['updated_at'] ?? '')
+        );
+        $cart->restoreCheckoutState(
+            (string) ($payload['state'] ?? Cart::STATE_ACTIVE),
+            (int) ($payload['checkout_order_id'] ?? 0)
         );
 
         foreach ((array) ($payload['items'] ?? []) as $item) {
@@ -86,7 +92,10 @@ final class WooCommerceCartSerializer
         $payment = (array) ($payload['payment'] ?? []);
 
         if (trim((string) ($payment['coupon_code'] ?? '')) !== '') {
-            $cart->setPaymentContext(PaymentContext::withCoupon((string) $payment['coupon_code']));
+            $cart->setPaymentContext(PaymentContext::withCoupon(
+                (string) $payment['coupon_code'],
+                (int) ($payment['coupon_discount_minor'] ?? 0)
+            ));
         }
 
         $orderType = (string) ($payload['order_type'] ?? OrderType::TAKEAWAY);

@@ -1014,3 +1014,62 @@ textarea:focus-visible,
         animation-iteration-count: 1 !important;
     }
 }
+
+.coffeepos-payment-form,
+.coffeepos-checkout-dialog [data-component="cash-payment"],
+.coffeepos-checkout-dialog [data-component="bank-transfer-payment"] {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.coffeepos-inline-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.coffeepos-inline-form input,
+.coffeepos-checkout-dialog input {
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 10px;
+    border: 1px solid var(--coffeepos-border-strong);
+    border-radius: var(--coffeepos-radius);
+}
+
+.coffeepos-coupon-list,
+.coffeepos-quick-cash {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.coffeepos-checkout-total {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 16px 0;
+    padding: 12px;
+    background: var(--coffeepos-surface-soft);
+    font-size: 18px;
+}
+
+.coffeepos-form-error { color: var(--coffeepos-danger); }
+.coffeepos-success-dialog { text-align: center; }
+[data-component="vietqr"] { text-align: center; }
+[data-component="vietqr"] img { width: min(300px, 100%); height: auto; }
+
+.coffeepos-receipt { display: none; }
+.coffeepos-receipt-item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; }
+.coffeepos-receipt-item small { grid-column: 1 / -1; }
+
+@media print {
+    body.coffeepos > * { display: none !important; }
+    body.coffeepos #coffeepos-app { display: block !important; }
+    #coffeepos-app > * { display: none !important; }
+    #coffeepos-app [data-component="overlay-root"] { display: block !important; }
+    #coffeepos-app [data-component="overlay-root"] > * { display: none !important; }
+    #coffeepos-app .coffeepos-receipt { display: block !important; position: static; padding: 12mm; color: #000; }
+}

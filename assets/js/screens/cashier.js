@@ -3,6 +3,7 @@
 
     const CoffeePOS = window.CoffeePOS || {};
     const setState = CoffeePOS.core.setState;
+    const POS_SESSION_STORAGE_KEY = 'coffeepos.pos_session_id';
 
     CoffeePOS.screens = CoffeePOS.screens || {};
 
@@ -23,7 +24,6 @@
         const store = CoffeePOS.state.createCashierStore();
         const api = CoffeePOS.api.createPosApi(CoffeePOS.api.createClient());
         const toast = CoffeePOS.ui.createToastController(root, renderer);
-        const modal = CoffeePOS.ui.createModalController(root);
         const confirmDialog = CoffeePOS.ui.createConfirmDialogController(root);
         const catalogRenderer = CoffeePOS.components.createCatalogRenderer(root, renderer);
         const cartPanel = CoffeePOS.components.createCartPanelController(root, renderer);
@@ -34,6 +34,8 @@
             store.setSearchTerm(term);
         });
         let contextController = null;
+        let couponSelector = null;
+        let checkoutController = null;
         const orderType = CoffeePOS.components.createOrderTypeController(root, function (requested) {
             if (mutationPending) {
                 return;
@@ -47,6 +49,26 @@
         let catalogRequest = null;
         let catalogSequence = 0;
         let mutationPending = false;
+
+        function storedPosSessionId() {
+            try {
+                return String(window.sessionStorage.getItem(POS_SESSION_STORAGE_KEY) || '');
+            } catch (error) {
+                return '';
+            }
+        }
+
+        function rememberPosSessionId(posSessionId) {
+            try {
+                if (posSessionId) {
+                    window.sessionStorage.setItem(POS_SESSION_STORAGE_KEY, String(posSessionId));
+                } else {
+                    window.sessionStorage.removeItem(POS_SESSION_STORAGE_KEY);
+                }
+            } catch (error) {
+                // The server cart remains authoritative when browser storage is unavailable.
+            }
+        }
 
         function setCatalogStatus(status) {
             const scroll = root.querySelector('[data-component="catalog-scroll"]');
@@ -125,10 +147,23 @@
 
         async function createCart() {
             cartPanel.setLoading();
+            const existingSessionId = storedPosSessionId();
             try {
-                const data = await api.createCartSession();
+                const data = existingSessionId
+                    ? await api.getCart(existingSessionId)
+                    : await api.createCartSession();
                 applyCart(data.cart);
             } catch (error) {
+                if (existingSessionId && error && error.code === 'cart_session_not_found') {
+                    rememberPosSessionId('');
+                    try {
+                        const replacement = await api.createCartSession();
+                        applyCart(replacement.cart);
+                        return;
+                    } catch (replacementError) {
+                        error = replacementError;
+                    }
+                }
                 store.setCartStatus('error');
                 cartPanel.setError();
                 toast.show(error.message || 'The cart could not be loaded.', 'error');
@@ -198,9 +233,15 @@
         }
 
         function applyCart(cart) {
+            if (cart && cart.pos_session_id) {
+                rememberPosSessionId(cart.pos_session_id);
+            }
             store.setCart(cart);
             cartPanel.render(cart);
             renderContext(cart);
+            if (checkoutController) {
+                checkoutController.reconcileCart(cart);
+            }
         }
 
         function attachCustomer(customerId) {
@@ -231,6 +272,21 @@
             api,
             attachCustomer,
             setServiceContext
+        );
+        couponSelector = CoffeePOS.components.createCouponSelector(
+            root,
+            renderer,
+            api,
+            function () { return store.getState().cart; },
+            applyCart
+        );
+        checkoutController = CoffeePOS.components.createCheckoutController(
+            root,
+            renderer,
+            api,
+            function () { return store.getState().cart; },
+            applyCart,
+            toast
         );
 
         function updateQuantity(item, quantity) {
@@ -271,7 +327,11 @@
             } else if (action === 'remove-customer' && cart) {
                 mutate(function () { return api.removeCustomer(cartPayload(cart)); }).catch(function () {});
             } else if (action === 'open-coupon') {
-                modal.open({ title: 'Coupon', message: 'Coupon application is not part of Phase 3.', action: action, state: 'idle' });
+                couponSelector.open();
+            } else if (action === 'remove-coupon' && cart) {
+                mutate(function () { return api.removeCoupon(cartPayload(cart)); }).catch(function () {});
+            } else if (action === 'checkout' && cart) {
+                checkoutController.open();
             }
         }
 

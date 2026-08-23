@@ -12,6 +12,10 @@ use CoffeePOS\Domain\Shared\Money;
 
 final class Cart
 {
+    public const STATE_ACTIVE = 'active';
+    public const STATE_CHECKOUT = 'checkout';
+    public const STATE_COMPLETED = 'completed';
+
     private string $currency;
 
     private OrderType $orderType;
@@ -29,6 +33,10 @@ final class Cart
     private int $revision;
 
     private string $updatedAt;
+
+    private string $state = self::STATE_ACTIVE;
+
+    private int $checkoutOrderId = 0;
 
     private function __construct(string $currency, string $posSessionId = '', int $revision = 0, string $updatedAt = '')
     {
@@ -78,6 +86,42 @@ final class Cart
     public function updatedAt(): string
     {
         return $this->updatedAt;
+    }
+
+    public function state(): string
+    {
+        return $this->state;
+    }
+
+    public function checkoutOrderId(): int
+    {
+        return $this->checkoutOrderId;
+    }
+
+    public function restoreCheckoutState(string $state, int $orderId = 0): void
+    {
+        if (! in_array($state, [self::STATE_ACTIVE, self::STATE_CHECKOUT, self::STATE_COMPLETED], true)) {
+            throw new \InvalidArgumentException('Invalid cart state.');
+        }
+        $this->state = $state;
+        $this->checkoutOrderId = max(0, $orderId);
+    }
+
+    public function beginCheckout(int $orderId): void
+    {
+        if ($this->state !== self::STATE_ACTIVE || $orderId <= 0) {
+            throw new \InvalidArgumentException('Cart cannot enter checkout.');
+        }
+        $this->state = self::STATE_CHECKOUT;
+        $this->checkoutOrderId = $orderId;
+    }
+
+    public function completeCheckout(): void
+    {
+        if ($this->state !== self::STATE_CHECKOUT) {
+            throw new \InvalidArgumentException('Cart is not in checkout.');
+        }
+        $this->state = self::STATE_COMPLETED;
     }
 
     public function advanceRevision(string $updatedAt): void

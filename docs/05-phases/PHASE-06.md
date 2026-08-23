@@ -514,11 +514,13 @@ Customer Display may show:
 display name
 membership status/tier when available
 points/balance presentation when explicitly supplied
+privacy-safe masked phone when supplied by the Phase-08 projection
 ```
 
 Do not show:
 
 ```text
+full phone
 email
 billing/shipping address
 order history
@@ -529,6 +531,10 @@ provider errors
 
 Guest state uses a neutral customer-facing presentation. The display must work
 when membership data is `null` or partially absent.
+
+Phase 08 extends this completed presentation contract with explicit Guest/Member
+identity and a centrally sanitized masked phone such as `0353***250`. It does
+not permit the full phone or email in any BroadcastChannel payload.
 
 ---
 

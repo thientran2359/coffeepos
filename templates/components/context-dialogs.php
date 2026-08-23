@@ -13,15 +13,34 @@ if (! defined('ABSPATH')) {
             <h3 id="coffeepos-customer-title"><?php esc_html_e('Find customer', 'coffeepos'); ?></h3>
             <button type="button" class="coffeepos-icon-button" data-action="close-customer-lookup" aria-label="<?php esc_attr_e('Close customer lookup', 'coffeepos'); ?>">&#215;</button>
         </header>
-        <form data-component="customer-lookup-form">
+        <form class="coffeepos-member-lookup-form" data-component="customer-lookup-form">
             <label class="coffeepos-field">
                 <span><?php esc_html_e('Phone number', 'coffeepos'); ?></span>
-                <input type="tel" data-component="customer-phone-input" autocomplete="tel" required>
+                <input type="tel" data-component="customer-phone-input" autocomplete="tel" inputmode="tel" aria-describedby="coffeepos-customer-lookup-status" required>
             </label>
             <button type="submit" class="coffeepos-btn coffeepos-btn-primary" data-action="lookup-customer"><?php esc_html_e('Search', 'coffeepos'); ?></button>
         </form>
-        <p data-component="customer-lookup-status" role="status"></p>
+        <p id="coffeepos-customer-lookup-status" data-component="customer-lookup-status" role="status" aria-live="polite"></p>
         <div data-component="customer-lookup-result"></div>
+        <section class="coffeepos-member-create" data-component="customer-create" hidden aria-labelledby="coffeepos-member-create-title">
+            <h4 id="coffeepos-member-create-title"><?php esc_html_e('Create member', 'coffeepos'); ?></h4>
+            <p><?php esc_html_e('No member uses this phone yet. Enter the member details below.', 'coffeepos'); ?></p>
+            <form data-component="customer-create-form">
+                <label class="coffeepos-field">
+                    <span><?php esc_html_e('Phone number', 'coffeepos'); ?></span>
+                    <input type="tel" data-component="customer-create-phone" autocomplete="tel" inputmode="tel" required>
+                </label>
+                <label class="coffeepos-field">
+                    <span><?php esc_html_e('Member name', 'coffeepos'); ?></span>
+                    <input type="text" data-component="customer-create-name" autocomplete="name" maxlength="200" required>
+                </label>
+                <label class="coffeepos-field">
+                    <span><?php esc_html_e('Email (optional)', 'coffeepos'); ?></span>
+                    <input type="email" data-component="customer-create-email" autocomplete="email" maxlength="254">
+                </label>
+                <button type="submit" class="coffeepos-btn coffeepos-btn-primary" data-action="create-customer"><?php esc_html_e('Create and use member', 'coffeepos'); ?></button>
+            </form>
+        </section>
     </section>
 </div>
 
@@ -29,8 +48,9 @@ if (! defined('ABSPATH')) {
     <article class="coffeepos-customer-result" data-key="customer_id" data-attr="data-customer-id:customer_id">
         <strong data-field="display_name"></strong>
         <span data-field="phone"></span>
+        <span data-field="email"></span>
         <span data-field="membership_label"></span>
-        <button type="button" class="coffeepos-btn coffeepos-btn-primary" data-action="select-customer" data-attr="data-customer-id:customer_id"><?php esc_html_e('Select customer', 'coffeepos'); ?></button>
+        <button type="button" class="coffeepos-btn coffeepos-btn-primary" data-action="select-customer" data-attr="data-customer-id:customer_id"><?php esc_html_e('Use member', 'coffeepos'); ?></button>
     </article>
 </template>
 

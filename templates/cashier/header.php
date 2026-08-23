@@ -25,9 +25,9 @@ $cashier = (string) ($cashierView['cashier'] ?? __('Cashier', 'coffeepos'));
         <button type="button" class="coffeepos-icon-button" data-action="open-customer-display" disabled title="<?php esc_attr_e('Customer display', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Customer display', 'coffeepos'); ?>">
             <span aria-hidden="true">D</span>
         </button>
-        <button type="button" class="coffeepos-icon-button" data-action="open-shift" disabled title="<?php esc_attr_e('Shift', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Shift', 'coffeepos'); ?>">
+        <a class="coffeepos-icon-button" href="<?php echo esc_url(home_url('/' . trim(\CoffeePOS\Infrastructure\Settings\Settings::getPosBaseSlug(), '/') . '/shifts/')); ?>" data-action="open-shift" title="<?php esc_attr_e('Shift', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Shift', 'coffeepos'); ?>">
             <span aria-hidden="true">S</span>
-        </button>
+        </a>
         <button type="button" class="coffeepos-icon-button" data-action="open-settings" disabled title="<?php esc_attr_e('Settings', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Settings', 'coffeepos'); ?>">
             <span aria-hidden="true">&#9881;</span>
         </button>

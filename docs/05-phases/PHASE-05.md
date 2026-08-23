@@ -329,6 +329,12 @@ Create/populate WooCommerce order
 Initialize or complete payment according to trusted method
 ```
 
+The WooCommerce cart used as the server-side pricing engine must be an isolated
+scratch cart populated only from the addressed CoffeePOS `pos_session_id`.
+When a custom REST request lazily initializes WooCommerce, the normal storefront
+cart session must finish loading before the scratch cart is created; storefront
+cart items must never be imported into POS pricing or mutated by POS pricing.
+
 Validation failure must return a stable error and enough safe current projection
 data for the Cashier to reconcile where applicable.
 
@@ -663,7 +669,7 @@ _coffeepos_payment_reference when applicable
 ```
 
 `_coffeepos_shift_id` is reserved but must not be populated until a valid active
-shift exists in Phase 08.
+shift exists in Phase 09.
 
 Order-item metadata:
 

@@ -72,6 +72,15 @@ final class AdminBootstrap
         echo '</tbody></table>';
         submit_button(__('Save VietQR settings', 'coffeepos'));
         echo '</form>';
+        echo '<hr><h2>' . esc_html__('Operational screens', 'coffeepos') . '</h2>';
+        echo '<form method="post" action="options.php">';
+        settings_fields(Settings::GROUP);
+        echo '<table class="form-table" role="presentation"><tbody>';
+        $this->numberSetting(Settings::OPTION_KDS_POLL_INTERVAL, __('KDS polling interval (ms)', 'coffeepos'));
+        $this->numberSetting(Settings::OPTION_ORDER_QUEUE_POLL_INTERVAL, __('Order Queue polling interval (ms)', 'coffeepos'));
+        echo '</tbody></table>';
+        submit_button(__('Save operational settings', 'coffeepos'));
+        echo '</form>';
         echo '</div>';
     }
 
@@ -80,5 +89,12 @@ final class AdminBootstrap
         echo '<tr><th scope="row"><label for="' . esc_attr($option) . '">' . esc_html($label) . '</label></th><td>';
         echo '<input class="regular-text" type="text" id="' . esc_attr($option) . '" name="' . esc_attr($option) . '" value="' . esc_attr((string) Settings::get($option)) . '">';
         echo '<p class="description">' . esc_html($description) . '</p></td></tr>';
+    }
+
+    private function numberSetting(string $option, string $label): void
+    {
+        echo '<tr><th scope="row"><label for="' . esc_attr($option) . '">' . esc_html($label) . '</label></th><td>';
+        echo '<input type="number" min="3000" max="60000" step="1000" id="' . esc_attr($option) . '" name="' . esc_attr($option) . '" value="' . esc_attr((string) Settings::get($option)) . '">';
+        echo '<p class="description">' . esc_html__('Allowed range: 3000–60000 ms.', 'coffeepos') . '</p></td></tr>';
     }
 }

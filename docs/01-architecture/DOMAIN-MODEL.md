@@ -232,11 +232,22 @@ Member context may contain:
 customer_id
 name
 phone
+masked phone projection
 membership information
 points/balance
 ```
 
-Membership/points data is not fully defined by the feature source and must be isolated behind a membership abstraction if implemented.
+WooCommerce remains canonical for member customer identity. Phase 08 adds
+WooCommerce-backed member creation and exact normalized-phone identification;
+it does not add an independent CoffeePOS customer table.
+
+The Cashier may receive the full phone for identity confirmation. Customer
+Display receives a dedicated safe projection containing only a masked phone,
+for example `0353***250`, and must not receive/render full phone or email.
+
+Loyalty benefits remain isolated behind the membership abstraction. Points,
+buy-five-get-one progress, tier calculation, and tier coupon rules are not
+defined by the identity model and must not be invented by clients.
 
 ---
 

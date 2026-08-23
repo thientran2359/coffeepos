@@ -17,6 +17,7 @@ use CoffeePOS\Application\Product\VariationService;
 use CoffeePOS\Infrastructure\Settings\SettingsProductConfigurationProvider;
 use CoffeePOS\Infrastructure\Settings\SettingsTableProvider;
 use CoffeePOS\Infrastructure\Customer\NullMembershipProvider;
+use CoffeePOS\Infrastructure\Concurrency\MySqlLockProvider;
 use CoffeePOS\Integration\WooCommerce\WooCommerceCartSessionStore;
 use CoffeePOS\Integration\WooCommerce\WooCommerceCustomerGateway;
 use CoffeePOS\Integration\WooCommerce\WooCommerceMoney;
@@ -58,7 +59,8 @@ final class CartController
 
         $this->customerService = $customerService ?? new CustomerService(
             new WooCommerceCustomerGateway(),
-            new NullMembershipProvider()
+            new NullMembershipProvider(),
+            new MySqlLockProvider()
         );
         $this->tableProvider = $tableProvider ?? new SettingsTableProvider();
         $this->cartSessionService = $cartSessionService ?? new CartSessionService(
@@ -123,6 +125,12 @@ final class CartController
         register_rest_route($namespace, '/customers/lookup', [[
             'methods' => WP_REST_Server::READABLE,
             'callback' => [$this, 'lookupCustomer'],
+            'permission_callback' => [$this, 'permissionCheck'],
+        ]]);
+
+        register_rest_route($namespace, '/customers', [[
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => [$this, 'createCustomer'],
             'permission_callback' => [$this, 'permissionCheck'],
         ]]);
 
@@ -284,6 +292,25 @@ final class CartController
                     sanitize_text_field((string) $request->get_param('phone'))
                 )->toArray(),
             ]);
+        } catch (\Throwable $throwable) {
+            return RestResponder::fromThrowable($throwable);
+        }
+    }
+
+    public function createCustomer(WP_REST_Request $request)
+    {
+        try {
+            $payload = $this->payload($request);
+            $result = $this->customerService->createMember([
+                'display_name' => sanitize_text_field((string) ($payload['display_name'] ?? '')),
+                'phone' => sanitize_text_field((string) ($payload['phone'] ?? '')),
+                'email' => sanitize_text_field((string) ($payload['email'] ?? '')),
+                'client_operation_id' => sanitize_text_field((string) ($payload['client_operation_id'] ?? '')),
+            ]);
+
+            return RestResponder::success([
+                'customer' => $result['customer']->toArray(),
+            ], ! empty($result['replayed']) ? 200 : 201);
         } catch (\Throwable $throwable) {
             return RestResponder::fromThrowable($throwable);
         }

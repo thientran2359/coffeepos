@@ -158,8 +158,14 @@ Response when found:
   "data": {
     "customer": {
       "id": 123,
+      "customer_id": 123,
+      "mode": "member",
       "name": "Customer",
-      "phone": "0900000000"
+      "display_name": "Customer",
+      "phone": "0353123250",
+      "phone_masked": "0353***250",
+      "email": "customer@example.com",
+      "membership": null
     }
   }
 }
@@ -184,6 +190,40 @@ customer_phone_ambiguous
 
 `customer_not_found` should be a controlled response, not a server exception.
 
+## POST /coffeepos/v1/customers
+
+Creates one WooCommerce-backed member after exact duplicate-phone validation.
+
+```json
+{
+  "display_name": "Nguyen Van An",
+  "phone": "0353123250",
+  "email": "",
+  "client_operation_id": "member-create-01J123456"
+}
+```
+
+`display_name`, `phone`, and `client_operation_id` are required. Email is
+optional. The server normalizes the phone, acquires a hash-only phone lock,
+rechecks existing customers, and persists operation ID/fingerprint with the
+WooCommerce customer.
+
+Initial creation returns HTTP 201. An identical idempotent replay returns HTTP
+200 and the same CustomerView. Reusing the operation ID with changed normalized
+data returns `idempotency_key_reused`.
+
+Additional stable errors:
+
+```text
+invalid_customer_name
+invalid_customer_email
+customer_phone_exists
+customer_phone_ambiguous
+customer_creation_locked
+customer_create_failed
+idempotency_key_reused
+```
+
 ## PUT /coffeepos/v1/cart/customer
 
 Attaches a trusted WooCommerce customer to the active cart. The request contains
@@ -196,6 +236,11 @@ Returns the active cart to guest mode using `pos_session_id` and
 `expected_revision`.
 
 Both operations increment the cart revision and return the full `CartView`.
+
+`CartView.customer` is the authorized Cashier projection. Its embedded
+`customer_display.customer` projection excludes full phone, email, and customer
+ID, and contains only mode, display name, masked phone, and approved membership
+presentation fields.
 
 ---
 
@@ -529,3 +574,9 @@ The list returns safe `{code,label}` fields only. Mutations require
 discount calculation to WooCommerce, increment the single cart revision once,
 and return the complete canonical `CartView`. The client never submits a
 discount or total.
+## Phase 09 Shift API
+
+`GET /shifts/current`, `POST /shifts/open`, `POST /shifts/{id}/close`, and
+`GET /shifts/history` expose the authenticated cashier's shift lifecycle.
+Cashier identity and derived totals are server-authoritative. Checkout rejects
+missing active shifts and stores the resolved `_coffeepos_shift_id` on orders.

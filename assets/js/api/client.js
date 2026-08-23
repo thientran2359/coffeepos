@@ -149,6 +149,9 @@
             lookupCustomer: function (phone, signal) {
                 return client.request('customers/lookup' + query({ phone: phone }), { signal: signal });
             },
+            createCustomer: function (payload) {
+                return client.request('customers', { method: 'POST', body: payload });
+            },
             loadTables: function (signal) {
                 return client.request('tables', { signal: signal });
             },
@@ -181,6 +184,34 @@
             },
             loadReceipt: function (orderId, signal) {
                 return client.request('orders/' + encodeURIComponent(String(orderId)) + '/receipt', { signal: signal });
+            },
+            loadKdsOrders: function (states, signal) {
+                return client.request('kds/orders' + query({ states: (states || []).join(','), limit: 100 }), { signal: signal });
+            },
+            transitionKdsOrder: function (orderId, payload) {
+                return client.request('kds/orders/' + encodeURIComponent(String(orderId)) + '/transition', { method: 'POST', body: payload });
+            },
+            loadOrderQueue: function (filters, signal) {
+                const value = filters || {};
+                return client.request('order-queue/orders' + query({ kds_state: value.kds_state || 'all', order_type: value.order_type || 'all', limit: 100 }), { signal: signal });
+            },
+            completeOperationalOrder: function (orderId, payload) {
+                return client.request('orders/' + encodeURIComponent(String(orderId)) + '/complete', { method: 'POST', body: payload });
+            },
+            cancelOperationalOrder: function (orderId, payload) {
+                return client.request('orders/' + encodeURIComponent(String(orderId)) + '/cancel', { method: 'POST', body: payload });
+            },
+            getCurrentShift: function () {
+                return client.request('shifts/current');
+            },
+            openShift: function (payload) {
+                return client.request('shifts/open', { method: 'POST', body: payload });
+            },
+            closeShift: function (shiftId, payload) {
+                return client.request('shifts/' + encodeURIComponent(String(shiftId)) + '/close', { method: 'POST', body: payload });
+            },
+            loadShiftHistory: function (limit) {
+                return client.request('shifts/history' + query({ limit: limit || 50 }));
             }
         };
     };

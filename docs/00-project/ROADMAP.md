@@ -162,7 +162,7 @@ A cashier can construct a complete cart without creating a WooCommerce order.
 
 ---
 
-# Phase 04 — Customer, Membership & Order Type
+# Phase 04 — Customer Context & Order Type Foundation
 
 ## Goal
 
@@ -171,10 +171,10 @@ Add customer and service context to the cart.
 ## Work
 
 - guest mode
-- member mode
+- existing-customer mode
 - phone lookup
 - customer selection
-- member information
+- optional membership projection
 - dine-in
 - table selection
 - takeaway
@@ -280,7 +280,35 @@ A newly created POS order reaches operational screens correctly.
 
 ---
 
-# Phase 08 — Shift Management
+# Phase 08 — Membership & Customer Identity
+
+## Goal
+
+Complete the cashier and Customer Display membership workflow on top of the
+Phase-04 customer-context foundation.
+
+## Work
+
+- guest/member identification
+- automatic exact phone lookup
+- member detail autofill
+- member creation through WooCommerce customer APIs
+- duplicate-phone protection
+- attach/remove member on the active cart
+- member identity on Customer Display
+- masked customer phone on Customer Display
+- cashier/customer-display synchronization
+- membership extension boundary for later loyalty benefits
+
+## Exit Criteria
+
+The cashier can identify or create a member by phone, use that member on the
+active cart/order, and show a privacy-safe guest/member projection on Customer
+Display.
+
+---
+
+# Phase 09 — Shift Management
 
 ## Goal
 
@@ -305,7 +333,7 @@ A complete shift can be opened, operated, closed, and reconciled.
 
 ---
 
-# Phase 09 — Order History, Refund & Quick Reorder
+# Phase 10 — Order History, Refund & Quick Reorder
 
 ## Goal
 
@@ -328,7 +356,7 @@ Historical POS orders can be inspected and common follow-up operations can be pe
 
 ---
 
-# Phase 10 — Reports, Analytics & Hardening
+# Phase 11 — Reports, Analytics & Hardening
 
 ## Goal
 
@@ -371,14 +399,14 @@ Phase 03
 Phase 04
    ↓
 Phase 05
-   ├────────→ Phase 06
-   └────────→ Phase 07
-                  ↓
-Phase 08 ←────────┘
-   ↓
-Phase 09
-   ↓
-Phase 10
+   ├────────→ Phase 06 ────────→ Phase 08 ─┐
+   └────────→ Phase 07 ────────────────────┤
+                                           ↓
+                                        Phase 09
+                                           ↓
+                                        Phase 10
+                                           ↓
+                                        Phase 11
 ```
 
 The dependency map is conceptual.

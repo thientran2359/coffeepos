@@ -82,6 +82,11 @@ cart session, revision, projection, and Cashier component contracts.
 
 Do not rebuild the Phase-03 cart or create a second customer/cart store.
 
+Phase 04 is the customer-context foundation only. Member creation, automatic
+lookup UX, and privacy-safe member identity on Customer Display are completed
+in Phase 08. Loyalty earning, tier assignment, and member discounts are not
+part of either phase.
+
 ---
 
 # 3. Scope

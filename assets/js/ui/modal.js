@@ -11,7 +11,7 @@
         );
     }
 
-    function createDialogLifecycle(element, onConfirm, onClose) {
+    function createDialogLifecycle(element, onConfirm, onClose, canClose) {
         const dialog = element ? element.querySelector('[role="dialog"], [role="alertdialog"]') : null;
         let previousFocus = null;
         let pendingAction = '';
@@ -69,6 +69,10 @@
 
         function close() {
             if (!element || element.hidden) {
+                return;
+            }
+
+            if (typeof canClose === 'function' && !canClose()) {
                 return;
             }
 

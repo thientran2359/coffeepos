@@ -2,6 +2,40 @@
 
 # CoffeePOS Order API
 
+## Phase-07 operational order API (2026-08-23)
+
+Protected list routes:
+
+```text
+GET /coffeepos/v1/kds/orders?states=new,preparing,ready&limit=100
+GET /coffeepos/v1/order-queue/orders?kds_state=all&order_type=all&limit=100
+```
+
+Both return `server_time`, effective `poll_interval_ms`, and a bounded `orders`
+projection. Default limit is 100; maximum is 200. Only paid CoffeePOS orders in
+active WooCommerce/operational state are returned.
+
+Mutation routes:
+
+```text
+POST /coffeepos/v1/kds/orders/{id}/transition
+POST /coffeepos/v1/orders/{id}/complete
+POST /coffeepos/v1/orders/{id}/cancel
+```
+
+Each mutation requires `expected_state`, `expected_revision`, and a valid
+`client_operation_id`; KDS transition also requires `target_state`. Valid state
+flow is `new -> preparing -> ready -> completed`, with cancellation allowed
+only from `new` or `preparing`. A stale request returns HTTP 409
+`order_state_conflict` with the current safe KDS projection where available.
+Successful mutations return `order` and an optional active `queue_order`.
+
+KDS items expose saved order-item name, quantity, variation, modifiers, quick
+notes, and custom note as plain text. Queue items expose order number, customer
+display name, service/table, received time, WooCommerce total, KDS revision/state,
+receipt availability, and server-derived allowed actions. Private billing and
+payment-provider data are excluded.
+
 ## Approved pre-order VietQR API (2026-08-23)
 
 `POST /coffeepos/v1/payments/vietqr-preview` accepts only
@@ -87,6 +121,12 @@ Initialize payment
  ↓
 Return checkout result
 ```
+
+For a Phase-08 member cart, validation reloads the WooCommerce customer selected
+by canonical CustomerContext. Order creation passes that customer ID to
+WooCommerce and copies the current billing identity through WooCommerce CRUD.
+Browser lookup/create fields and Customer Display projection are never order
+authority. Guest carts keep `customer_id = 0`.
 
 ---
 
@@ -439,3 +479,8 @@ WooCommerce order. The fallback bank-transfer adapter can initialize a
 configured VietQR and report pending/provider-unavailable, but exposes no
 browser operation that can mark an order paid. Receipt data comes only from the
 saved order.
+## Phase 09 Order-to-Shift Association
+
+Checkout resolves the authenticated cashier's active shift before order
+creation. The client cannot provide a shift ID. Every new POS order persists
+the resolved ID in `_coffeepos_shift_id`; shift totals query this association.

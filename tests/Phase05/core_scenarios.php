@@ -121,4 +121,11 @@ $test('TC-66/67 PHP templates and client authority boundary', static function ()
     $assert(strpos((string) $gateway, 'https://vietqr.app/img?') !== false, 'Approved VietQR preview URL is missing.');
 });
 
+$test('TC-70 POS pricing cart is isolated from the storefront cart', static function () use ($assert): void {
+    $root = dirname(__DIR__, 2);
+    $pricing = file_get_contents($root . '/includes/Integration/WooCommerce/WooCommercePricingGateway.php');
+    $assert(strpos((string) $pricing, "did_action('woocommerce_load_cart_from_session')") !== false, 'Pricing does not complete the storefront session load before creating its scratch cart.');
+    $assert(strpos((string) $pricing, '$wooCart->set_cart_contents($cartContents)') !== false, 'Pricing does not populate an isolated scratch cart from CoffeePOS items.');
+});
+
 exit($failures === [] ? 0 : 1);

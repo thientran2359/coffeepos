@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CoffeePOS\Application\Projection;
 
+use CoffeePOS\Application\Customer\CustomerPhone;
 use CoffeePOS\Domain\Customer\CustomerContext;
 
 final class CustomerView
@@ -16,14 +17,28 @@ final class CustomerView
 
     private string $phone;
 
+    private string $email;
+
+    private string $maskedPhone;
+
     private ?array $membership;
 
-    private function __construct(bool $guest, ?int $id, string $name, string $phone, ?array $membership = null)
+    private function __construct(
+        bool $guest,
+        ?int $id,
+        string $name,
+        string $phone,
+        ?array $membership = null,
+        string $email = '',
+        string $maskedPhone = ''
+    )
     {
         $this->guest = $guest;
         $this->id = $id;
         $this->name = trim($name);
         $this->phone = trim($phone);
+        $this->email = trim($email);
+        $this->maskedPhone = $maskedPhone !== '' ? $maskedPhone : CustomerPhone::mask($phone);
         $this->membership = $membership;
     }
 
@@ -32,9 +47,16 @@ final class CustomerView
         return new self(true, null, '', '');
     }
 
-    public static function member(int $id, string $name = '', string $phone = '', ?array $membership = null): self
+    public static function member(
+        int $id,
+        string $name = '',
+        string $phone = '',
+        ?array $membership = null,
+        string $email = '',
+        string $maskedPhone = ''
+    ): self
     {
-        return new self(false, $id, $name, $phone, $membership);
+        return new self(false, $id, $name, $phone, $membership, $email, $maskedPhone);
     }
 
     public static function fromDomain(CustomerContext $customerContext): self
@@ -61,6 +83,8 @@ final class CustomerView
             'name' => $this->name,
             'display_name' => $this->name,
             'phone' => $this->phone,
+            'phone_masked' => $this->maskedPhone,
+            'email' => $this->email,
             'membership' => $this->membership,
         ];
     }

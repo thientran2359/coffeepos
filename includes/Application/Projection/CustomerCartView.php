@@ -39,7 +39,9 @@ final class CustomerCartView
             ],
             'customer' => [
                 'is_guest' => ! empty($customer['is_guest']),
+                'mode' => ! empty($customer['is_guest']) ? 'guest' : 'member',
                 'display_name' => (string) ($customer['display_name'] ?? ''),
+                'phone_masked' => (string) ($customer['phone_masked'] ?? ''),
                 'membership' => $membership,
             ],
             'items' => $items,

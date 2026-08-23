@@ -11,20 +11,32 @@
         const phoneInput = customerElement.querySelector('[data-component="customer-phone-input"]');
         const customerStatus = customerElement.querySelector('[data-component="customer-lookup-status"]');
         const customerResult = customerElement.querySelector('[data-component="customer-lookup-result"]');
+        const createPanel = customerElement.querySelector('[data-component="customer-create"]');
+        const createForm = customerElement.querySelector('[data-component="customer-create-form"]');
+        const createPhone = customerElement.querySelector('[data-component="customer-create-phone"]');
+        const createName = customerElement.querySelector('[data-component="customer-create-name"]');
+        const createEmail = customerElement.querySelector('[data-component="customer-create-email"]');
         const tableElement = root.querySelector('[data-component="table-selector"]');
         const tableStatus = tableElement.querySelector('[data-component="table-selector-status"]');
         const tableList = tableElement.querySelector('[data-component="table-list"]');
         let lookupRequest = null;
         let lookupSequence = 0;
+        let lookupTimer = 0;
         let tableRequest = null;
-        let pending = false;
+        let attaching = false;
+        let creating = false;
+        let tablePending = false;
+        let creationOperationId = '';
 
         const customerDialog = CoffeePOS.ui.createDialogLifecycle(customerElement, null, function () {
             if (lookupRequest) {
                 lookupRequest.abort();
             }
+            window.clearTimeout(lookupTimer);
             lookupSequence += 1;
             setState(customerElement, 'closed');
+        }, function () {
+            return !creating && !attaching;
         });
         const tableDialog = CoffeePOS.ui.createDialogLifecycle(tableElement, null, function () {
             if (tableRequest) {
@@ -33,33 +45,85 @@
             setState(tableElement, 'closed');
         });
 
+        function operationId() {
+            if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+                return 'member-' + window.crypto.randomUUID();
+            }
+            return 'member-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+        }
+
+        function normalizedDigits(value) {
+            let digits = String(value || '').replace(/\D+/g, '');
+            if (digits.length === 11 && digits.indexOf('84') === 0) {
+                digits = '0' + digits.slice(2);
+            }
+            return digits;
+        }
+
+        function canLookup(value) {
+            const digits = normalizedDigits(value);
+            return digits.length >= 9 && digits.length <= 15;
+        }
+
         function setCustomerStatus(status, message) {
             setState(customerElement, status);
             customerStatus.textContent = message || '';
         }
 
+        function membershipLabel(customer) {
+            const membership = customer && customer.membership;
+            return membership
+                ? membership.tier_label || membership.status_label || membership.points_display || ''
+                : '';
+        }
+
+        function renderCandidate(value) {
+            const customer = Object.assign({ membership_label: '', email: '' }, value || {});
+            customer.membership_label = membershipLabel(customer);
+            renderer.renderList('coffeepos-customer-result-template', [customer], customerResult);
+            createPanel.hidden = true;
+            setCustomerStatus('found', 'Member found. Confirm to use this member.');
+        }
+
+        function showCreate(phone) {
+            customerResult.replaceChildren();
+            createPhone.value = String(phone || '');
+            createPanel.hidden = false;
+            setCustomerStatus('not_found', 'No member was found. You can create one below.');
+        }
+
+        function resetCandidate() {
+            customerResult.replaceChildren();
+            createPanel.hidden = true;
+            creationOperationId = '';
+        }
+
         async function lookup() {
+            window.clearTimeout(lookupTimer);
+            const value = phoneInput.value;
+            if (!canLookup(value)) {
+                if (lookupRequest) {
+                    lookupRequest.abort();
+                }
+                lookupSequence += 1;
+                resetCandidate();
+                setCustomerStatus(value.trim() === '' ? 'idle' : 'typing', value.trim() === '' ? '' : 'Enter a complete phone number.');
+                return;
+            }
             if (lookupRequest) {
                 lookupRequest.abort();
             }
             lookupRequest = new window.AbortController();
             const sequence = ++lookupSequence;
             customerResult.replaceChildren();
-            setCustomerStatus('searching', 'Searching...');
+            createPanel.hidden = true;
+            setCustomerStatus('searching', 'Searching for member…');
             try {
-                const data = await api.lookupCustomer(phoneInput.value, lookupRequest.signal);
+                const data = await api.lookupCustomer(value, lookupRequest.signal);
                 if (sequence !== lookupSequence || customerElement.hidden) {
                     return;
                 }
-                const customer = Object.assign({ membership_label: '' }, data.customer || {});
-                if (customer.membership) {
-                    customer.membership_label = customer.membership.tier_label
-                        || customer.membership.status_label
-                        || customer.membership.points_display
-                        || '';
-                }
-                renderer.renderList('coffeepos-customer-result-template', [customer], customerResult);
-                setCustomerStatus('found', 'Customer found.');
+                renderCandidate(data.customer || {});
             } catch (error) {
                 if (error && error.name === 'AbortError') {
                     return;
@@ -67,23 +131,76 @@
                 if (sequence !== lookupSequence) {
                     return;
                 }
-                setCustomerStatus(error.code === 'customer_not_found' ? 'not_found' : 'error', error.message);
+                if (error && error.code === 'customer_not_found') {
+                    showCreate(value);
+                    return;
+                }
+                resetCandidate();
+                setCustomerStatus('error', error && error.message ? error.message : 'Member lookup failed.');
             }
         }
 
-        async function selectCustomer(customerId) {
-            if (pending) {
+        function scheduleLookup() {
+            window.clearTimeout(lookupTimer);
+            resetCandidate();
+            if (!canLookup(phoneInput.value)) {
+                setCustomerStatus(phoneInput.value.trim() === '' ? 'idle' : 'typing', phoneInput.value.trim() === '' ? '' : 'Enter a complete phone number.');
                 return;
             }
-            pending = true;
-            setCustomerStatus('attaching', 'Adding customer...');
+            setCustomerStatus('typing', 'Waiting to search…');
+            lookupTimer = window.setTimeout(lookup, 400);
+        }
+
+        async function selectCustomer(customerId) {
+            if (attaching || creating) {
+                return;
+            }
+            attaching = true;
+            setCustomerStatus('attaching', 'Adding member to cart…');
             try {
                 await onAttach(Number(customerId));
+                attaching = false;
                 customerDialog.close();
             } catch (error) {
-                setCustomerStatus('found', error.message);
+                setCustomerStatus('conflict', error && error.message ? error.message : 'Member could not be attached.');
             } finally {
-                pending = false;
+                attaching = false;
+            }
+        }
+
+        async function createCustomer() {
+            if (creating || attaching) {
+                return;
+            }
+            creating = true;
+            createForm.querySelectorAll('input, button').forEach(function (element) { element.disabled = true; });
+            if (!creationOperationId) {
+                creationOperationId = operationId();
+            }
+            setCustomerStatus('creating', 'Creating member…');
+            try {
+                const data = await api.createCustomer({
+                    display_name: createName.value,
+                    phone: createPhone.value,
+                    email: createEmail.value,
+                    client_operation_id: creationOperationId
+                });
+                const customer = data.customer || {};
+                renderCandidate(customer);
+                setCustomerStatus('created_pending_attach', 'Member created. Adding member to cart…');
+                creating = false;
+                await selectCustomer(customer.customer_id);
+                return;
+            } catch (error) {
+                if (error && error.code === 'customer_phone_exists' && error.details && error.details.customer) {
+                    renderCandidate(error.details.customer);
+                    setCustomerStatus('found', 'This phone already belongs to a member. Confirm to use it.');
+                } else {
+                    setCustomerStatus('error', error && error.message ? error.message : 'Member could not be created.');
+                }
+            } finally {
+                creating = false;
+                createForm.querySelectorAll('input, button').forEach(function (element) { element.disabled = false; });
             }
         }
 
@@ -115,10 +232,10 @@
         }
 
         async function selectTable(tableId) {
-            if (pending) {
+            if (tablePending) {
                 return;
             }
-            pending = true;
+            tablePending = true;
             setState(tableElement, 'updating');
             tableStatus.textContent = 'Updating service...';
             try {
@@ -128,13 +245,24 @@
                 setState(tableElement, 'error');
                 tableStatus.textContent = error.message;
             } finally {
-                pending = false;
+                tablePending = false;
             }
         }
 
         customerForm.addEventListener('submit', function (event) {
             event.preventDefault();
             lookup();
+        });
+        phoneInput.addEventListener('input', scheduleLookup);
+        createForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            createCustomer();
+        });
+        createForm.addEventListener('input', function () {
+            creationOperationId = '';
+        });
+        createPhone.addEventListener('input', function () {
+            phoneInput.value = createPhone.value;
         });
         customerElement.addEventListener('click', function (event) {
             const trigger = event.target.closest('[data-action]');
@@ -161,8 +289,12 @@
 
         return {
             openCustomer: function () {
-                customerResult.replaceChildren();
+                resetCandidate();
                 customerStatus.textContent = '';
+                phoneInput.value = '';
+                createPhone.value = '';
+                createName.value = '';
+                createEmail.value = '';
                 customerDialog.open('');
                 setState(customerElement, 'idle');
                 phoneInput.focus();

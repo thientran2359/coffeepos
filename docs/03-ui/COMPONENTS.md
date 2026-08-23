@@ -339,9 +339,14 @@ Phone number.
 
 ```text
 idle
+typing
 searching
 found
 not_found
+creating
+attaching
+attached
+conflict
 error
 ```
 
@@ -355,6 +360,24 @@ phone
 membership status
 points if supported
 ```
+
+After a valid phone is entered, lookup is automatically debounced. A found
+member fills the preview but is attached only through the authoritative cart
+mutation. A not-found result may open the Phase-08 create-member form.
+
+Customer Display uses a separate safe summary:
+
+```text
+Guest
+
+or
+
+Member
+name
+masked phone, for example 0353***250
+```
+
+Customer Display must not render or receive the full phone or email.
 
 ---
 
@@ -498,6 +521,12 @@ new order
 
 # 23. KDS Card
 
+Phase-07 behavior hooks use `data-component="kds-order-card"` and
+`data-action="transition-kds-order"`. Exactly one primary action is shown for
+the current active state: Start, Ready, or Complete. Pending disables only the
+affected card. Timer severity is derived presentation and is never submitted as
+business state.
+
 Displays:
 
 ```text
@@ -529,6 +558,11 @@ critical
 ---
 
 # 24. Order Card
+
+On Order Queue, server-projected allowed actions control presentation: Complete
+only for `ready`, Cancel only for `new|preparing`, and Reprint when a receipt is
+available. Cancel uses the shared accessible confirmation dialog. UI visibility
+is not authorization; every action is revalidated by the server.
 
 Shared operational card for order queue/history where appropriate.
 

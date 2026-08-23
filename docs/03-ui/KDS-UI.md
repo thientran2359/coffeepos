@@ -2,6 +2,23 @@
 
 # CoffeePOS Kitchen Display System UI Specification
 
+## Phase-07 finalized behavior (2026-08-23)
+
+KDS uses one non-overlapping poll scheduled after the prior request settles.
+The baseline/effective interval is five seconds. The initial accepted list
+establishes the sound baseline and never alerts; a later response containing one
+or more previously unseen `new` order IDs produces one short alert only when the
+operator explicitly enabled sound. Sound preference is per browser.
+
+Elapsed time uses response `server_time` and order `received_at` to derive a
+server clock offset. One screen timer updates all cards locally every second.
+`05:00` is warning and `10:00` is critical. No per-card or per-second server
+request is allowed.
+
+Repeated cards/items are PHP-owned native templates rendered through the shared
+`TemplateRenderer`. A stale action replaces the affected card with the server
+projection; a failed refresh keeps the last accepted list visible.
+
 ## 1. Purpose
 
 KDS presents active preparation work.

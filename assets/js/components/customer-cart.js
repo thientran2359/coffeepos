@@ -14,7 +14,10 @@
             text('customer-discount', cart && cart.discount && cart.discount.display);
             text('customer-total', cart && cart.total && cart.total.display);
             const customer = cart && cart.customer || {};
-            text('customer-name', customer.is_guest ? '' : customer.display_name);
+            const isGuest = customer.mode === 'guest' || customer.is_guest === true;
+            text('customer-mode', isGuest ? 'Guest' : 'Member');
+            text('customer-name', isGuest ? '' : customer.display_name);
+            text('customer-phone-masked', isGuest ? '' : customer.phone_masked);
             const membership = customer.membership || {};
             text('customer-membership', membership.tier_label || membership.status_label || membership.points_display || '');
             const service = cart && cart.order_type === 'dine_in'

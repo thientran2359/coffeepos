@@ -34,7 +34,11 @@
             if (!cart) { return; }
             try { window.sessionStorage.setItem(sequenceKey(cart.pos_session_id), String(workflowSequence)); } catch (error) {}
         }
-        function safeCart(value) { return value && value.customer_display ? value.customer_display : null; }
+        function safeCart(value) {
+            return value && value.customer_display
+                ? protocol.safeCustomerCart(value.customer_display)
+                : null;
+        }
         function snapshotPayload() {
             const customerCart = safeCart(cart);
             return {

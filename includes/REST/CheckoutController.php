@@ -14,6 +14,10 @@ use CoffeePOS\Integration\WooCommerce\WooCommerceCartSessionStore;
 use CoffeePOS\Integration\WooCommerce\WooCommerceMoneyFormatter;
 use CoffeePOS\Integration\WooCommerce\WooCommerceOrderGateway;
 use CoffeePOS\Integration\WooCommerce\WooCommercePricingGateway;
+use CoffeePOS\Application\Shift\ShiftService;
+use CoffeePOS\Infrastructure\Concurrency\MySqlLockProvider;
+use CoffeePOS\Infrastructure\Shift\WpdbShiftRepository;
+use CoffeePOS\Integration\WooCommerce\WooCommerceShiftTotalsGateway;
 use CoffeePOS\Support\Capabilities;
 use CoffeePOS\Support\ErrorFactory;
 use WP_REST_Request;
@@ -23,6 +27,7 @@ final class CheckoutController
 {
     private CartCouponService $coupons;
     private CheckoutService $checkout;
+    private ShiftService $shifts;
 
     public function __construct(?CartCouponService $coupons = null, ?CheckoutService $checkout = null)
     {
@@ -38,6 +43,7 @@ final class CheckoutController
             new PendingVietQrGateway(),
             $formatter
         );
+        $this->shifts = new ShiftService(new WpdbShiftRepository(), new WooCommerceShiftTotalsGateway(), new MySqlLockProvider());
     }
 
     public function register(string $namespace): void
@@ -102,12 +108,14 @@ final class CheckoutController
     {
         return $this->respond(function () use ($request): array {
             $payload = $this->payload($request);
+            $shift = $this->shifts->requireOpen(get_current_user_id());
             return $this->checkout->checkout(
                 $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
                 $this->revision($payload),
                 sanitize_text_field((string) ($payload['client_operation_id'] ?? '')),
                 is_array($payload['payment'] ?? null) ? $payload['payment'] : [],
-                get_current_user_id()
+                get_current_user_id(),
+                (int) $shift['id']
             );
         });
     }

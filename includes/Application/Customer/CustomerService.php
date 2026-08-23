@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace CoffeePOS\Application\Customer;
 
 use CoffeePOS\Application\Contracts\CustomerGatewayInterface;
+use CoffeePOS\Application\Contracts\CustomerCreationGatewayInterface;
+use CoffeePOS\Application\Contracts\LockProviderInterface;
 use CoffeePOS\Application\Contracts\MembershipProviderInterface;
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
 use CoffeePOS\Application\Error\Phase01Exception;
@@ -17,13 +19,17 @@ final class CustomerService
 
     private ?MembershipProviderInterface $membershipProvider;
 
+    private ?LockProviderInterface $lockProvider;
+
     public function __construct(
         ?CustomerGatewayInterface $customerGateway = null,
-        ?MembershipProviderInterface $membershipProvider = null
+        ?MembershipProviderInterface $membershipProvider = null,
+        ?LockProviderInterface $lockProvider = null
     )
     {
         $this->customerGateway = $customerGateway;
         $this->membershipProvider = $membershipProvider;
+        $this->lockProvider = $lockProvider;
     }
 
     public function guestContext(): CustomerContext
@@ -87,15 +93,17 @@ final class CustomerService
             $customerId,
             (string) ($customer['name'] ?? ''),
             (string) ($customer['phone'] ?? ''),
-            $membership
+            $membership,
+            (string) ($customer['email'] ?? ''),
+            CustomerPhone::mask((string) ($customer['phone'] ?? ''))
         );
     }
 
     public function findByPhone(string $phone, array $customers = []): CustomerView
     {
-        $normalizedPhone = $this->normalizePhone($phone);
+        $normalizedPhone = CustomerPhone::normalize($phone);
 
-        if (strlen($normalizedPhone) < 7 || strlen($normalizedPhone) > 15) {
+        if ($normalizedPhone === '') {
             throw Phase01Exception::withCode(
                 Phase01ErrorCodes::INVALID_CUSTOMER_PHONE,
                 'Enter a valid phone number.'
@@ -132,7 +140,7 @@ final class CustomerService
                 continue;
             }
 
-            $candidatePhone = $this->normalizePhone((string) ($customer['phone'] ?? ''));
+            $candidatePhone = CustomerPhone::normalize((string) ($customer['phone'] ?? ''));
 
             if ($candidatePhone !== $normalizedPhone) {
                 continue;
@@ -148,9 +156,137 @@ final class CustomerService
         );
     }
 
-    private function normalizePhone(string $phone): string
+    public function createMember(array $input): array
     {
-        return preg_replace('/\D+/', '', trim($phone)) ?? '';
+        if (! $this->customerGateway instanceof CustomerCreationGatewayInterface) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CONFIGURATION,
+                'Customer creation gateway is not configured.'
+            );
+        }
+
+        if ($this->lockProvider === null) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CONFIGURATION,
+                'Customer creation lock is not configured.'
+            );
+        }
+
+        $displayName = $this->normalizeDisplayName((string) ($input['display_name'] ?? ''));
+        $phone = CustomerPhone::normalize((string) ($input['phone'] ?? ''));
+        $email = trim((string) ($input['email'] ?? ''));
+        $operationId = trim((string) ($input['client_operation_id'] ?? ''));
+
+        if ($displayName === '') {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CUSTOMER_NAME,
+                'Enter a member name.'
+            );
+        }
+
+        $nameLength = function_exists('mb_strlen') ? mb_strlen($displayName) : strlen($displayName);
+        if ($nameLength > 200) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CUSTOMER_NAME,
+                'Member name must not exceed 200 characters.'
+            );
+        }
+
+        if ($phone === '') {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CUSTOMER_PHONE,
+                'Enter a valid phone number.'
+            );
+        }
+
+        if ($email !== '' && (strlen($email) > 254 || filter_var($email, FILTER_VALIDATE_EMAIL) === false)) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CUSTOMER_EMAIL,
+                'Enter a valid email address or leave it empty.'
+            );
+        }
+
+        if (preg_match('/^[A-Za-z0-9._:-]{8,128}$/', $operationId) !== 1) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CUSTOMER,
+                'Invalid member creation operation id.'
+            );
+        }
+
+        $normalized = [
+            'display_name' => $displayName,
+            'phone' => $phone,
+            'email' => strtolower($email),
+        ];
+        $encoded = json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $fingerprint = hash('sha256', is_string($encoded) ? $encoded : serialize($normalized));
+
+        return $this->lockProvider->synchronized(
+            'customer-phone:' . hash('sha256', $phone),
+            function () use ($normalized, $operationId, $fingerprint): array {
+                $gateway = $this->customerGateway;
+
+                if (! $gateway instanceof CustomerCreationGatewayInterface) {
+                    throw Phase01Exception::withCode(
+                        Phase01ErrorCodes::INVALID_CONFIGURATION,
+                        'Customer creation gateway is not configured.'
+                    );
+                }
+
+                $replay = $gateway->findByCreationOperation($operationId);
+                if ($replay !== null) {
+                    if (! hash_equals((string) ($replay['creation_fingerprint'] ?? ''), $fingerprint)) {
+                        throw Phase01Exception::withCode(
+                            Phase01ErrorCodes::IDEMPOTENCY_KEY_REUSED,
+                            'This member creation operation was already used with different data.'
+                        );
+                    }
+
+                    return [
+                        'customer' => $this->projectCustomer($replay),
+                        'replayed' => true,
+                    ];
+                }
+
+                $existing = $gateway->findByPhone($normalized['phone']);
+                if ($existing !== null) {
+                    if (! empty($existing['ambiguous'])) {
+                        throw Phase01Exception::withCode(
+                            Phase01ErrorCodes::CUSTOMER_PHONE_AMBIGUOUS,
+                            'More than one customer uses this phone number.'
+                        );
+                    }
+
+                    throw Phase01Exception::withCode(
+                        Phase01ErrorCodes::CUSTOMER_PHONE_EXISTS,
+                        'A member already uses this phone number.',
+                        ['customer' => $this->projectCustomer($existing)->toArray()]
+                    );
+                }
+
+                try {
+                    return [
+                        'customer' => $this->projectCustomer(
+                            $gateway->createCustomer($normalized, $operationId, $fingerprint)
+                        ),
+                        'replayed' => false,
+                    ];
+                } catch (Phase01Exception $exception) {
+                    throw $exception;
+                } catch (\Throwable $throwable) {
+                    throw Phase01Exception::withCode(
+                        Phase01ErrorCodes::CUSTOMER_CREATE_FAILED,
+                        'Member could not be created.'
+                    );
+                }
+            }
+        );
+    }
+
+    private function normalizeDisplayName(string $name): string
+    {
+        $value = trim(strip_tags($name));
+        return preg_replace('/\s+/u', ' ', $value) ?? '';
     }
 
     private function normalizeMembership(?array $membership): ?array
@@ -161,7 +297,7 @@ final class CustomerService
 
         $projection = [];
 
-        foreach (['status_label', 'tier_label', 'points_display', 'balance_display'] as $field) {
+        foreach (['status_label', 'tier_code', 'tier_label', 'points_display', 'balance_display'] as $field) {
             if (isset($membership[$field]) && is_scalar($membership[$field])) {
                 $projection[$field] = trim((string) $membership[$field]);
             }

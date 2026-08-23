@@ -34,7 +34,7 @@ final class CheckoutService
         $this->formatter = $formatter;
     }
 
-    public function checkout(string $sessionId, int $revision, string $clientOperationId, array $payment, int $cashierId): array
+    public function checkout(string $sessionId, int $revision, string $clientOperationId, array $payment, int $cashierId, int $shiftId = 0): array
     {
         if (! preg_match('/^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$/', $clientOperationId)) {
             throw Phase01Exception::withCode(Phase01ErrorCodes::DUPLICATE_OPERATION_CONFLICT, 'A valid client operation id is required.');
@@ -53,9 +53,9 @@ final class CheckoutService
             throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_PAYMENT, 'Bank transfer receipt must be explicitly confirmed by the cashier.');
         }
         $operationId = hash('sha256', $cashierId . '|' . $sessionId . '|' . $clientOperationId);
-        $fingerprint = hash('sha256', wp_json_encode([$sessionId, $revision, $method, $received]));
+        $fingerprint = hash('sha256', wp_json_encode([$sessionId, $revision, $method, $received, $shiftId]));
 
-        return $this->withLock($operationId, function () use ($operationId, $fingerprint, $sessionId, $revision, $method, $received, $cashierId): array {
+        return $this->withLock($operationId, function () use ($operationId, $fingerprint, $sessionId, $revision, $method, $received, $cashierId, $shiftId): array {
             $existing = $this->orders->findByOperation($operationId);
             if ($existing !== null) {
                 if (! hash_equals((string) $existing['fingerprint'], $fingerprint)) {
@@ -83,7 +83,10 @@ final class CheckoutService
             if ($method === 'cash') {
                 $receivedMinor = $this->toMinor($received);
                 if ($receivedMinor < (int) $pricing['total_minor']) {
-                    throw Phase01Exception::withCode(Phase01ErrorCodes::INSUFFICIENT_CASH, 'Cash received is below the authoritative order total.', ['required_minor' => (int) $pricing['total_minor']]);
+                    throw Phase01Exception::withCode(Phase01ErrorCodes::INSUFFICIENT_CASH, 'Cash received is below the authoritative order total.', [
+                        'received_minor' => $receivedMinor,
+                        'required_minor' => (int) $pricing['total_minor'],
+                    ]);
                 }
                 $changeMinor = $receivedMinor - (int) $pricing['total_minor'];
             }
@@ -94,6 +97,7 @@ final class CheckoutService
                 'change' => $this->fromMinor($changeMinor),
                 'payment_reference' => $method === 'bank_transfer' ? $this->bankReference($sessionId, $revision) : '',
                 'bank_confirmed_by' => $method === 'bank_transfer' ? $cashierId : 0,
+                'shift_id' => $shiftId,
             ]);
             $cart->beginCheckout((int) $order['id']);
             $cart = $this->store->save($cart, $revision);

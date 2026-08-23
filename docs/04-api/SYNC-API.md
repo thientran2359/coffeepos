@@ -213,14 +213,17 @@ Payload:
 ```json
 {
   "customer": {
-    "id": 123,
-    "name": "Customer",
+    "mode": "member",
+    "display_name": "Customer",
+    "phone_masked": "0353***250",
     "membership": null
   }
 }
 ```
 
-Only customer-facing fields should be included.
+Only customer-facing fields should be included. Full phone, email, customer ID,
+and a nested raw Cashier `CartView` are prohibited. Guest uses `mode = guest`
+with an empty `phone_masked` value.
 
 ---
 
@@ -455,10 +458,10 @@ The finalized snapshot payload is:
 
 `cart` is the server-defined `customer_display` projection embedded in
 `CartView`. It contains item names/configuration summaries, quantities, display
-prices/totals, safe customer name/membership, and service context. It excludes
-phone, customer IDs, custom item notes, staff data, credentials, and internal
-metadata. REST recovery requests `GET /cart?...&view=customer` to receive only
-this projection.
+prices/totals, safe customer name/membership, privacy-safe `phone_masked`, and
+service context. It excludes full phone, email, customer IDs, custom item notes,
+staff data, credentials, and internal metadata. REST recovery requests
+`GET /cart?...&view=customer` to receive only this projection.
 
 Ordering rules:
 

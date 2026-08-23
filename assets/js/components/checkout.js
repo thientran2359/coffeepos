@@ -141,7 +141,17 @@
                 showPending(result);
             } catch (error) {
                 if (error.code === 'cart_revision_conflict' && error.details && error.details.cart) { onNewCart(error.details.cart); reconcileCart(error.details.cart); }
-                errorBox.textContent = error.message || 'Checkout failed.'; errorBox.hidden = false;
+                if (error.code === 'insufficient_cash' && error.details) {
+                    const receivedMinor = Number(error.details.received_minor);
+                    const requiredMinor = Number(error.details.required_minor);
+                    const divisor = Math.pow(10, decimals());
+                    errorBox.textContent = Number.isFinite(receivedMinor) && Number.isFinite(requiredMinor)
+                        ? 'Cash received (' + (receivedMinor / divisor).toFixed(decimals()) + ') is below the required total (' + (requiredMinor / divisor).toFixed(decimals()) + ').'
+                        : (error.message || 'Checkout failed.');
+                } else {
+                    errorBox.textContent = error.message || 'Checkout failed.';
+                }
+                errorBox.hidden = false;
                 modal.setAttribute('data-state', 'error');
             } finally { pending = false; if (!result || result.payment.state !== 'pending') { preview(); } }
         }

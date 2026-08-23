@@ -168,6 +168,7 @@ Product Search Results
 Product Configuration Modal
 Customer Lookup
 Customer Summary
+Member Creation
 Order Type Selector
 Table Selector
 Coupon Selector
@@ -181,6 +182,10 @@ Shift Summary
 ```
 
 Detailed contracts belong in `COMPONENTS.md`.
+
+Phase-08 Customer Lookup automatically starts after 400 ms of stable valid phone
+input, ignores stale requests, and keeps lookup separate from authoritative cart
+attachment. A not-found state exposes the PHP-owned create-member form.
 
 ---
 
@@ -302,6 +307,10 @@ Customer Display
     ├── Payment Projection
     └── Thank You State
 ```
+
+The Customer Area renders `Guest` or `Member`. Member presentation may include
+display name and server-provided masked phone such as `0353***250`; it never
+renders full phone, email, or customer ID.
 
 On landscape displays, the menu occupies approximately 68–72% and the cart
 occupies approximately 28–32%. The menu remains visible while cart/payment state
@@ -555,3 +564,8 @@ Changing it requires:
 2. documentation update
 3. consumer update
 4. verification
+## Phase 09 Shift Management
+
+`/pos/shifts/` owns the open, active/reconciliation, and history states. The
+Cashier header consumes only the current ShiftView status and links to that
+screen. Shift totals are server projections and are never calculated by UI.

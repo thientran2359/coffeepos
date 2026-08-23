@@ -64,12 +64,38 @@
                 ? parsed.href : '';
         } catch (error) { return ''; }
     }
+    function safeCustomer(value) {
+        const customer = plainObject(value) ? value : {};
+        const isGuest = customer.mode === 'guest' || customer.is_guest === true;
+        const membership = plainObject(customer.membership) ? customer.membership : null;
+        const safeMembership = membership ? {
+            status_label: String(membership.status_label || ''),
+            tier_code: String(membership.tier_code || ''),
+            tier_label: String(membership.tier_label || ''),
+            points_display: String(membership.points_display || ''),
+            balance_display: String(membership.balance_display || '')
+        } : null;
+        return {
+            is_guest: isGuest,
+            mode: isGuest ? 'guest' : 'member',
+            display_name: isGuest ? 'Guest' : String(customer.display_name || ''),
+            phone_masked: isGuest ? '' : String(customer.phone_masked || ''),
+            membership: safeMembership
+        };
+    }
+    function safeCustomerCart(value) {
+        if (!plainObject(value)) { return null; }
+        const cart = Object.assign({}, value);
+        cart.customer = safeCustomer(value.customer);
+        return cart;
+    }
 
     CoffeePOS.sync = CoffeePOS.sync || {};
     CoffeePOS.sync.protocol = {
         types: TYPES.slice(), plainObject: plainObject, validSessionId: validSessionId,
         channelName: channelName, instanceId: instanceId, createEnvelope: createEnvelope,
-        validateEnvelope: validateEnvelope, safeQrUrl: safeQrUrl
+        validateEnvelope: validateEnvelope, safeQrUrl: safeQrUrl,
+        safeCustomer: safeCustomer, safeCustomerCart: safeCustomerCart
     };
     window.CoffeePOS = CoffeePOS;
 }(window));

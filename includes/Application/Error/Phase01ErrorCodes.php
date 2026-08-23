@@ -30,6 +30,18 @@ final class Phase01ErrorCodes
 
     public const CUSTOMER_PHONE_AMBIGUOUS = 'customer_phone_ambiguous';
 
+    public const CUSTOMER_PHONE_EXISTS = 'customer_phone_exists';
+
+    public const INVALID_CUSTOMER_NAME = 'invalid_customer_name';
+
+    public const INVALID_CUSTOMER_EMAIL = 'invalid_customer_email';
+
+    public const CUSTOMER_CREATE_FAILED = 'customer_create_failed';
+
+    public const CUSTOMER_CREATION_LOCKED = 'customer_creation_locked';
+
+    public const IDEMPOTENCY_KEY_REUSED = 'idempotency_key_reused';
+
     public const INVALID_CUSTOMER = 'invalid_customer';
 
     public const INVALID_TABLE = 'invalid_table';
@@ -56,4 +68,13 @@ final class Phase01ErrorCodes
     public const INVALID_ORDER_STATE = 'invalid_order_state';
     public const ORDER_NOT_FOUND = 'order_not_found';
     public const DUPLICATE_OPERATION_CONFLICT = 'duplicate_operation_conflict';
+    public const ORDER_STATE_CONFLICT = 'order_state_conflict';
+
+    public const SHIFT_REQUIRED = 'shift_required';
+    public const SHIFT_ALREADY_OPEN = 'shift_already_open';
+    public const SHIFT_NOT_FOUND = 'shift_not_found';
+    public const SHIFT_STATE_CONFLICT = 'shift_state_conflict';
+    public const SHIFT_WRITE_FAILED = 'shift_write_failed';
+    public const INVALID_SHIFT_AMOUNT = 'invalid_shift_amount';
+    public const INVALID_SHIFT_NOTE = 'invalid_shift_note';
 }

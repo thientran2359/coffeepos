@@ -50,6 +50,21 @@
         let catalogRequest = null;
         let catalogSequence = 0;
         let mutationPending = false;
+        let activeShift = null;
+
+        async function loadShift() {
+            const label = root.querySelector('[data-component="shift-status"]');
+            const header = root.querySelector('[data-component="cashier-header"]');
+            try {
+                const data = await api.getCurrentShift();
+                activeShift = data.shift || null;
+                label.textContent = activeShift ? 'Shift #' + activeShift.id + ' open' : 'No shift open';
+                setState(header, activeShift ? 'open' : 'closed');
+            } catch (error) {
+                label.textContent = 'Shift unavailable';
+                setState(header, 'error');
+            }
+        }
 
         function storedPosSessionId() {
             try {
@@ -338,6 +353,10 @@
             } else if (action === 'remove-coupon' && cart) {
                 mutate(function () { return api.removeCoupon(cartPayload(cart)); }).catch(function () {});
             } else if (action === 'checkout' && cart) {
+                if (!activeShift) {
+                    toast.show('Open a shift before checkout.', 'error');
+                    return;
+                }
                 checkoutController.open();
             }
         }
@@ -357,6 +376,7 @@
             root.addEventListener('coffeepos:confirm', onConfirm);
             loadCatalog();
             createCart();
+            loadShift();
         }
 
         return {

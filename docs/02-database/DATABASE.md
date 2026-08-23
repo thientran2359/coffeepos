@@ -2,6 +2,34 @@
 
 # CoffeePOS Database Architecture
 
+## Phase-07 operational order metadata (2026-08-23)
+
+KDS state remains WooCommerce order metadata written through WooCommerce CRUD:
+
+```text
+_coffeepos_kds_state              new|preparing|ready|completed|cancelled
+_coffeepos_kds_revision           non-negative monotonic integer
+_coffeepos_kds_received_at        UTC ISO-8601
+_coffeepos_kds_started_at         UTC ISO-8601
+_coffeepos_kds_ready_at           UTC ISO-8601
+_coffeepos_kds_completed_at       UTC ISO-8601
+_coffeepos_kds_cancelled_at       UTC ISO-8601
+_coffeepos_kds_operations         JSON, last eight idempotency entries
+```
+
+The operations ledger contains only operation ID, request fingerprint, target
+state, resulting revision, and completion timestamp. It is not an order/event
+store. Order Queue is queried from WooCommerce and has no persistence table.
+
+Phase-07 configuration uses Options API keys:
+
+```text
+coffeepos_kds_poll_interval_ms
+coffeepos_order_queue_poll_interval_ms
+```
+
+Both default to `5000` and are clamped to `3000..60000` milliseconds.
+
 ## Approved manual bank confirmation audit (2026-08-23)
 
 Pre-order VietQR preview is derived from the WooCommerce session cart and is
@@ -396,12 +424,26 @@ shipping address
 
 into a CoffeePOS customer table.
 
-Membership/points are not fully specified by the feature source.
+Phase 08 uses WooCommerce customers as member identities and does not create an
+independent customer or loyalty table. Name, billing phone, and optional email
+are written through WooCommerce customer CRUD.
 
-Until a dedicated membership architecture is approved:
+Reserved WooCommerce customer meta used only for safe phone-only creation and
+idempotent retries:
 
-- do not create an independent loyalty database
-- do not duplicate WooCommerce customer records
+```text
+_coffeepos_member_create_operation_id   client creation operation identifier
+_coffeepos_member_create_fingerprint    normalized creation request hash
+_coffeepos_placeholder_email            yes when WooCommerce-required email is internal
+```
+
+When email is omitted, the WooCommerce gateway creates a non-routable internal
+`example.invalid` address because the WooCommerce customer API requires email.
+That placeholder is never exposed as member email or copied to billing email.
+
+Do not create an independent loyalty database or duplicate WooCommerce customer
+records. Buy-five-get-one progress, points, tiers, and tier coupons have no
+storage in Phase 08.
 
 ---
 
@@ -577,6 +619,10 @@ CoffeePOS Shift
 ```
 
 Shift totals can be calculated from eligible WooCommerce orders and refunds.
+
+Phase 09 makes this association mandatory for new POS checkout orders. An
+authenticated cashier may have at most one `open` shift; service-level MySQL
+locking serializes open/close mutations for that cashier.
 
 If later scale requires a transaction projection table, add it through an explicit architecture change.
 

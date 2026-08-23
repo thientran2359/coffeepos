@@ -60,6 +60,21 @@ final class AssetLoader
             $appDependencies[] = 'coffeepos-screen-customer';
         }
 
+        if ($screen === 'kds') {
+            $this->registerKdsScripts($version);
+            $appDependencies[] = 'coffeepos-screen-kds';
+        }
+
+        if ($screen === 'order-queue') {
+            $this->registerOrderQueueScripts($version);
+            $appDependencies[] = 'coffeepos-screen-order-queue';
+        }
+
+        if ($screen === 'shifts') {
+            $this->registerShiftScripts($version);
+            $appDependencies[] = 'coffeepos-screen-shifts';
+        }
+
         wp_register_script(
             'coffeepos-app',
             COFFEEPOS_URL . 'assets/js/app.js',
@@ -76,6 +91,7 @@ final class AssetLoader
             'customerDisplayUrl' => esc_url_raw(home_url('/' . trim(Settings::getPosBaseSlug(), '/') . '/customer/')),
             'posSessionId' => $screen === 'customer' && $pairingValid ? $pairingInput : '',
             'pairingState' => $screen === 'customer' ? ($pairingValid ? 'paired' : ($pairingInput === '' ? 'missing' : 'invalid')) : '',
+            'pollIntervalMs' => $screen === 'kds' ? Settings::getKdsPollInterval() : ($screen === 'order-queue' ? Settings::getOrderQueuePollInterval() : 0),
             'i18n' => [
                 'addItem' => __('Add item', 'coffeepos'),
                 'editItem' => __('Edit item', 'coffeepos'),
@@ -204,5 +220,38 @@ final class AssetLoader
             'coffeepos-component-customer-cart',
             'coffeepos-component-customer-payment',
         ], $version, true);
+    }
+
+    private function registerOperationsCommon(string $version): void
+    {
+        wp_register_script('coffeepos-operations-api-client', COFFEEPOS_URL . 'assets/js/api/client.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-operations-template-renderer', COFFEEPOS_URL . 'assets/js/ui/template-renderer.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-operations-toast', COFFEEPOS_URL . 'assets/js/ui/toast.js', ['coffeepos-operations-template-renderer'], $version, true);
+        wp_register_script('coffeepos-operations-modal', COFFEEPOS_URL . 'assets/js/ui/modal.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-operations-polling', COFFEEPOS_URL . 'assets/js/core/polling-controller.js', ['coffeepos-core-app'], $version, true);
+    }
+
+    private function registerKdsScripts(string $version): void
+    {
+        $this->registerOperationsCommon($version);
+        wp_register_script('coffeepos-state-kds', COFFEEPOS_URL . 'assets/js/state/kds-store.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-component-kds-grid', COFFEEPOS_URL . 'assets/js/components/kds-order-grid.js', ['coffeepos-operations-template-renderer'], $version, true);
+        wp_register_script('coffeepos-component-kds-timer', COFFEEPOS_URL . 'assets/js/components/kds-timer.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-component-kds-sound', COFFEEPOS_URL . 'assets/js/components/kds-sound.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-screen-kds', COFFEEPOS_URL . 'assets/js/screens/kds.js', ['coffeepos-operations-api-client', 'coffeepos-operations-toast', 'coffeepos-operations-polling', 'coffeepos-state-kds', 'coffeepos-component-kds-grid', 'coffeepos-component-kds-timer', 'coffeepos-component-kds-sound'], $version, true);
+    }
+
+    private function registerOrderQueueScripts(string $version): void
+    {
+        $this->registerOperationsCommon($version);
+        wp_register_script('coffeepos-state-order-queue', COFFEEPOS_URL . 'assets/js/state/order-queue-store.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-component-order-queue-list', COFFEEPOS_URL . 'assets/js/components/order-queue-list.js', ['coffeepos-operations-template-renderer'], $version, true);
+        wp_register_script('coffeepos-screen-order-queue', COFFEEPOS_URL . 'assets/js/screens/order-queue.js', ['coffeepos-operations-api-client', 'coffeepos-operations-toast', 'coffeepos-operations-modal', 'coffeepos-operations-polling', 'coffeepos-state-order-queue', 'coffeepos-component-order-queue-list'], $version, true);
+    }
+
+    private function registerShiftScripts(string $version): void
+    {
+        wp_register_script('coffeepos-shifts-api-client', COFFEEPOS_URL . 'assets/js/api/client.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-screen-shifts', COFFEEPOS_URL . 'assets/js/screens/shifts.js', ['coffeepos-shifts-api-client'], $version, true);
     }
 }

@@ -19,6 +19,19 @@ final class WooCommercePricingGateway implements PricingGatewayInterface
 
         $woocommerce = function_exists('WC') ? WC() : null;
         $originalCustomer = is_object($woocommerce) && isset($woocommerce->customer) ? $woocommerce->customer : null;
+        if (is_object($woocommerce) && ! did_action('woocommerce_load_cart_from_session')) {
+            if ((! isset($woocommerce->cart) || $woocommerce->cart === null)
+                && method_exists($woocommerce, 'initialize_cart')) {
+                $woocommerce->initialize_cart();
+            }
+            if (isset($woocommerce->cart) && $woocommerce->cart instanceof \WC_Cart) {
+                // WC_Cart::get_cart() lazily loads the shopper cart and marks
+                // the global session-load event. Without this step, the first
+                // get_cart() on a scratch cart inside a custom REST request
+                // imports storefront contents into the POS pricing cart.
+                $woocommerce->cart->get_cart();
+            }
+        }
         if (is_object($woocommerce) && class_exists('WC_Customer')) {
             $woocommerce->customer = new \WC_Customer($cart->customerContext()->customerId() ?? 0, true);
         }
@@ -38,6 +51,18 @@ final class WooCommercePricingGateway implements PricingGatewayInterface
                 remove_filter('woocommerce_cart_session_initialize', $disableCartSessionHooks, 10);
             }
 
+            // A POS pricing cart must never inherit or mutate the shopper cart
+            // attached to the same WooCommerce session. Build its contents
+            // directly instead of calling WC_Cart::add_to_cart(), whose global
+            // hooks may replace this scratch cart with storefront contents.
+            $wooCart->set_cart_contents([]);
+            $wooCart->set_removed_cart_contents([]);
+            $wooCart->set_applied_coupons([]);
+            $wooCart->set_coupon_discount_totals([]);
+            $wooCart->set_coupon_discount_tax_totals([]);
+            $wooCart->set_totals([]);
+
+            $cartContents = [];
             foreach ($cart->items() as $item) {
                 $product = wc_get_product($item->variationId() > 0 ? $item->variationId() : $item->productId());
                 if (! $product || ! $product->is_purchasable()) {
@@ -46,11 +71,28 @@ final class WooCommercePricingGateway implements PricingGatewayInterface
                 if (! $product->is_in_stock() || ! $product->has_enough_stock($item->quantity())) {
                     throw Phase01Exception::withCode(Phase01ErrorCodes::OUT_OF_STOCK, 'A cart product does not have enough stock.', ['product_id' => $item->productId()]);
                 }
-                $key = $wooCart->add_to_cart($item->productId(), $item->quantity(), $item->variationId());
-                if (! $key) {
-                    throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_CART, 'WooCommerce rejected a cart item.');
+
+                $variation = $item->variationId() > 0 && method_exists($product, 'get_variation_attributes')
+                    ? $product->get_variation_attributes()
+                    : [];
+                $key = $wooCart->generate_cart_id($item->productId(), $item->variationId(), $variation, []);
+
+                if (isset($cartContents[$key])) {
+                    $cartContents[$key]['quantity'] += $item->quantity();
+                    continue;
                 }
+
+                $cartContents[$key] = [
+                    'key' => $key,
+                    'product_id' => $item->productId(),
+                    'variation_id' => $item->variationId(),
+                    'variation' => $variation,
+                    'quantity' => $item->quantity(),
+                    'data' => $product,
+                    'data_hash' => wc_get_cart_item_data_hash($product),
+                ];
             }
+            $wooCart->set_cart_contents($cartContents);
 
             $code = trim((string) $couponCode);
             if ($code !== '' && ! $wooCart->apply_coupon($code)) {

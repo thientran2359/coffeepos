@@ -2,6 +2,14 @@
 
 # WooCommerce Data Ownership
 
+## Phase-07 operational mapping (2026-08-23)
+
+`new`, `preparing`, and `ready` are CoffeePOS order metadata and never custom
+WooCommerce statuses. A Phase-07 `completed` transition sets WooCommerce status
+`completed`; an allowed `cancelled` transition sets WooCommerce status
+`cancelled`. Terminal WooCommerce status wins over conflicting KDS metadata.
+All reads/writes use WooCommerce order CRUD for HPOS compatibility.
+
 ## 1. Purpose
 
 This document defines how CoffeePOS interacts with WooCommerce-native data.
@@ -96,7 +104,18 @@ Before checkout, revalidate availability.
 
 WooCommerce customer remains canonical.
 
-Phone lookup should use the existing customer mechanism or approved WooCommerce query.
+Phase-08 lookup normalizes supported local/`+84` input and performs an exact
+normalized comparison against WooCommerce billing phone. A narrowing metadata
+query may be used, but the final match is never fuzzy.
+
+Member creation uses WooCommerce customer CRUD with required display name and
+billing phone plus optional email. CoffeePOS rechecks the normalized phone
+under a hashed phone-scoped lock before creation.
+
+If email is omitted, the gateway may use the documented non-routable internal
+placeholder required by WooCommerce. The placeholder is marked by reserved
+CoffeePOS customer meta and is excluded from Cashier/Customer Display email
+projections.
 
 Do not create duplicate customer rows in CoffeePOS.
 

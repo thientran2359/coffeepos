@@ -67,6 +67,7 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
                 $order->update_meta_data('_coffeepos_table_label', $cart->tableContext()->tableLabel());
             }
             $order->update_meta_data('_coffeepos_cashier_id', (int) ($context['cashier_id'] ?? 0));
+            $order->update_meta_data('_coffeepos_shift_id', (int) ($context['shift_id'] ?? 0));
             $order->update_meta_data('_coffeepos_payment_method', (string) $context['payment_method']);
             $order->update_meta_data('_coffeepos_operation_id', (string) $context['operation_id']);
             $order->update_meta_data('_coffeepos_operation_fingerprint', (string) $context['fingerprint']);
@@ -74,18 +75,19 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
             $order->set_payment_method((string) $context['payment_method'] === 'cash' ? 'cod' : 'bacs');
             $order->set_payment_method_title((string) $context['payment_method'] === 'cash' ? 'Cash' : 'Bank transfer');
             $order->calculate_totals();
+            $this->initializeOperationalMetadata($order);
 
             if ((string) $context['payment_method'] === 'cash') {
                 $order->update_meta_data('_coffeepos_cash_received', (string) $context['received_amount']);
                 $order->update_meta_data('_coffeepos_cash_change', (string) $context['change']);
                 $order->save();
-                $order->payment_complete('coffeepos-cash-' . $order->get_id());
+                $this->completePaymentForPreparation($order, 'coffeepos-cash-' . $order->get_id());
             } else {
                 $order->update_meta_data('_coffeepos_payment_reference', (string) ($context['payment_reference'] ?? ''));
                 $order->update_meta_data('_coffeepos_bank_confirmed_by', (int) ($context['bank_confirmed_by'] ?? 0));
                 $order->update_meta_data('_coffeepos_bank_confirmed_at', gmdate('c'));
                 $order->save();
-                $order->payment_complete('coffeepos-bank-manual-' . $order->get_id());
+                $this->completePaymentForPreparation($order, 'coffeepos-bank-manual-' . $order->get_id());
             }
             return $this->projectOrder($order);
         } catch (Phase01Exception $exception) {
@@ -147,6 +149,37 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
         }
         $customer = new \WC_Customer($customerId);
         $order->set_address($customer->get_billing(), 'billing');
+    }
+
+    private function initializeOperationalMetadata($order): void
+    {
+        if ((string) $order->get_meta(WooCommerceOperationalOrderGateway::META_STATE, true) !== '') {
+            return;
+        }
+        $order->update_meta_data(WooCommerceOperationalOrderGateway::META_STATE, 'new');
+        $order->update_meta_data(WooCommerceOperationalOrderGateway::META_REVISION, 0);
+        $order->update_meta_data(WooCommerceOperationalOrderGateway::META_RECEIVED_AT, gmdate('c'));
+        $order->update_meta_data(WooCommerceOperationalOrderGateway::META_OPERATIONS, '[]');
+    }
+
+    private function completePaymentForPreparation($order, string $transactionId): void
+    {
+        $orderId = (int) $order->get_id();
+        $forceProcessing = static function (string $status, int $candidateOrderId) use ($orderId): string {
+            return $candidateOrderId === $orderId ? 'processing' : $status;
+        };
+
+        // Payment is complete, but KDS preparation is not. Run after gateway
+        // filters such as COD, which otherwise force virtual orders directly
+        // to completed and make them disappear from the active KDS/Queue.
+        add_filter('woocommerce_payment_complete_order_status', $forceProcessing, PHP_INT_MAX, 2);
+        try {
+            if (! $order->payment_complete($transactionId)) {
+                throw new \RuntimeException('WooCommerce could not complete the payment.');
+            }
+        } finally {
+            remove_filter('woocommerce_payment_complete_order_status', $forceProcessing, PHP_INT_MAX);
+        }
     }
 
     private function modifierMetadata(array $groups, array $capturedLabels): array

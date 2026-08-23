@@ -480,6 +480,12 @@ Checkout loads the cart from the WooCommerce session and revalidates its
 WooCommerce prices, stock, coupon, and customer context. It does not accept a
 browser-owned cart as the order source.
 
+WooCommerce repricing uses an isolated scratch `WC_Cart`. The integration must
+complete normal storefront-cart session loading before constructing that cart,
+then populate it only from the addressed CoffeePOS cart. A shopper cart in the
+same WooCommerce session must not affect POS totals and must not be changed by
+POS repricing.
+
 ---
 
 # 21. Source-of-Truth Summary
@@ -497,3 +503,21 @@ Order Queue → query/projection
 Order History → WooCommerce
 Reports → query/projection
 ```
+
+## Phase-08 Member Identity Flow
+
+```text
+Cashier phone input
+→ shared server phone normalization
+→ exact WooCommerce customer lookup
+→ existing CustomerView OR controlled not-found
+→ WooCommerce customer creation under hashed phone lock when requested
+→ explicit revisioned cart attachment
+→ Cashier CartView
+→ centralized Customer Display sanitizer
+→ mode + name + masked phone BroadcastChannel projection
+```
+
+Customer creation and cart attachment are separate operations. If attachment
+conflicts after creation, the customer remains valid and the Cashier reconciles
+the cart before retrying attachment.

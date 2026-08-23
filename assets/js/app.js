@@ -24,6 +24,21 @@
             screenController.init();
         }
 
+        if (screen === 'kds' && window.CoffeePOS.screens.createKdsController) {
+            screenController = window.CoffeePOS.screens.createKdsController(root);
+            screenController.init();
+        }
+
+        if (screen === 'order-queue' && window.CoffeePOS.screens.createOrderQueueController) {
+            screenController = window.CoffeePOS.screens.createOrderQueueController(root);
+            screenController.init();
+        }
+
+        if (screen === 'shifts' && window.CoffeePOS.screens.createShiftsController) {
+            screenController = window.CoffeePOS.screens.createShiftsController(root);
+            screenController.init();
+        }
+
         window.CoffeePOS.activeScreen = screenController;
 
         window.dispatchEvent(new CustomEvent('coffeepos:ready', {

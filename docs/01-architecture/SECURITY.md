@@ -155,6 +155,15 @@ as protected business data.
 
 Do not expose unnecessary customer data to the Customer Display.
 
+Phase-08 Customer Display payloads contain only guest/member mode, safe display
+name, server-produced masked phone, and approved membership presentation. Full
+phone, email, customer ID, address, internal username, and a nested raw Cashier
+CartView are prohibited in every cart/workflow snapshot.
+
+Member creation uses a lock key derived from a phone hash; raw phone and email
+must not appear in lock names or logs. Duplicate detection and creation
+idempotency are server-side.
+
 ---
 
 # 12. Logging
@@ -246,3 +255,8 @@ Before Phase 10 completion, review:
 - stock adjustment authorization
 - customer data exposure
 - logs
+## Phase 09 Shift Security
+
+Shift identity and cashier ownership are resolved server-side. Open/close
+mutations use a cashier-scoped database lock, monetary inputs are normalized,
+notes are sanitized, and all derived totals come from WooCommerce transactions.

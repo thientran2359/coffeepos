@@ -7,7 +7,9 @@ if (! defined('ABSPATH')) { exit; }
         <span class="coffeepos-eyebrow"><?php esc_html_e('Your order', 'coffeepos'); ?></span>
         <h2 data-field="customer-state-title"><?php esc_html_e('Ready when you are', 'coffeepos'); ?></h2>
         <p data-field="customer-service"></p>
+        <p class="coffeepos-customer-identity" data-field="customer-mode"><?php esc_html_e('Guest', 'coffeepos'); ?></p>
         <p data-field="customer-name"></p>
+        <p data-field="customer-phone-masked"></p>
         <p data-field="customer-membership"></p>
     </header>
     <div class="coffeepos-customer-cart__items" data-component="customer-cart-items"></div>

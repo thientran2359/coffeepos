@@ -27,6 +27,8 @@ final class Settings
     public const OPTION_VIETQR_ACCOUNT_NUMBER = 'coffeepos_vietqr_account_number';
     public const OPTION_VIETQR_ACCOUNT_NAME = 'coffeepos_vietqr_account_name';
     public const OPTION_VIETQR_TEMPLATE = 'coffeepos_vietqr_template';
+    public const OPTION_KDS_POLL_INTERVAL = 'coffeepos_kds_poll_interval_ms';
+    public const OPTION_ORDER_QUEUE_POLL_INTERVAL = 'coffeepos_order_queue_poll_interval_ms';
 
     public function register(): void
     {
@@ -89,6 +91,16 @@ final class Settings
         }
 
         return $slug;
+    }
+
+    public static function getKdsPollInterval(): int
+    {
+        return self::boundedPollInterval(self::get(self::OPTION_KDS_POLL_INTERVAL));
+    }
+
+    public static function getOrderQueuePollInterval(): int
+    {
+        return self::boundedPollInterval(self::get(self::OPTION_ORDER_QUEUE_POLL_INTERVAL));
     }
 
     private static function definitions(): array
@@ -165,6 +177,14 @@ final class Settings
                 'type' => 'string', 'default' => 'compact2',
                 'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'sanitize_key',
             ],
+            self::OPTION_KDS_POLL_INTERVAL => [
+                'type' => 'integer', 'default' => 5000,
+                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'absint',
+            ],
+            self::OPTION_ORDER_QUEUE_POLL_INTERVAL => [
+                'type' => 'integer', 'default' => 5000,
+                'capability' => Capabilities::MANAGE_WOOCOMMERCE, 'sanitize' => 'absint',
+            ],
         ];
     }
 
@@ -209,7 +229,16 @@ final class Settings
             return $definition['default'];
         }
 
+        if (in_array($optionName, [self::OPTION_KDS_POLL_INTERVAL, self::OPTION_ORDER_QUEUE_POLL_INTERVAL], true)) {
+            return self::boundedPollInterval($value);
+        }
+
         return $value;
+    }
+
+    private static function boundedPollInterval($value): int
+    {
+        return max(3000, min(60000, (int) $value));
     }
 
     private static function sanitizeModifierGroups(array $groups): array

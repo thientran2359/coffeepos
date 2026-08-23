@@ -85,8 +85,21 @@ The cashier MUST support:
 - member customer
 - phone-based customer lookup
 - customer identification before checkout
+- automatic exact lookup after a valid phone is entered
+- creating a WooCommerce-backed member when the phone does not exist
+- filling allowed member data from an existing exact phone match
+- returning an attached member cart to guest mode without clearing other cart
+  context
 
 The feature baseline describes automatic customer recognition through phone lookup, including customer name, history, and points where available.
+
+WooCommerce remains canonical for customer identity. CoffeePOS MUST NOT create
+an independent customer table solely for membership identity.
+
+The initial membership workflow does not award points, free items, tiers, or
+automatic member discounts. Buy-five-get-one and tier-specific coupons are
+future capabilities whose earning, refund, redemption, and WooCommerce coupon
+contracts must be defined before implementation.
 
 ---
 
@@ -192,6 +205,9 @@ The customer display MUST:
 - display prices
 - display totals
 - display customer/member information where applicable
+- distinguish guest from member
+- display only a privacy-safe masked member phone, for example `0353***250`
+- never render the member's full phone number or email
 - display payment amount
 - display VietQR during bank-transfer payment
 - display thank-you state after successful payment

@@ -66,6 +66,7 @@ Use WordPress REST API for:
 - structured application operations
 - order operations
 - customer lookup
+- WooCommerce-backed member creation
 - reports where appropriate
 - KDS/order queue retrieval
 
@@ -155,6 +156,13 @@ cart_revision_conflict
 out_of_stock
 invalid_coupon
 invalid_customer
+invalid_customer_name
+invalid_customer_email
+customer_phone_exists
+customer_phone_ambiguous
+customer_creation_locked
+customer_create_failed
+idempotency_key_reused
 invalid_order_type
 invalid_table
 invalid_payment
@@ -162,6 +170,7 @@ payment_failed
 payment_pending
 order_creation_failed
 order_not_found
+order_state_conflict
 refund_failed
 shift_not_open
 shift_already_closed
@@ -348,3 +357,9 @@ PaymentGateway
 ```
 
 The actual class names may differ, but responsibilities must remain separated.
+## Phase 09 Shift Routes
+
+Shift routes are handled by `ShiftController` and `ShiftService`. They expose
+only the authenticated cashier's current lifecycle. WooCommerce remains the
+authority for shift sales totals, while the CoffeePOS shift table owns opening,
+closing, and reconciliation inputs.

@@ -2,6 +2,7 @@
     'use strict';
 
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     const setState = CoffeePOS.core.setState;
 
     CoffeePOS.components = CoffeePOS.components || {};
@@ -91,10 +92,10 @@
         }
 
         function showLoading(productName) {
-            title.textContent = productName || (labels.product || 'Product');
+            title.textContent = productName || (labels.product || __('Product', 'coffeepos'));
             modeLabel.textContent = state.mode === 'edit'
-                ? (labels.editItem || 'Edit item')
-                : (labels.addItem || 'Add item');
+                ? (labels.editItem || __('Edit item', 'coffeepos'))
+                : (labels.addItem || __('Add item', 'coffeepos'));
             content.hidden = true;
             error.hidden = true;
             loading.hidden = false;
@@ -105,7 +106,7 @@
             loading.hidden = true;
             content.hidden = true;
             error.hidden = false;
-            errorMessage.textContent = message || (labels.productLoadError || 'Product could not be loaded.');
+            errorMessage.textContent = message || (labels.productLoadError || __('Product could not be loaded.', 'coffeepos'));
             notifyState('error');
         }
 
@@ -258,8 +259,8 @@
                 || !variationValid
                 || !modifiersAreValid();
             submitButton.textContent = state.submitting
-                ? (labels.saving || 'Saving...')
-                : (state.mode === 'edit' ? (labels.updateItem || 'Update item') : (labels.addToCart || 'Add to cart'));
+                ? (labels.saving || __('Saving...', 'coffeepos'))
+                : (state.mode === 'edit' ? (labels.updateItem || __('Update item', 'coffeepos')) : (labels.addToCart || __('Add to cart', 'coffeepos')));
         }
 
         async function resolveVariation() {
@@ -302,7 +303,7 @@
                 }
 
                 state.resolvedVariation = null;
-                variationError.textContent = requestError.message || (labels.variationUnavailable || 'This variation is unavailable.');
+                variationError.textContent = requestError.message || (labels.variationUnavailable || __('This variation is unavailable.', 'coffeepos'));
                 variationError.hidden = false;
                 updatePrice();
                 updateSubmitState();
@@ -417,7 +418,7 @@
                 lifecycle.close();
             } catch (submitError) {
                 state.submitting = false;
-                variationError.textContent = submitError.message || (labels.cartUpdateError || 'The cart could not be updated.');
+                variationError.textContent = submitError.message || (labels.cartUpdateError || __('The cart could not be updated.', 'coffeepos'));
                 variationError.hidden = false;
                 updateSubmitState();
             }

@@ -25,6 +25,7 @@ class FakeBroadcastChannel {
 const storage = new Map();
 const window = {
 	CoffeePOS: {},
+	wp: { i18n: { __: (text) => text } },
 	BroadcastChannel: FakeBroadcastChannel,
 	URL: URL,
 	crypto: { randomUUID: () => '00000000-0000-4000-8000-000000000001' },

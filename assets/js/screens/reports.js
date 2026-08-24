@@ -2,6 +2,8 @@
     'use strict';
 
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
+    const sprintf = window.wp.i18n.sprintf;
     CoffeePOS.screens = CoffeePOS.screens || {};
 
     CoffeePOS.screens.createReportsController = function (appRoot) {
@@ -45,9 +47,9 @@
         }
 
         function showError(error) {
-            errorNode.textContent = error && error.message ? error.message : 'The report could not be loaded.';
+            errorNode.textContent = error && error.message ? error.message : __('The report could not be loaded.', 'coffeepos');
             errorNode.hidden = false;
-            setState('error', 'Report unavailable. Adjust the filters or try again.');
+            setState('error', __('Report unavailable. Adjust the filters or try again.', 'coffeepos'));
         }
 
         function renderWarnings(items) {
@@ -75,7 +77,7 @@
             const rangeLabel = appRoot.querySelector('[data-field="report-range-label"]');
             rangeLabel.textContent = nextReport.range.label + ' · ' + nextReport.range.timezone;
             emptyNode.hidden = groups.length !== 0;
-            setState(groups.length === 0 ? 'empty' : 'ready', groups.length === 0 ? 'No sales found.' : '');
+            setState(groups.length === 0 ? 'empty' : 'ready', groups.length === 0 ? __('No sales found.', 'coffeepos') : '');
         }
 
         async function load() {
@@ -88,7 +90,7 @@
             emptyNode.hidden = true;
             warningsNode.hidden = true;
             groupsNode.replaceChildren();
-            setState('loading', 'Loading sales report…');
+            setState('loading', __('Loading sales report…', 'coffeepos'));
             Array.from(filters.elements).forEach(function (element) { element.disabled = true; });
             try {
                 const data = await api.loadSalesReport(requestValues, requestController.signal);
@@ -109,7 +111,7 @@
             }
             exporting = true;
             errorNode.hidden = true;
-            setState('exporting', 'Preparing ' + format.toUpperCase() + ' export…');
+            setState('exporting', sprintf(__('Preparing %s export…', 'coffeepos'), format.toUpperCase()));
             try {
                 const file = await api.downloadSalesReport(values({format: format}));
                 const url = window.URL.createObjectURL(file.blob);

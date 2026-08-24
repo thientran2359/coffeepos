@@ -1,6 +1,8 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
+    const sprintf = window.wp.i18n.sprintf;
     CoffeePOS.screens = CoffeePOS.screens || {};
     CoffeePOS.screens.createOrderHistoryController = function (root) {
         const renderer = new CoffeePOS.ui.TemplateRenderer();
@@ -23,20 +25,20 @@
         function operation(prefix) { return prefix + '-' + (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Date.now() + '-' + Math.random().toString(16).slice(2)); }
         function value(form, name) { return String(new window.FormData(form).get(name) || ''); }
         function criteria() { return {page: page, per_page: 20, date_from: value(filters, 'date_from'), date_to: value(filters, 'date_to'), status: value(filters, 'status'), order_type: value(filters, 'order_type'), search: value(filters, 'search')}; }
-        function service(order) { const context = order.service || {}; return context.order_type === 'dine_in' ? 'Dine-in' + (context.table_label ? ' · ' + context.table_label : '') : 'Takeaway'; }
-        function showError(node, error) { node.textContent = error && error.message ? error.message : 'The request could not be completed.'; node.hidden = false; }
+        function service(order) { const context = order.service || {}; return context.order_type === 'dine_in' ? __('Dine-in', 'coffeepos') + (context.table_label ? ' · ' + context.table_label : '') : __('Takeaway', 'coffeepos'); }
+        function showError(node, error) { node.textContent = error && error.message ? error.message : __('The request could not be completed.', 'coffeepos'); node.hidden = false; }
         function setField(parent, name, text) { const node = parent.querySelector('[data-field="' + name + '"]'); if (node) { node.textContent = String(text === undefined || text === null ? '' : text); } }
 
         function renderList(data) {
             orders = Array.isArray(data.items) ? data.items : []; pages = Number(data.pages || 0); list.replaceChildren();
             orders.forEach(function (order) {
                 const node = cardTemplate.content.firstElementChild.cloneNode(true); node.setAttribute('data-order-id', String(order.id));
-                setField(node, 'number', 'Order #' + order.number); setField(node, 'created', order.created_at_display || new Date(order.created_at).toLocaleString());
-                setField(node, 'customer', order.customer.display_name || 'Guest'); setField(node, 'service', service(order));
+                setField(node, 'number', sprintf(__('Order #%s', 'coffeepos'), order.number)); setField(node, 'created', order.created_at_display || new Date(order.created_at).toLocaleString());
+                setField(node, 'customer', order.customer.display_name || __('Guest', 'coffeepos')); setField(node, 'service', service(order));
                 setField(node, 'status', order.status_label); setField(node, 'total', order.totals.total.display); list.appendChild(node);
             });
             empty.hidden = orders.length > 0; setField(screen, 'history-count', data.total || 0);
-            setField(screen, 'page-status', pages > 0 ? 'Page ' + page + ' of ' + pages : 'Page 0 of 0');
+            setField(screen, 'page-status', pages > 0 ? sprintf(__('Page %1$s of %2$s', 'coffeepos'), page, pages) : __('Page 0 of 0', 'coffeepos'));
             root.querySelector('[data-action="previous-page"]').disabled = page <= 1;
             root.querySelector('[data-action="next-page"]').disabled = pages === 0 || page >= pages;
         }
@@ -46,8 +48,8 @@
             catch (error) { if (error && error.name === 'AbortError') { return; } showError(errorNode, error); screen.setAttribute('data-state', 'error'); }
         }
         function renderDetail(order) {
-            selected = order; setField(detailDialog, 'detail-status', order.status_label); setField(detailDialog, 'detail-number', 'Order #' + order.number);
-            setField(detailDialog, 'detail-created', order.created_at_display || new Date(order.created_at).toLocaleString()); setField(detailDialog, 'detail-customer', order.customer.display_name || 'Guest');
+            selected = order; setField(detailDialog, 'detail-status', order.status_label); setField(detailDialog, 'detail-number', sprintf(__('Order #%s', 'coffeepos'), order.number));
+            setField(detailDialog, 'detail-created', order.created_at_display || new Date(order.created_at).toLocaleString()); setField(detailDialog, 'detail-customer', order.customer.display_name || __('Guest', 'coffeepos'));
             setField(detailDialog, 'detail-service', service(order)); setField(detailDialog, 'detail-payment', order.payment.method_label || order.payment.method || '—');
             setField(detailDialog, 'detail-subtotal', order.totals.subtotal.display); setField(detailDialog, 'detail-discount', order.totals.discount.display);
             setField(detailDialog, 'detail-refunded', order.totals.refunded.display); setField(detailDialog, 'detail-total', order.totals.total.display);
@@ -67,7 +69,7 @@
         async function refreshSelected() { if (!selected) { return; } const data = await api.loadOrderDetail(selected.id); renderDetail(data.order); await load(); if (!detailDialog.open) { detailDialog.showModal(); } }
         async function cancelSelected() {
             if (!selected || pending) { return; } pending = true;
-            try { await api.cancelOperationalOrder(selected.id, {expected_state: selected.kds.state, expected_revision: selected.kds.revision, client_operation_id: operation('history-cancel'), reason: 'Cancelled from Order History'}); await refreshSelected(); }
+            try { await api.cancelOperationalOrder(selected.id, {expected_state: selected.kds.state, expected_revision: selected.kds.revision, client_operation_id: operation('history-cancel'), reason: __('Cancelled from Order History', 'coffeepos')}); await refreshSelected(); }
             catch (error) { if (!detailDialog.open) { detailDialog.showModal(); } showError(detailDialog.querySelector('[data-component="detail-error"]'), error); } finally { pending = false; }
         }
         async function reorderSelected() {
@@ -90,7 +92,7 @@
                 const data = await api.loadReceipt(selected.id); await receiptPrinter.print(data.receipt);
             } catch (error) { showError(detailDialog.querySelector('[data-component="detail-error"]'), error); }
         }
-        function openRefund() { if (!selected) { return; } refundForm.querySelector('[name="amount"]').value = selected.totals.refundable_amount; setField(refundDialog, 'refund-maximum', 'Maximum: ' + selected.totals.refundable.display); refundDialog.querySelector('[data-component="refund-error"]').hidden = true; refundDialog.showModal(); }
+        function openRefund() { if (!selected) { return; } refundForm.querySelector('[name="amount"]').value = selected.totals.refundable_amount; setField(refundDialog, 'refund-maximum', sprintf(__('Maximum: %s', 'coffeepos'), selected.totals.refundable.display)); refundDialog.querySelector('[data-component="refund-error"]').hidden = true; refundDialog.showModal(); }
         function onClick(event) {
             const trigger = event.target.closest('[data-action]'); if (!trigger) { return; } const action = trigger.getAttribute('data-action');
             if (action === 'view-order') { const card=trigger.closest('[data-order-id]'); if(card){openDetail(Number(card.getAttribute('data-order-id')));} }
@@ -100,8 +102,8 @@
             else if (action === 'close-refund') { refundDialog.close(); }
             else if (action === 'refund-order') { openRefund(); }
             else if (action === 'reprint-order') { printSelected(); }
-            else if (action === 'cancel-history-order' && selected) { detailDialog.close(); confirmDialog.open({title:'Cancel order #' + selected.number + '?',message:'This cancels the WooCommerce order but does not return money. Use Refund when money must be returned.',action:'cancel-order'}); }
-            else if (action === 'reorder-order' && selected) { detailDialog.close(); confirmDialog.open({title:'Reorder order #' + selected.number + '?',message:'A new cashier cart will be created using current prices and availability.',action:'reorder-order'}); }
+            else if (action === 'cancel-history-order' && selected) { detailDialog.close(); confirmDialog.open({title:sprintf(__('Cancel order #%s?', 'coffeepos'), selected.number),message:__('This cancels the WooCommerce order but does not return money. Use Refund when money must be returned.', 'coffeepos'),action:'cancel-order'}); }
+            else if (action === 'reorder-order' && selected) { detailDialog.close(); confirmDialog.open({title:sprintf(__('Reorder order #%s?', 'coffeepos'), selected.number),message:__('A new cashier cart will be created using current prices and availability.', 'coffeepos'),action:'reorder-order'}); }
         }
         function onConfirm(event) { const action=String(event.detail&&event.detail.action||''); if(action==='cancel-order'){cancelSelected();} if(action==='reorder-order'){reorderSelected();} }
         function init() { filters.addEventListener('submit',function(event){event.preventDefault();page=1;load();}); root.addEventListener('click',onClick); root.addEventListener('coffeepos:confirm',onConfirm); refundForm.addEventListener('submit',submitRefund); load(); }

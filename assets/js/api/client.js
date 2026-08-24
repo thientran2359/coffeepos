@@ -1,12 +1,13 @@
 (function (window) {
     'use strict';
+    const __ = window.wp.i18n.__;
 
     const CoffeePOS = window.CoffeePOS || {};
 
     function ApiError(code, message, status, details) {
         this.name = 'CoffeePOSApiError';
         this.code = code || 'request_failed';
-        this.message = message || 'The request failed.';
+        this.message = message || __('The request failed.', 'coffeepos');
         this.status = Number(status || 0);
         this.details = details && typeof details === 'object' ? details : {};
 
@@ -55,7 +56,7 @@
                     throw error;
                 }
 
-                throw new ApiError('network_error', 'The server could not be reached.', 0, {});
+                throw new ApiError('network_error', __('The server could not be reached.', 'coffeepos'), 0, {});
             }
 
             let envelope;
@@ -63,7 +64,7 @@
             try {
                 envelope = await response.json();
             } catch (error) {
-                throw new ApiError('invalid_response', 'The server returned an invalid response.', response.status, {});
+                throw new ApiError('invalid_response', __('The server returned an invalid response.', 'coffeepos'), response.status, {});
             }
 
             if (!response.ok || !envelope || envelope.success !== true) {
@@ -73,14 +74,14 @@
 
                 throw new ApiError(
                     responseError.code || 'request_failed',
-                    responseError.message || 'The request failed.',
+                    responseError.message || __('The request failed.', 'coffeepos'),
                     response.status,
                     responseError.details || {}
                 );
             }
 
             if (!envelope.data || typeof envelope.data !== 'object' || Array.isArray(envelope.data)) {
-                throw new ApiError('invalid_response', 'The server returned an invalid data envelope.', response.status, {});
+                throw new ApiError('invalid_response', __('The server returned an invalid data envelope.', 'coffeepos'), response.status, {});
             }
 
             return envelope.data;
@@ -103,7 +104,7 @@
                 if (error && error.name === 'AbortError') {
                     throw error;
                 }
-                throw new ApiError('network_error', 'The server could not be reached.', 0, {});
+                throw new ApiError('network_error', __('The server could not be reached.', 'coffeepos'), 0, {});
             }
 
             if (!response.ok) {
@@ -114,7 +115,7 @@
                     envelope = null;
                 }
                 const responseError = envelope && envelope.error && typeof envelope.error === 'object' ? envelope.error : {};
-                throw new ApiError(responseError.code || 'request_failed', responseError.message || 'The download failed.', response.status, responseError.details || {});
+                throw new ApiError(responseError.code || 'request_failed', responseError.message || __('The download failed.', 'coffeepos'), response.status, responseError.details || {});
             }
 
             const disposition = String(response.headers.get('Content-Disposition') || '');

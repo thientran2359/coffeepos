@@ -1,6 +1,7 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
 
     CoffeePOS.sync.createChannel = function (options) {
         const protocol = CoffeePOS.sync.protocol;
@@ -26,8 +27,8 @@
         }
         function bind(nextSessionId) {
             close();
-            if (!protocol.validSessionId(nextSessionId)) { throw new Error('Invalid POS session id.'); }
-            if (typeof window.BroadcastChannel !== 'function') { throw new Error('BroadcastChannel is unavailable.'); }
+            if (!protocol.validSessionId(nextSessionId)) { throw new Error(__('Invalid POS session id.', 'coffeepos')); }
+            if (typeof window.BroadcastChannel !== 'function') { throw new Error(__('BroadcastChannel is unavailable.', 'coffeepos')); }
             sessionId = String(nextSessionId); seen = new Set(); seenOrder = [];
             const currentGeneration = generation;
             channel = new window.BroadcastChannel(protocol.channelName(sessionId));

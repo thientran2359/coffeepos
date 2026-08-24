@@ -2,6 +2,8 @@
     'use strict';
 
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
+    const sprintf = window.wp.i18n.sprintf;
     const setState = CoffeePOS.core.setState;
     const POS_SESSION_STORAGE_KEY = 'coffeepos.pos_session_id';
 
@@ -65,10 +67,10 @@
             try {
                 const data = await api.getCurrentShift();
                 activeShift = data.shift || null;
-                label.textContent = activeShift ? 'Shift #' + activeShift.id + ' open' : 'No shift open';
+                label.textContent = activeShift ? sprintf(__('Shift #%s open', 'coffeepos'), activeShift.id) : __('No shift open', 'coffeepos');
                 setState(header, activeShift ? 'open' : 'closed');
             } catch (error) {
-                label.textContent = 'Shift unavailable';
+                label.textContent = __('Shift unavailable', 'coffeepos');
                 setState(header, 'error');
             }
         }
@@ -131,7 +133,7 @@
                     return;
                 }
                 setCatalogStatus(store.getState().catalog ? 'normal' : 'error');
-                toast.show(error.message || 'The catalog could not be loaded.', 'error');
+                toast.show(error.message || __('The catalog could not be loaded.', 'coffeepos'), 'error');
             }
         }
 
@@ -142,13 +144,13 @@
                 return false;
             }
             applyCart(latest);
-            toast.show(error.message || 'The cart changed and was refreshed.', 'warning');
+            toast.show(error.message || __('The cart changed and was refreshed.', 'coffeepos'), 'warning');
             return true;
         }
 
         async function mutate(operation) {
             if (mutationPending) {
-                throw new Error('A cart update is already in progress.');
+                throw new Error(__('A cart update is already in progress.', 'coffeepos'));
             }
             mutationPending = true;
             store.setCartStatus('updating');
@@ -160,7 +162,7 @@
             } catch (error) {
                 if (!reconcileConflict(error)) {
                     applyCart(store.getState().cart || { items: [] });
-                    toast.show(error.message || 'The cart could not be updated.', 'error');
+                    toast.show(error.message || __('The cart could not be updated.', 'coffeepos'), 'error');
                 }
                 throw error;
             } finally {
@@ -191,14 +193,14 @@
                 }
                 store.setCartStatus('error');
                 cartPanel.setError();
-                toast.show(error.message || 'The cart could not be loaded.', 'error');
+                toast.show(error.message || __('The cart could not be loaded.', 'coffeepos'), 'error');
             }
         }
 
         async function submitProduct(payload, mode, itemId) {
             const cart = store.getState().cart;
             if (!cart) {
-                throw new Error('The cart is not ready.');
+                throw new Error(__('The cart is not ready.', 'coffeepos'));
             }
             const request = Object.assign({}, payload, {
                 pos_session_id: cart.pos_session_id,
@@ -245,7 +247,7 @@
             const membershipData = customer.membership;
 
             setState(customerSummary, isGuest ? 'empty' : 'selected');
-            customerName.textContent = isGuest ? 'Guest customer' : String(customer.display_name || customer.name || 'Customer');
+            customerName.textContent = isGuest ? __('Guest customer', 'coffeepos') : String(customer.display_name || customer.name || __('Customer', 'coffeepos'));
             customerPhone.textContent = String(customer.phone || '');
             customerPhone.hidden = isGuest || customerPhone.textContent === '';
             membership.textContent = membershipData && String(membershipData.status_label || membershipData.tier_label || '');
@@ -254,7 +256,7 @@
             orderType.setSelected(cart && cart.order_type || 'takeaway', false);
             tableLabel.textContent = cart && cart.table && cart.table.table_label
                 ? String(cart.table.table_label)
-                : 'Select table';
+                : __('Select table', 'coffeepos');
         }
 
         function applyCart(cart) {
@@ -359,7 +361,7 @@
             } else if (action === 'retry-cart') {
                 createCart();
             } else if (action === 'clear-cart' && cart && cart.items.length > 0) {
-                confirmDialog.open({ title: 'Clear cart?', message: 'Remove all items from the current cart?', action: 'clear-cart' });
+                confirmDialog.open({ title: __('Clear cart?', 'coffeepos'), message: __('Remove all items from the current cart?', 'coffeepos'), action: 'clear-cart' });
             } else if (action === 'increase-quantity' && item) {
                 updateQuantity(item, Number(item.quantity) + 1).catch(function () {});
             } else if (action === 'decrease-quantity' && item && Number(item.quantity) > 1) {
@@ -384,18 +386,18 @@
                 cartPanel.closeOrderNote();
             } else if (action === 'save-order-note' && cart) {
                 const input = root.querySelector('[data-component="order-note-input"]');
-                cartPanel.setOrderNoteStatus('Saving…');
+                cartPanel.setOrderNoteStatus(__('Saving…', 'coffeepos'));
                 mutate(function () { return api.setOrderNote(Object.assign(cartPayload(cart), { note: input.value })); })
-                    .then(function () { cartPanel.setOrderNoteStatus('Saved'); })
-                    .catch(function () { cartPanel.setOrderNoteStatus('Could not save'); });
+                    .then(function () { cartPanel.setOrderNoteStatus(__('Saved', 'coffeepos')); })
+                    .catch(function () { cartPanel.setOrderNoteStatus(__('Could not save', 'coffeepos')); });
             } else if (action === 'clear-order-note' && cart) {
-                cartPanel.setOrderNoteStatus('Saving…');
+                cartPanel.setOrderNoteStatus(__('Saving…', 'coffeepos'));
                 mutate(function () { return api.clearOrderNote(cartPayload(cart)); })
-                    .then(function () { cartPanel.setOrderNoteStatus('Cleared'); })
-                    .catch(function () { cartPanel.setOrderNoteStatus('Could not clear'); });
+                    .then(function () { cartPanel.setOrderNoteStatus(__('Cleared', 'coffeepos')); })
+                    .catch(function () { cartPanel.setOrderNoteStatus(__('Could not clear', 'coffeepos')); });
             } else if (action === 'checkout' && cart) {
                 if (requireOpenShift && !activeShift) {
-                    toast.show('Open a shift before checkout.', 'error');
+                    toast.show(__('Open a shift before checkout.', 'coffeepos'), 'error');
                     return;
                 }
                 checkoutController.open();

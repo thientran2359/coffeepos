@@ -7,7 +7,7 @@ const vm = require('vm');
 
 const root = path.resolve(__dirname, '..', '..');
 const source = fs.readFileSync(path.join(root, 'assets/js/sync/protocol.js'), 'utf8');
-const window = { CoffeePOS: {}, URL: URL };
+const window = { CoffeePOS: {}, URL: URL, wp: { i18n: { __: (text) => text } } };
 window.window = window;
 
 vm.runInNewContext(source, { window, URL, Date, Math, Number, Object, Array, String, RegExp });

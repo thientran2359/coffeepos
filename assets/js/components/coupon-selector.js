@@ -1,6 +1,7 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     CoffeePOS.components = CoffeePOS.components || {};
 
     CoffeePOS.components.createCouponSelector = function (root, renderer, api, getCart, onCart) {
@@ -26,17 +27,17 @@
             document.body.classList.add('coffeepos-overlay-open');
             input.focus();
             const current = ++sequence;
-            status.textContent = 'Loading coupons...';
+            status.textContent = __('Loading coupons...', 'coffeepos');
             try {
                 const data = await api.loadApplicableCoupons(cart.pos_session_id);
                 if (current !== sequence) { return; }
                 const items = Array.isArray(data.items) ? data.items : [];
                 renderer.renderList('coffeepos-coupon-option-template', items, list);
-                status.textContent = items.length ? 'Select a coupon or enter a code.' : 'No suggested coupons. You can still enter a code.';
+                status.textContent = items.length ? __('Select a coupon or enter a code.', 'coffeepos') : __('No suggested coupons. You can still enter a code.', 'coffeepos');
                 modal.setAttribute('data-state', items.length ? 'normal' : 'empty');
             } catch (error) {
                 if (current !== sequence) { return; }
-                status.textContent = error.message || 'Coupons could not be loaded.';
+                status.textContent = error.message || __('Coupons could not be loaded.', 'coffeepos');
                 modal.setAttribute('data-state', 'error');
             }
         }
@@ -46,7 +47,7 @@
             const cart = getCart();
             pending = true;
             modal.setAttribute('data-state', 'applying');
-            status.textContent = 'Applying coupon...';
+            status.textContent = __('Applying coupon...', 'coffeepos');
             try {
                 const data = await api.applyCoupon({ pos_session_id: cart.pos_session_id, expected_revision: cart.revision, code: String(code || '').trim() });
                 onCart(data.cart);
@@ -54,7 +55,7 @@
                 close();
             } catch (error) {
                 if (error.code === 'cart_revision_conflict' && error.details && error.details.cart) { onCart(error.details.cart); }
-                status.textContent = error.message || 'Coupon could not be applied.';
+                status.textContent = error.message || __('Coupon could not be applied.', 'coffeepos');
                 modal.setAttribute('data-state', 'invalid');
             } finally { pending = false; }
         }

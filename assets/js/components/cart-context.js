@@ -2,6 +2,7 @@
     'use strict';
 
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     const setState = CoffeePOS.core.setState;
     CoffeePOS.components = CoffeePOS.components || {};
 
@@ -83,19 +84,19 @@
             customer.membership_label = membershipLabel(customer);
             renderer.renderList('coffeepos-customer-result-template', [customer], customerResult);
             createPanel.hidden = true;
-            setCustomerStatus('found', 'Member found. Confirm to use this member.');
+            setCustomerStatus('found', __('Member found. Confirm to use this member.', 'coffeepos'));
         }
 
         function showCreate(phone) {
             customerResult.replaceChildren();
             if (!memberCreateEnabled) {
                 createPanel.hidden = true;
-                setCustomerStatus('not_found', 'No member was found. Member creation is disabled.');
+                setCustomerStatus('not_found', __('No member was found. Member creation is disabled.', 'coffeepos'));
                 return;
             }
             createPhone.value = String(phone || '');
             createPanel.hidden = false;
-            setCustomerStatus('not_found', 'No member was found. You can create one below.');
+            setCustomerStatus('not_found', __('No member was found. You can create one below.', 'coffeepos'));
         }
 
         function resetCandidate() {
@@ -113,7 +114,7 @@
                 }
                 lookupSequence += 1;
                 resetCandidate();
-                setCustomerStatus(value.trim() === '' ? 'idle' : 'typing', value.trim() === '' ? '' : 'Enter a complete phone number.');
+                setCustomerStatus(value.trim() === '' ? 'idle' : 'typing', value.trim() === '' ? '' : __('Enter a complete phone number.', 'coffeepos'));
                 return;
             }
             if (lookupRequest) {
@@ -123,7 +124,7 @@
             const sequence = ++lookupSequence;
             customerResult.replaceChildren();
             createPanel.hidden = true;
-            setCustomerStatus('searching', 'Searching for member…');
+            setCustomerStatus('searching', __('Searching for member…', 'coffeepos'));
             try {
                 const data = await api.lookupCustomer(value, lookupRequest.signal);
                 if (sequence !== lookupSequence || customerElement.hidden) {
@@ -142,7 +143,7 @@
                     return;
                 }
                 resetCandidate();
-                setCustomerStatus('error', error && error.message ? error.message : 'Member lookup failed.');
+                setCustomerStatus('error', error && error.message ? error.message : __('Member lookup failed.', 'coffeepos'));
             }
         }
 
@@ -150,10 +151,10 @@
             window.clearTimeout(lookupTimer);
             resetCandidate();
             if (!canLookup(phoneInput.value)) {
-                setCustomerStatus(phoneInput.value.trim() === '' ? 'idle' : 'typing', phoneInput.value.trim() === '' ? '' : 'Enter a complete phone number.');
+                setCustomerStatus(phoneInput.value.trim() === '' ? 'idle' : 'typing', phoneInput.value.trim() === '' ? '' : __('Enter a complete phone number.', 'coffeepos'));
                 return;
             }
-            setCustomerStatus('typing', 'Waiting to search…');
+            setCustomerStatus('typing', __('Waiting to search…', 'coffeepos'));
             lookupTimer = window.setTimeout(lookup, 400);
         }
 
@@ -162,13 +163,13 @@
                 return;
             }
             attaching = true;
-            setCustomerStatus('attaching', 'Adding member to cart…');
+            setCustomerStatus('attaching', __('Adding member to cart…', 'coffeepos'));
             try {
                 await onAttach(Number(customerId));
                 attaching = false;
                 customerDialog.close();
             } catch (error) {
-                setCustomerStatus('conflict', error && error.message ? error.message : 'Member could not be attached.');
+                setCustomerStatus('conflict', error && error.message ? error.message : __('Member could not be attached.', 'coffeepos'));
             } finally {
                 attaching = false;
             }
@@ -183,7 +184,7 @@
             if (!creationOperationId) {
                 creationOperationId = operationId();
             }
-            setCustomerStatus('creating', 'Creating member…');
+            setCustomerStatus('creating', __('Creating member…', 'coffeepos'));
             try {
                 const data = await api.createCustomer({
                     display_name: createName.value,
@@ -193,16 +194,16 @@
                 });
                 const customer = data.customer || {};
                 renderCandidate(customer);
-                setCustomerStatus('created_pending_attach', 'Member created. Adding member to cart…');
+                setCustomerStatus('created_pending_attach', __('Member created. Adding member to cart…', 'coffeepos'));
                 creating = false;
                 await selectCustomer(customer.customer_id);
                 return;
             } catch (error) {
                 if (error && error.code === 'customer_phone_exists' && error.details && error.details.customer) {
                     renderCandidate(error.details.customer);
-                    setCustomerStatus('found', 'This phone already belongs to a member. Confirm to use it.');
+                    setCustomerStatus('found', __('This phone already belongs to a member. Confirm to use it.', 'coffeepos'));
                 } else {
-                    setCustomerStatus('error', error && error.message ? error.message : 'Member could not be created.');
+                    setCustomerStatus('error', error && error.message ? error.message : __('Member could not be created.', 'coffeepos'));
                 }
             } finally {
                 creating = false;
@@ -213,7 +214,7 @@
         async function openTables() {
             tableDialog.open('');
             setState(tableElement, 'loading');
-            tableStatus.textContent = 'Loading tables...';
+            tableStatus.textContent = __('Loading tables...', 'coffeepos');
             tableList.replaceChildren();
             if (tableRequest) {
                 tableRequest.abort();
@@ -227,13 +228,13 @@
                 const items = Array.isArray(data.items) ? data.items : [];
                 renderer.renderList('coffeepos-table-option-template', items, tableList);
                 setState(tableElement, items.length ? 'normal' : 'empty');
-                tableStatus.textContent = items.length ? '' : 'No tables are available.';
+                tableStatus.textContent = items.length ? '' : __('No tables are available.', 'coffeepos');
             } catch (error) {
                 if (error && error.name === 'AbortError') {
                     return;
                 }
                 setState(tableElement, 'error');
-                tableStatus.textContent = error.message || 'Tables could not be loaded.';
+                tableStatus.textContent = error.message || __('Tables could not be loaded.', 'coffeepos');
             }
         }
 
@@ -243,7 +244,7 @@
             }
             tablePending = true;
             setState(tableElement, 'updating');
-            tableStatus.textContent = 'Updating service...';
+            tableStatus.textContent = __('Updating service...', 'coffeepos');
             try {
                 await onService('dine_in', Number(tableId));
                 tableDialog.close();

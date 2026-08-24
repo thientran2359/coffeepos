@@ -1,0 +1,2308 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: CoffeePOS 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/coffeepos/\n"
+"POT-Creation-Date: 2026-08-24 00:00+0000\n"
+"PO-Revision-Date: 2026-08-24 00:00+0000\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Domain: coffeepos\n"
+
+msgid "%1$d %2$s orders have unknown legacy payment metadata."
+msgstr "Các đơn hàng %1$d %2$s có siêu dữ liệu thanh toán cũ không xác định."
+
+#: includes/Application/Reports/SalesReportService.php:162
+msgid "%1$s in %2$s refunds cannot be allocated to individual products."
+msgstr "Không thể phân bổ số tiền hoàn lại %1$s trong %2$s cho từng sản phẩm."
+
+#: templates/components/catalog-category.php:25
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] "%d món"
+
+#: assets/js/screens/cashier.js:153
+msgid "A cart update is already in progress."
+msgstr "Đang cập nhật giỏ hàng."
+
+#: templates/settings/content.php:131
+msgid "Account holder"
+msgstr "Chủ tài khoản"
+
+#: templates/settings/content.php:130
+msgid "Account number"
+msgstr "Số tài khoản"
+
+#: templates/settings/content.php:152
+msgid "Actions"
+msgstr "Hành động"
+
+#: templates/shifts/content.php:23
+msgid "Active shift"
+msgstr "Ca đang mở"
+
+#: templates/shifts/content.php:46
+msgid "Actual"
+msgstr "Thực tế"
+
+#: templates/shifts/content.php:34
+msgid "Actual cash"
+msgstr "Tiền mặt thực tế"
+
+#: includes/REST/RestResponder.php:149
+msgid "A customer already uses this phone number."
+msgstr "Một khách hàng đã sử dụng số điện thoại này."
+
+#: templates/cashier/cart-panel.php:64
+msgid "Add coupon"
+msgstr "Thêm mã giảm giá"
+
+#: assets/js/components/cart-context.js:166
+msgid "Adding member to cart…"
+msgstr "Đang thêm hội viên vào giỏ hàng…"
+
+#: includes/Infrastructure/Assets/AssetLoader.php:123 templates/components/product-modal.php:14 assets/js/components/product-modal.js:98
+msgid "Add item"
+msgstr "Thêm món"
+
+#: assets/js/components/cart-panel.js:98
+msgid "Add order note"
+msgstr "Thêm ghi chú đơn hàng"
+
+#: templates/settings/content.php:149
+msgid "Add quick note"
+msgstr "Thêm ghi chú nhanh"
+
+#: templates/settings/content.php:57
+msgid "Address"
+msgstr "Địa chỉ"
+
+#: includes/Infrastructure/Assets/AssetLoader.php:125 templates/components/product-modal.php:74 assets/js/components/product-modal.js:263
+msgid "Add to cart"
+msgstr "Thêm vào giỏ hàng"
+
+#: templates/settings/content.php:208
+msgid "Advanced"
+msgstr "Nâng cao"
+
+#: templates/reports/content.php:71
+msgid "After WooCommerce refunds"
+msgstr "Sau khi hoàn tiền trong WooCommerce"
+
+#: templates/cashier/menu-panel.php:40 templates/order-queue/content.php:12
+msgid "All"
+msgstr "Tất cả"
+
+#: templates/kds/content.php:15 templates/order-queue/content.php:11
+msgid "All active"
+msgstr "Tất cả đang hoạt động"
+
+#: templates/settings/content.php:197
+msgid "Allow cashier to create members"
+msgstr "Cho phép nhân viên thu ngân tạo hội viên"
+
+#: templates/settings/content.php:142
+msgid "Allow new-order sound on KDS"
+msgstr "Bật âm thanh khi KDS có đơn hàng mới"
+
+#: templates/order-history/content.php:15
+msgid "All statuses"
+msgstr "Tất cả trạng thái"
+
+#: templates/order-history/content.php:16
+msgid "All types"
+msgstr "Tất cả các loại"
+
+#: templates/customer/cart.php:24
+msgid "Amount due"
+msgstr "Số tiền đến hạn"
+
+#: assets/js/screens/order-history.js:106
+msgid "A new cashier cart will be created using current prices and availability."
+msgstr "Một giỏ hàng thu ngân mới sẽ được tạo theo giá và tình trạng hàng hiện tại."
+
+#: assets/js/components/checkout.js:242
+msgid "A new order could not be started."
+msgstr "Một đơn hàng mới không thể được bắt đầu."
+
+#: templates/settings/content.php:72
+msgid "Appearance"
+msgstr "Giao diện"
+
+#: templates/components/coupon-selector.php:16 templates/reports/content.php:48
+msgid "Apply"
+msgstr "Áp dụng"
+
+#: templates/components/coupon-selector.php:9
+msgid "Apply coupon"
+msgstr "Áp dụng mã giảm giá"
+
+#: templates/order-history/content.php:18
+msgid "Apply filters"
+msgstr "Áp dụng bộ lọc"
+
+#: assets/js/components/coupon-selector.js:50
+msgid "Applying coupon..."
+msgstr "Đang áp dụng mã giảm giá..."
+
+#: includes/REST/RestResponder.php:144
+msgid "A table cannot be used with this service type."
+msgstr "Không thể chọn bàn cho loại phục vụ này."
+
+#: templates/settings/content.php:123
+msgid "At least one payment method must remain enabled. VietQR is shown only on Customer Display."
+msgstr "Phải bật ít nhất một phương thức thanh toán. VietQR chỉ hiển thị trên Màn hình khách hàng."
+
+#: templates/settings/content.php:186
+msgid "Automatically open print after successful checkout"
+msgstr "Tự động mở in sau khi thanh toán thành công"
+
+#: templates/reports/content.php:73
+msgid "Average order value"
+msgstr "Giá trị đơn hàng trung bình"
+
+#: templates/order-history/content.php:9 templates/reports/content.php:17 templates/settings/content.php:35 templates/shifts/content.php:8
+msgid "Back to Cashier"
+msgstr "Quay lại Thu ngân"
+
+#: templates/settings/content.php:129
+msgid "Bank ID"
+msgstr "ID ngân hàng"
+
+#: includes/Application/Reports/SalesReportService.php:312 templates/components/checkout-modal.php:16 templates/shifts/content.php:28
+msgid "Bank transfer"
+msgstr "Chuyển khoản ngân hàng"
+
+#: assets/js/components/customer-payment.js:23
+msgid "Bank transfer is unavailable."
+msgstr "Chuyển khoản ngân hàng không khả dụng."
+
+#: templates/reports/content.php:91
+msgid "Best sellers by quantity"
+msgstr "Bán chạy nhất theo số lượng"
+
+#: templates/reports/content.php:87
+msgid "Best sellers by revenue"
+msgstr "Bán chạy nhất theo doanh thu"
+
+#: templates/settings/content.php:54
+msgid "Branch name"
+msgstr "Tên chi nhánh"
+
+#: templates/settings/content.php:77
+msgid "Brand color"
+msgstr "Màu sắc thương hiệu"
+
+#: includes/POS/SettingsScreen.php:165
+msgid "Brand color must be a six-digit hexadecimal color."
+msgstr "Màu thương hiệu phải là màu thập lục phân gồm sáu chữ số."
+
+#: assets/js/sync/channel.js:31
+msgid "BroadcastChannel is unavailable."
+msgstr "BroadcastChannel không khả dụng."
+
+#: templates/components/checkout-modal.php:39 templates/components/confirm-dialog.php:16 templates/components/modal.php:34 templates/components/order-queue-templates.php:12 templates/components/product-modal.php:72 templates/order-history/content.php:42
+msgid "Cancel"
+msgstr "Hủy bỏ"
+
+#: assets/js/screens/order-history.js:72
+msgid "Cancelled from Order History"
+msgstr "Đã hủy khỏi lịch sử đơn hàng"
+
+#: templates/order-history/content.php:38
+msgid "Cancel order"
+msgstr "Hủy đơn hàng"
+
+#: assets/js/screens/order-history.js:105
+msgid "Cancel order #%s?"
+msgstr "Hủy đơn hàng #%s?"
+
+#: assets/js/screens/order-queue.js:47
+msgid "Cancel order %s?"
+msgstr "Hủy đơn hàng %s?"
+
+#: templates/cashier/cart-panel.php:14
+msgid "Cart"
+msgstr "Giỏ hàng"
+
+#: templates/cashier/cart-panel.php:16
+msgid "Cart item count"
+msgstr "Số lượng mặt hàng trong giỏ hàng"
+
+#: assets/js/screens/customer.js:115
+msgid "Cart recovered; waiting for Cashier state…"
+msgstr "Xe đã được phục hồi; đang chờ trạng thái thu ngân…"
+
+#: includes/Application/Reports/SalesReportService.php:311 templates/components/checkout-modal.php:15
+msgid "Cash"
+msgstr "Tiền mặt"
+
+#: includes/POS/Router.php:183 templates/cashier/content.php:12 templates/cashier/header.php:11 templates/cashier/index.php:9 templates/receipt/receipt.php:8
+msgid "Cashier"
+msgstr "Thu ngân"
+
+#: templates/cashier/header.php:21
+msgid "Cashier utility actions"
+msgstr "Hành động tiện ích thu ngân"
+
+#: templates/receipt/receipt.php:15
+msgid "Cash received"
+msgstr "Tiền mặt nhận được"
+
+#: assets/js/components/checkout.js:158
+msgid "Cash received (%1$s) is below the required total (%2$s)."
+msgstr "Tiền mặt nhận được (%1$s) thấp hơn tổng số tiền yêu cầu (%2$s)."
+
+#: includes/REST/RestResponder.php:166
+msgid "Cash received is below the authoritative order total."
+msgstr "Tiền mặt nhận được thấp hơn tổng tiền chính xác của đơn hàng."
+
+#: templates/shifts/content.php:27
+msgid "Cash sales"
+msgstr "Bán tiền mặt"
+
+#: templates/settings/content.php:152
+msgid "Category IDs"
+msgstr "ID danh mục"
+
+#: templates/receipt/receipt.php:15
+msgid "Change"
+msgstr "Thay đổi"
+
+#: assets/js/components/checkout.js:186 assets/js/components/customer-payment.js:28
+msgid "Change: %s"
+msgstr "Tiền thừa: %s"
+
+#: templates/cashier/cart-panel.php:140 templates/components/checkout-modal.php:10
+msgid "Checkout"
+msgstr "Thanh toán"
+
+#: assets/js/components/checkout.js:159 assets/js/components/checkout.js:161
+msgid "Checkout failed."
+msgstr "Thanh toán không thành công."
+
+#: includes/REST/RestResponder.php:169
+msgid "Checkout is already being processed."
+msgstr "Việc thanh toán đang được xử lý."
+
+#: includes/Infrastructure/Settings/SettingsProductConfigurationProvider.php:88
+msgid "Choose %1$d to %2$d"
+msgstr "Chọn %1$d thành %2$d"
+
+#: includes/Infrastructure/Settings/SettingsProductConfigurationProvider.php:81
+msgid "Choose one"
+msgstr "Chọn một"
+
+#: includes/Infrastructure/Settings/SettingsProductConfigurationProvider.php:96
+msgid "Choose up to %d"
+msgstr "Chọn tối đa %d"
+
+#: includes/Infrastructure/Settings/SettingsProductConfigurationProvider.php:82
+msgid "Choose up to one"
+msgstr "Chọn tối đa một"
+
+#: templates/components/order-note-dialog.php:26
+msgid "Clear"
+msgstr "Xóa"
+
+#: templates/cashier/cart-panel.php:17
+msgid "Clear cart"
+msgstr "Xóa giỏ hàng"
+
+#: assets/js/screens/cashier.js:364
+msgid "Clear cart?"
+msgstr "Xóa giỏ hàng?"
+
+#: assets/js/screens/cashier.js:396
+msgid "Cleared"
+msgstr "Đã xóa"
+
+#: templates/cashier/menu-panel.php:24
+msgid "Clear search"
+msgstr "Xóa tìm kiếm"
+
+#: templates/components/checkout-modal.php:11 templates/components/coupon-selector.php:10 templates/components/order-note-dialog.php:27
+msgid "Close"
+msgstr "Đóng"
+
+#: templates/shifts/content.php:36
+msgid "Close and reconcile shift"
+msgstr "Đóng và đối chiếu ca làm việc"
+
+#: templates/components/context-dialogs.php:17
+msgid "Close customer lookup"
+msgstr "Đóng tra cứu khách hàng"
+
+#: templates/components/modal.php:14
+msgid "Close dialog"
+msgstr "Đóng hộp thoại"
+
+#: templates/order-history/content.php:32
+msgid "Close order detail"
+msgstr "Đóng chi tiết đơn hàng"
+
+#: templates/components/order-note-dialog.php:18
+msgid "Close order note"
+msgstr "Đóng ghi chú đơn hàng"
+
+#: templates/components/drawer.php:14
+msgid "Close panel"
+msgstr "Đóng bảng điều khiển"
+
+#: templates/components/product-modal.php:17
+msgid "Close product configuration"
+msgstr "Đóng cấu hình sản phẩm"
+
+#: templates/order-history/content.php:42
+msgid "Close refund"
+msgstr "Đóng hoàn tiền"
+
+#: templates/components/context-dialogs.php:65
+msgid "Close table selector"
+msgstr "Đóng cửa sổ chọn bàn"
+
+#: templates/shifts/content.php:35
+msgid "Closing note"
+msgstr "Ghi chú kết thúc"
+
+#: templates/cashier/cart-panel.php:60
+msgid "COFFEE10"
+msgstr "CÀ PHÊ10"
+
+#: templates/cashier/content.php:10 templates/cashier/header.php:9
+msgid "CoffeePOS"
+msgstr "CoffeePOS"
+
+#: includes/REST/RestResponder.php:158
+msgid "CoffeePOS configuration is invalid or incomplete."
+msgstr "Cấu hình CoffeePOS không hợp lệ hoặc không đầy đủ."
+
+#: includes/Application/Reports/SalesReportService.php:129
+msgid "CoffeePOS could not generate the sales report."
+msgstr "CoffeePOS không thể tạo báo cáo bán hàng."
+
+#: templates/components/screen-shell.php:52
+msgid "CoffeePOS foundation template loaded successfully."
+msgstr "Mẫu nền tảng CoffeePOS đã được tải thành công."
+
+#: templates/components/staff-navigation.php:29
+msgid "CoffeePOS home"
+msgstr "Trang chủ CoffeePOS"
+
+#: templates/settings/content.php:50
+msgid "CoffeePOS identity is independent from the WordPress site title and WooCommerce store address."
+msgstr "Danh tính CoffeePOS độc lập với tiêu đề trang web WordPress và địa chỉ cửa hàng WooCommerce."
+
+#: coffeepos.php:37
+msgid "CoffeePOS requires Composer autoload files. Run \"composer install\" inside the plugin directory."
+msgstr "CoffeePOS cần các file autoload của Composer. Hãy chạy lệnh \"composer install\" trong thư mục plugin."
+
+#: includes/Core/Bootstrap.php:59 includes/Core/Lifecycle.php:26
+msgid "CoffeePOS requires PHP %s or higher."
+msgstr "CoffeePOS yêu cầu PHP %s trở lên."
+
+#: includes/Core/Bootstrap.php:81
+msgid "CoffeePOS requires WooCommerce %s or higher."
+msgstr "CoffeePOS yêu cầu WooCommerce %s trở lên."
+
+#: includes/Core/Bootstrap.php:72
+msgid "CoffeePOS requires WooCommerce to be installed and active."
+msgstr "CoffeePOS yêu cầu WooCommerce phải được cài đặt và kích hoạt."
+
+#: templates/login/content.php:20
+msgid "CoffeePOS staff"
+msgstr "Nhân viên CoffeePOS"
+
+#: templates/components/staff-navigation.php:28
+msgid "CoffeePOS staff navigation"
+msgstr "Điều hướng nhân viên CoffeePOS"
+
+#: includes/POS/SettingsScreen.php:202
+msgid "CoffeePOS version"
+msgstr "Phiên bản CoffeePOS"
+
+#: templates/components/staff-navigation.php:25 templates/components/staff-navigation.php:37
+msgid "Collapse navigation"
+msgstr "Thu gọn điều hướng"
+
+#: templates/settings/content.php:88
+msgid "Collapse staff menu by default"
+msgstr "Thu gọn menu nhân viên theo mặc định"
+
+#: templates/settings/content.php:84
+msgid "Compact"
+msgstr "Nhỏ gọn"
+
+#: templates/components/order-queue-templates.php:11
+msgid "Complete"
+msgstr "Hoàn thành"
+
+#: templates/components/checkout-modal.php:40 assets/js/components/checkout.js:88 assets/js/components/checkout.js:106
+msgid "Complete checkout"
+msgstr "Hoàn tất thanh toán"
+
+#: includes/POS/SettingsScreen.php:116
+msgid "Configure at least one quick note. To hide all quick notes, disable every row instead."
+msgstr "Định cấu hình ít nhất một ghi chú nhanh. Để ẩn tất cả ghi chú nhanh, thay vào đó hãy tắt mọi hàng."
+
+#: templates/components/confirm-dialog.php:17 templates/components/modal.php:35
+msgid "Confirm"
+msgstr "Xác nhận"
+
+#: templates/components/confirm-dialog.php:13
+msgid "Confirm action"
+msgstr "Xác nhận hành động"
+
+#: assets/js/components/checkout.js:83
+msgid "Confirm received & complete"
+msgstr "Xác nhận đã nhận tiền và hoàn tất"
+
+#: templates/customer/menu.php:11 assets/js/screens/customer.js:126
+msgid "Connecting display…"
+msgstr "Đang kết nối màn hình…"
+
+#: assets/js/screens/customer.js:96
+msgid "Connecting next order…"
+msgstr "Đang kết nối đơn hàng tiếp theo…"
+
+#: assets/js/screens/cashier.js:397
+msgid "Could not clear"
+msgstr "Không thể xóa"
+
+#: includes/Application/Reports/ReportExporter.php:49
+msgid "Could not create the CSV export."
+msgstr "Không thể tạo bản xuất CSV."
+
+#: includes/Application/Reports/XlsxWriter.php:20
+msgid "Could not create the Excel export."
+msgstr "Không thể tạo bản xuất Excel."
+
+#: includes/Application/Reports/ReportExporter.php:61
+msgid "Could not finalize the CSV export."
+msgstr "Không thể hoàn tất quá trình xuất CSV."
+
+#: includes/Application/Reports/XlsxWriter.php:46
+msgid "Could not finalize the Excel export."
+msgstr "Không thể hoàn tất quá trình xuất Excel."
+
+#: includes/Application/Reports/XlsxWriter.php:26
+msgid "Could not open the Excel export package."
+msgstr "Không thể mở gói xuất Excel."
+
+#: assets/js/screens/customer.js:99
+msgid "Could not pair the next order. Reconnect this display."
+msgstr "Không thể ghép đơn hàng tiếp theo. Kết nối lại màn hình này."
+
+#: assets/js/screens/cashier.js:392
+msgid "Could not save"
+msgstr "Không thể lưu"
+
+#: templates/shifts/content.php:14
+msgid "Count the cash drawer before accepting the first order."
+msgstr "Đếm ngăn đựng tiền trước khi nhận đơn hàng đầu tiên."
+
+#: templates/cashier/cart-panel.php:57
+msgid "Coupon"
+msgstr "Mã giảm giá"
+
+#: templates/components/coupon-selector.php:13
+msgid "Coupon code"
+msgstr "Mã mã giảm giá"
+
+#: assets/js/components/coupon-selector.js:58
+msgid "Coupon could not be applied."
+msgstr "Mã giảm giá không thể được áp dụng."
+
+#: assets/js/components/coupon-selector.js:40
+msgid "Coupons could not be loaded."
+msgstr "Không thể tải mã giảm giá."
+
+#: templates/components/context-dialogs.php:44
+msgid "Create and use member"
+msgstr "Tạo và sử dụng hội viên"
+
+#: templates/order-history/content.php:33
+msgid "Created"
+msgstr "Tạo"
+
+#: templates/components/context-dialogs.php:29
+msgid "Create member"
+msgstr "Tạo hội viên"
+
+#: templates/order-history/content.php:42
+msgid "Create refund"
+msgstr "Tạo hoàn tiền"
+
+#: assets/js/components/cart-context.js:187
+msgid "Creating member…"
+msgstr "Đang tạo hội viên…"
+
+#: templates/reports/content.php:69
+msgid "Currency"
+msgstr "Tiền tệ"
+
+#: templates/reports/content.php:27
+msgid "Current month"
+msgstr "Tháng hiện tại"
+
+#: templates/cashier/cart-panel.php:13 templates/components/order-note-dialog.php:15
+msgid "Current order"
+msgstr "Đơn hàng hiện tại"
+
+#: templates/components/product-modal.php:35
+msgid "Current price"
+msgstr "Giá hiện tại"
+
+#: templates/settings/content.php:93
+msgid "Custom CSS"
+msgstr "CSS tùy chỉnh"
+
+#: includes/POS/SettingsScreen.php:179
+msgid "Custom CSS cannot contain HTML, URL references, @import, expression, behavior, or JavaScript syntax."
+msgstr "CSS tùy chỉnh không được chứa HTML, tham chiếu URL, @import, biểu thức, hành vi hoặc cú pháp JavaScript."
+
+#: includes/POS/SettingsScreen.php:175
+msgid "Custom CSS cannot exceed 20 KB."
+msgstr "CSS tùy chỉnh không thể vượt quá 20 KB."
+
+#: templates/cashier/cart-panel.php:42 templates/components/order-queue-templates.php:8 templates/order-history/content.php:33 templates/receipt/receipt.php:9 assets/js/screens/cashier.js:250
+msgid "Customer"
+msgstr "Khách hàng"
+
+#: templates/settings/content.php:194
+msgid "Customer & Membership"
+msgstr "Khách hàng & Hội viên"
+
+#: includes/REST/RestResponder.php:153
+msgid "Customer creation is already in progress."
+msgstr "Việc tạo khách hàng đang được tiến hành."
+
+#: templates/cashier/header.php:25
+msgid "Customer display"
+msgstr "Màn hình khách hàng"
+
+#: templates/customer/index.php:9
+msgid "Customer Display"
+msgstr "Màn hình khách hàng"
+
+#: assets/js/components/cashier-sync.js:25 assets/js/components/cashier-sync.js:68
+msgid "Customer Display synchronization is unavailable."
+msgstr "Không thể đồng bộ với Màn hình khách hàng."
+
+#: templates/settings/content.php:73
+msgid "Customize CoffeePOS screens without changing the WordPress theme or storefront."
+msgstr "Tùy chỉnh màn hình CoffeePOS mà không thay đổi chủ đề hoặc mặt tiền cửa hàng WordPress."
+
+#: templates/reports/content.php:28
+msgid "Custom range"
+msgstr "Phạm vi tùy chỉnh"
+
+#: includes/Application/Reports/SalesReportService.php:246
+msgid "Custom report date is invalid."
+msgstr "Ngày báo cáo tùy chỉnh không hợp lệ."
+
+#: includes/Application/Reports/SalesReportService.php:242
+msgid "Custom report dates must use YYYY-MM-DD."
+msgstr "Ngày báo cáo tùy chỉnh phải sử dụng YYYY-MM-DD."
+
+#: templates/reports/content.php:58
+msgid "Data quality notes"
+msgstr "Ghi chú chất lượng dữ liệu"
+
+#: templates/settings/content.php:60
+msgid "Date format"
+msgstr "Định dạng ngày"
+
+#: templates/reports/content.php:22
+msgid "Date range"
+msgstr "Phạm vi ngày"
+
+#: templates/cashier/cart-panel.php:105 templates/components/cart-item.php:24 templates/components/product-modal.php:65
+msgid "Decrease quantity"
+msgstr "Giảm số lượng"
+
+#: templates/components/cart-item.php:20
+msgid "Default configuration"
+msgstr "Cấu hình mặc định"
+
+#: templates/settings/content.php:100
+msgid "Defaults and requirements enforced by both Cashier and the server."
+msgstr "Mặc định và yêu cầu được thực thi bởi cả Nhân viên thu ngân và máy chủ."
+
+#: templates/settings/content.php:102
+msgid "Default service"
+msgstr "Dịch vụ mặc định"
+
+#: templates/settings/content.php:212
+msgid "Delete CoffeePOS data when uninstalling the plugin"
+msgstr "Xóa dữ liệu CoffeePOS khi gỡ cài đặt plugin"
+
+#: includes/Application/Reports/SalesReportService.php:95
+msgid "Deleted product #%d"
+msgstr "Đã xóa sản phẩm #%d"
+
+#: templates/components/modal.php:13
+msgid "Details"
+msgstr "Chi tiết"
+
+#: templates/cashier/cart-panel.php:25 templates/order-history/content.php:16 templates/order-queue/content.php:12 templates/settings/content.php:102 assets/js/components/customer-cart.js:25 assets/js/screens/order-history.js:28
+msgid "Dine-in"
+msgstr "Dùng tại chỗ"
+
+#: templates/settings/content.php:112
+msgid "Dine-in tables"
+msgstr "Bàn ăn tại chỗ"
+
+#: templates/cashier/cart-panel.php:129 templates/customer/cart.php:19 templates/customer/cart.php:34 templates/order-history/content.php:36 templates/receipt/receipt.php:15
+msgid "Discount"
+msgstr "Giảm giá"
+
+#: templates/components/toast.php:14
+msgid "Dismiss notification"
+msgstr "Loại bỏ thông báo"
+
+#: assets/js/screens/customer.js:59
+msgid "Display connected"
+msgstr "Đã kết nối màn hình"
+
+#: assets/js/screens/customer.js:124
+msgid "Display connection was interrupted."
+msgstr "Kết nối hiển thị bị gián đoạn."
+
+#: assets/js/screens/customer.js:118
+msgid "Display sync is unavailable. Reconnect to try again."
+msgstr "Đồng bộ hóa hiển thị không khả dụng. Hãy kết nối lại để thử lại."
+
+#: includes/POS/SettingsScreen.php:123
+msgid "Each quick note must be a valid settings row."
+msgstr "Mỗi ghi chú nhanh phải là một hàng cài đặt hợp lệ."
+
+#: includes/Infrastructure/Assets/AssetLoader.php:124 templates/cashier/cart-panel.php:108 templates/components/cart-item.php:27 assets/js/components/product-modal.js:97
+msgid "Edit item"
+msgstr "Sửa món"
+
+#: assets/js/components/cart-panel.js:98
+msgid "Edit order note"
+msgstr "Chỉnh sửa ghi chú đơn hàng"
+
+#: templates/components/context-dialogs.php:41 templates/settings/content.php:203
+msgid "Email"
+msgstr "E-mail"
+
+#: templates/components/context-dialogs.php:41
+msgid "Email (optional)"
+msgstr "Email (tùy chọn)"
+
+#: includes/POS/SettingsScreen.php:188
+msgid "Enable at least one payment method."
+msgstr "Kích hoạt ít nhất một phương thức thanh toán."
+
+#: templates/settings/content.php:126
+msgid "Enable Bank Transfer"
+msgstr "Kích hoạt chuyển khoản ngân hàng"
+
+#: templates/settings/content.php:125
+msgid "Enable Cash"
+msgstr "Kích hoạt tiền mặt"
+
+#: templates/settings/content.php:196
+msgid "Enable customer/member lookup"
+msgstr "Bật tra cứu khách hàng/hội viên"
+
+#: templates/settings/content.php:152
+msgid "Enabled"
+msgstr "Đã bật"
+
+#: assets/js/components/cart-context.js:117 assets/js/components/cart-context.js:154
+msgid "Enter a complete phone number."
+msgstr "Nhập số điện thoại đầy đủ."
+
+#: includes/REST/RestResponder.php:151
+msgid "Enter a valid customer email address."
+msgstr "Nhập địa chỉ email khách hàng hợp lệ."
+
+#: includes/REST/RestResponder.php:150
+msgid "Enter a valid customer name."
+msgstr "Nhập tên khách hàng hợp lệ."
+
+#: includes/REST/RestResponder.php:146
+msgid "Enter a valid customer phone number."
+msgstr "Nhập số điện thoại hợp lệ của khách hàng."
+
+#: includes/REST/RestResponder.php:181
+msgid "Enter a valid shift amount."
+msgstr "Nhập số tiền làm ca hợp lệ."
+
+#: templates/settings/content.php:113
+msgid "Enter one table name per line. Empty lines and duplicate names are ignored."
+msgstr "Nhập tên mỗi bàn trên một dòng. Dòng trống và tên trùng lặp sẽ được bỏ qua."
+
+#: includes/POS/SettingsScreen.php:135
+msgid "Every quick note requires a label."
+msgstr "Mỗi ghi chú nhanh đều cần có nhãn."
+
+#: templates/components/checkout-modal.php:25
+msgid "Exact"
+msgstr "Chính xác"
+
+#: includes/Application/Reports/XlsxWriter.php:15
+msgid "Excel export requires the PHP Zip extension."
+msgstr "Xuất Excel yêu cầu phần mở rộng PHP Zip."
+
+#: templates/components/staff-navigation.php:25 templates/components/staff-navigation.php:38
+msgid "Expand navigation"
+msgstr "Mở rộng điều hướng"
+
+#: templates/shifts/content.php:46
+msgid "Expected"
+msgstr "Dự kiến"
+
+#: templates/shifts/content.php:30
+msgid "Expected cash"
+msgstr "Tiền mặt dự kiến"
+
+#: templates/reports/content.php:50
+msgid "Export CSV"
+msgstr "Xuất CSV"
+
+#: templates/reports/content.php:51
+msgid "Export Excel"
+msgstr "Xuất Excel"
+
+#: templates/settings/content.php:215
+msgid "Export settings"
+msgstr "Xuất cài đặt"
+
+#: includes/Infrastructure/Settings/Settings.php:410
+msgid "Extra sugar"
+msgstr "Nhiều đường"
+
+#: templates/cashier/cart-panel.php:47 templates/components/context-dialogs.php:16
+msgid "Find customer"
+msgstr "Tìm khách hàng"
+
+#: includes/POS/Router.php:122 includes/POS/SettingsScreen.php:23
+msgid "Forbidden"
+msgstr "Không có quyền truy cập"
+
+#: templates/components/order-note-dialog.php:22
+msgid "For example: serve together, pack separately…"
+msgstr "Ví dụ: phục vụ chung, đóng gói riêng…"
+
+#: templates/order-history/content.php:13 templates/reports/content.php:32
+msgid "From"
+msgstr "Từ"
+
+#: templates/settings/content.php:49
+msgid "General"
+msgstr "Tổng quan"
+
+#: includes/Integration/WooCommerce/WooCommerceOrderGateway.php:190 templates/customer/cart.php:10 assets/js/components/customer-cart.js:19 assets/js/screens/order-history.js:37 assets/js/screens/order-history.js:52
+msgid "Guest"
+msgstr "Khách lẻ"
+
+#: templates/cashier/cart-panel.php:43 assets/js/screens/cashier.js:250
+msgid "Guest customer"
+msgstr "Khách lẻ"
+
+#: templates/cashier/header.php:22
+msgid "Held carts"
+msgstr "Đơn tạm giữ"
+
+#: templates/settings/content.php:152
+msgid "ID"
+msgstr "ID"
+
+#: includes/POS/SettingsScreen.php:226
+msgid "Import must be a valid CoffeePOS settings JSON export."
+msgstr "Quá trình nhập phải là xuất JSON cài đặt CoffeePOS hợp lệ."
+
+#: templates/settings/content.php:217
+msgid "Import settings"
+msgstr "Nhập cài đặt"
+
+#: templates/settings/content.php:216
+msgid "Import settings JSON"
+msgstr "Nhập cài đặt JSON"
+
+#: templates/cashier/cart-panel.php:107 templates/components/cart-item.php:26 templates/components/product-modal.php:67
+msgid "Increase quantity"
+msgstr "Tăng số lượng"
+
+#: includes/Infrastructure/Assets/AssetLoader.php:128 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
+msgid "In stock"
+msgstr "Còn hàng"
+
+#: templates/settings/content.php:81
+msgid "Interface density"
+msgstr "Mật độ giao diện"
+
+#: includes/POS/SettingsScreen.php:170
+msgid "Interface density must be Compact or Normal."
+msgstr "Mật độ giao diện phải Nhỏ gọn hoặc Bình thường."
+
+#: assets/js/sync/channel.js:30 assets/js/sync/protocol.js:30
+msgid "Invalid POS session id."
+msgstr "Id phiên POS không hợp lệ."
+
+#: assets/js/sync/protocol.js:36
+msgid "Invalid synchronization envelope input."
+msgstr "Gói tin đồng bộ không hợp lệ."
+
+#: templates/components/product-modal.php:57
+msgid "Item note"
+msgstr "Ghi chú món"
+
+#: templates/settings/content.php:148
+msgid "Item quick notes"
+msgstr "Ghi chú nhanh cho món"
+
+#: templates/settings/content.php:140
+msgid "KDS polling interval (ms)"
+msgstr "Khoảng thời gian cập nhật KDS (ms)"
+
+#: templates/kds/content.php:14
+msgid "KDS status filters"
+msgstr "Bộ lọc trạng thái KDS"
+
+#: templates/settings/content.php:148
+msgid "Keep saved IDs stable. Product and category IDs are comma-separated."
+msgstr "Giữ ID đã lưu ổn định. ID sản phẩm và danh mục được phân tách bằng dấu phẩy."
+
+#: includes/POS/Router.php:184 templates/kds/content.php:7
+msgid "Kitchen Display"
+msgstr "Màn hình bếp"
+
+#: templates/kds/index.php:9
+msgid "Kitchen Display System"
+msgstr "Hệ thống màn hình bếp"
+
+#: templates/settings/content.php:152
+msgid "Label"
+msgstr "Nhãn"
+
+#: templates/reports/content.php:26
+msgid "Last 7 days"
+msgstr "7 ngày qua"
+
+#: templates/settings/content.php:171
+msgid "Less hot"
+msgstr "Ít nóng"
+
+#: includes/Infrastructure/Settings/Settings.php:412
+msgid "Less ice"
+msgstr "Ít đá"
+
+#: includes/Infrastructure/Settings/Settings.php:411
+msgid "Less milk"
+msgstr "Ít sữa"
+
+#: includes/Infrastructure/Settings/Settings.php:409
+msgid "Less sugar"
+msgstr "Ít đường"
+
+#: templates/settings/content.php:95
+msgid "Loaded after CoffeePOS styles on /pos/* only. URL references, @import, HTML, expression, behavior, and JavaScript syntax are blocked. Invalid CSS may disrupt the POS layout."
+msgstr "Chỉ được tải sau các kiểu CoffeePOS trên /pos/*. Các tham chiếu URL, @import, HTML, biểu thức, hành vi và cú pháp JavaScript đều bị chặn. CSS không hợp lệ có thể làm gián đoạn bố cục POS."
+
+#: templates/components/loading.php:10
+msgid "Loading..."
+msgstr "Đang tải..."
+
+#: templates/kds/content.php:20 templates/order-queue/content.php:14
+msgid "Loading active orders…"
+msgstr "Đang tải các đơn hàng đang hoạt động…"
+
+#: templates/cashier/menu-panel.php:52
+msgid "Loading catalog..."
+msgstr "Đang tải danh mục..."
+
+#: assets/js/components/coupon-selector.js:30
+msgid "Loading coupons..."
+msgstr "Đang tải mã giảm giá..."
+
+#: templates/customer/menu.php:15 assets/js/screens/customer.js:135
+msgid "Loading menu…"
+msgstr "Đang tải trình đơn…"
+
+#: templates/kds/content.php:9 templates/order-queue/content.php:8 assets/js/screens/kds.js:59 assets/js/screens/order-queue.js:54
+msgid "Loading orders…"
+msgstr "Đang tải đơn hàng…"
+
+#: templates/components/product-modal.php:23
+msgid "Loading product..."
+msgstr "Đang tải sản phẩm..."
+
+#: templates/reports/content.php:17
+msgid "Loading report range…"
+msgstr "Đang tải phạm vi báo cáo…"
+
+#: templates/reports/content.php:55 assets/js/screens/reports.js:93
+msgid "Loading sales report…"
+msgstr "Đang tải báo cáo bán hàng..."
+
+#: assets/js/components/cart-context.js:217
+msgid "Loading tables..."
+msgstr "Đang tải danh sách bàn..."
+
+#: templates/settings/content.php:32
+msgid "Management"
+msgstr "Quản lý"
+
+#: assets/js/screens/order-history.js:95
+msgid "Maximum: %s"
+msgstr "Tối đa: %s"
+
+#: assets/js/components/customer-cart.js:19
+msgid "Member"
+msgstr "Hội viên"
+
+#: assets/js/components/cart-context.js:172
+msgid "Member could not be attached."
+msgstr "Không thể gắn hội viên vào giỏ hàng."
+
+#: assets/js/components/cart-context.js:206
+msgid "Member could not be created."
+msgstr "Không thể tạo hội viên."
+
+#: assets/js/components/cart-context.js:197
+msgid "Member created. Adding member to cart…"
+msgstr "Hội viên đã tạo. Đang thêm hội viên vào giỏ hàng…"
+
+#: assets/js/components/cart-context.js:87
+msgid "Member found. Confirm to use this member."
+msgstr "Đã tìm thấy hội viên. Xác nhận sử dụng hội viên này."
+
+#: assets/js/components/cart-context.js:146
+msgid "Member lookup failed."
+msgstr "Tra cứu hội viên không thành công."
+
+#: templates/components/context-dialogs.php:37
+msgid "Member name"
+msgstr "Tên hội viên"
+
+#: includes/REST/RestResponder.php:148
+msgid "More than one customer uses this phone number."
+msgstr "Nhiều khách hàng sử dụng số điện thoại này."
+
+#: templates/settings/content.php:202
+msgid "Name"
+msgstr "Tên"
+
+#: templates/reports/content.php:74
+msgid "Net item quantity"
+msgstr "Số lượng mặt hàng ròng"
+
+#: templates/reports/content.php:71
+msgid "Net revenue"
+msgstr "Doanh thu thuần"
+
+#: templates/reports/content.php:73
+msgid "Net revenue ÷ orders"
+msgstr "Doanh thu thuần ÷ số đơn hàng"
+
+#: templates/kds/content.php:16 templates/order-queue/content.php:11
+msgid "New"
+msgstr "Mới"
+
+#: templates/order-history/content.php:25
+msgid "Next"
+msgstr "Kế tiếp"
+
+#: templates/kds/content.php:22 templates/order-queue/content.php:16
+msgid "No active orders."
+msgstr "Không có đơn hàng đang xử lý."
+
+#: templates/shifts/content.php:42
+msgid "No closed shifts yet."
+msgstr "Chưa có ca làm việc nào đã đóng."
+
+#: templates/login/content.php:26
+msgid "No CoffeePOS access"
+msgstr "Không có quyền truy cập CoffeePOS"
+
+#: templates/order-history/content.php:24
+msgid "No CoffeePOS orders match these filters."
+msgstr "Không có đơn hàng CoffeePOS nào khớp với các bộ lọc này."
+
+#: templates/reports/content.php:63
+msgid "No CoffeePOS sales in this range"
+msgstr "Không có doanh số bán CoffeePOS trong phạm vi này"
+
+#: templates/cashier/cart-panel.php:58
+msgid "No coupon applied"
+msgstr "Không áp dụng mã giảm giá"
+
+#: templates/cashier/menu-panel.php:32
+msgid "No matching products"
+msgstr "Không có sản phẩm phù hợp"
+
+#: templates/components/context-dialogs.php:30
+msgid "No member uses this phone yet. Enter the member details below."
+msgstr "Chưa có hội viên nào sử dụng điện thoại này. Nhập thông tin hội viên bên dưới."
+
+#: assets/js/components/cart-context.js:94
+msgid "No member was found. Member creation is disabled."
+msgstr "Không có hội viên nào được tìm thấy. Việc tạo hội viên bị vô hiệu hóa."
+
+#: assets/js/components/cart-context.js:99
+msgid "No member was found. You can create one below."
+msgstr "Không tìm thấy hội viên. Bạn có thể tạo hội viên mới bên dưới."
+
+#: templates/cashier/cart-panel.php:118 assets/js/components/cart-panel.js:94
+msgid "No order note"
+msgstr "Không có ghi chú đơn hàng"
+
+#: templates/cashier/menu-panel.php:59
+msgid "No products available"
+msgstr "Không có sản phẩm nào"
+
+#: templates/settings/content.php:165
+msgid "No quick notes configured."
+msgstr "Không có ghi chú nhanh nào được định cấu hình."
+
+#: templates/settings/content.php:83
+msgid "Normal"
+msgstr "Bình thường"
+
+#: assets/js/screens/reports.js:80
+msgid "No sales found."
+msgstr "Không tìm thấy doanh số bán hàng."
+
+#: templates/cashier/header.php:10
+msgid "No shift context"
+msgstr "Không có thông tin ca làm việc"
+
+#: templates/cashier/content.php:11 assets/js/screens/cashier.js:70
+msgid "No shift open"
+msgstr "Không mở ca"
+
+#: assets/js/components/coupon-selector.js:36
+msgid "No suggested coupons. You can still enter a code."
+msgstr "Không có mã giảm giá được đề xuất. Bạn vẫn có thể nhập mã."
+
+#: assets/js/components/cart-context.js:231
+msgid "No tables are available."
+msgstr "Không có bàn nào khả dụng."
+
+#: templates/components/cart-item.php:21
+msgid "Note: "
+msgstr "Ghi chú:"
+
+#: templates/components/cart-item.php:21
+msgid "Note: -"
+msgstr "Ghi chú: -"
+
+#: templates/components/empty-state.php:9
+msgid "Nothing here yet"
+msgstr "Chưa có gì ở đây"
+
+#: includes/REST/RestResponder.php:183
+msgid "One or more order filters are invalid."
+msgstr "Một hoặc nhiều bộ lọc đơn hàng không hợp lệ."
+
+#: templates/shifts/content.php:23
+msgid "Open"
+msgstr "Mở"
+
+#: assets/js/screens/cashier.js:400
+msgid "Open a shift before checkout."
+msgstr "Mở ca trước khi thanh toán."
+
+#: includes/REST/RestResponder.php:176
+msgid "Open a shift before completing checkout."
+msgstr "Mở ca trước khi hoàn tất thanh toán."
+
+#: assets/js/screens/customer.js:148
+msgid "Open Customer Display from the Cashier screen to pair it."
+msgstr "Mở Màn hình khách hàng từ màn hình Thu ngân để ghép nối."
+
+#: templates/shifts/content.php:16 templates/shifts/content.php:26
+msgid "Opening cash"
+msgstr "Tiền đầu ca"
+
+#: templates/shifts/content.php:17
+msgid "Opening note"
+msgstr "Ghi chú mở đầu"
+
+#: templates/shifts/content.php:13 templates/shifts/content.php:18
+msgid "Open shift"
+msgstr "Mở ca"
+
+#: templates/settings/content.php:138
+msgid "Operational screens"
+msgstr "Màn hình vận hành"
+
+#: templates/kds/content.php:7 templates/order-history/content.php:8 templates/order-queue/content.php:7 templates/reports/content.php:14 templates/shifts/content.php:7
+msgid "Operations"
+msgstr "Vận hành"
+
+#: templates/components/product-modal.php:46
+msgid "Options"
+msgstr "Tùy chọn"
+
+#: includes/Infrastructure/Assets/AssetLoader.php:130 templates/components/product-card.php:49 assets/js/components/catalog-renderer.js:39
+msgid "Options available"
+msgstr "Tùy chọn có sẵn"
+
+#: templates/components/kds-templates.php:7 templates/components/order-queue-templates.php:7 templates/components/payment-success.php:9 templates/receipt/receipt.php:6 templates/settings/content.php:152
+msgid "Order"
+msgstr "Đơn hàng"
+
+#: assets/js/screens/order-history.js:36 assets/js/screens/order-history.js:51
+msgid "Order #%s"
+msgstr "Đơn hàng #%s"
+
+#: templates/order-history/content.php:17
+msgid "Order, customer, product…"
+msgstr "Đơn hàng, khách hàng, sản phẩm…"
+
+#: assets/js/screens/order-queue.js:31
+msgid "Order cancelled."
+msgstr "Đơn hàng bị hủy."
+
+#: assets/js/screens/order-queue.js:31
+msgid "Order completed."
+msgstr "Đơn hàng đã hoàn tất."
+
+#: assets/js/components/customer-payment.js:21
+msgid "Order completed successfully"
+msgstr "Đơn hàng đã hoàn tất thành công"
+
+#: assets/js/screens/kds.js:43 assets/js/screens/order-queue.js:33
+msgid "Order could not be updated."
+msgstr "Đơn hàng không thể được cập nhật."
+
+#: templates/customer/cart.php:30
+msgid "Order details"
+msgstr "Chi tiết đơn hàng"
+
+#: includes/POS/Router.php:187 templates/order-history/content.php:8 templates/order-history/index.php:9
+msgid "Order History"
+msgstr "Lịch sử đơn hàng"
+
+#: templates/order-history/content.php:25
+msgid "Order history pages"
+msgstr "Các trang lịch sử đơn hàng"
+
+#: templates/cashier/cart-panel.php:117 templates/components/order-note-dialog.php:16 templates/order-history/content.php:35 templates/receipt/receipt.php:16
+msgid "Order note"
+msgstr "Ghi chú đơn hàng"
+
+#: includes/POS/Router.php:185 templates/order-queue/content.php:7 templates/order-queue/index.php:9
+msgid "Order Queue"
+msgstr "Hàng đợi đơn hàng"
+
+#: templates/settings/content.php:141
+msgid "Order Queue polling interval (ms)"
+msgstr "Khoảng thời gian cập nhật Hàng đợi đơn hàng (ms)"
+
+#: templates/reports/content.php:69 templates/reports/content.php:100 templates/reports/content.php:116
+msgid "orders"
+msgstr "đơn hàng"
+
+#: templates/reports/content.php:72 templates/shifts/content.php:31
+msgid "Orders"
+msgstr "Đơn hàng"
+
+#: templates/order-history/content.php:22
+msgid "orders found"
+msgstr "đơn hàng được tìm thấy"
+
+#: includes/Application/Reports/SalesReportService.php:147
+msgid "Orders use multiple currencies. Monetary totals are shown separately and are never converted or combined."
+msgstr "Đơn hàng sử dụng nhiều loại tiền tệ. Tổng số tiền được hiển thị riêng biệt và không bao giờ được chuyển đổi hoặc kết hợp."
+
+#: templates/order-history/content.php:16
+msgid "Order type"
+msgstr "Loại đơn hàng"
+
+#: assets/js/screens/kds.js:40
+msgid "Order updated."
+msgstr "Đã cập nhật đơn hàng."
+
+#: includes/Infrastructure/Assets/AssetLoader.php:129 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
+msgid "Out of stock"
+msgstr "Hết hàng"
+
+#: assets/js/screens/order-history.js:41
+msgid "Page %1$s of %2$s"
+msgstr "Trang %1$s của %2$s"
+
+#: assets/js/screens/order-history.js:41
+msgid "Page 0 of 0"
+msgstr "Trang 0 trên 0"
+
+#: templates/reports/content.php:72
+msgid "Paid CoffeePOS orders"
+msgstr "Đơn hàng CoffeePOS đã thanh toán"
+
+#: templates/components/drawer.php:13
+msgid "Panel"
+msgstr "bảng điều khiển"
+
+#: templates/settings/content.php:184
+msgid "Paper width"
+msgstr "Chiều rộng giấy"
+
+#: templates/login/content.php:44
+msgid "Password"
+msgstr "Mật khẩu"
+
+#: templates/order-history/content.php:33 templates/receipt/receipt.php:11
+msgid "Payment"
+msgstr "Thanh toán"
+
+#: templates/reports/content.php:79
+msgid "Payment composition"
+msgstr "Thành phần thanh toán"
+
+#: assets/js/components/customer-cart.js:27
+msgid "Payment pending"
+msgstr "Đang chờ thanh toán"
+
+#: assets/js/components/checkout.js:173
+msgid "Payment pending verification."
+msgstr "Thanh toán đang chờ xác minh."
+
+#: templates/settings/content.php:123
+msgid "Payments"
+msgstr "Thanh toán"
+
+#: assets/js/components/checkout.js:208
+msgid "Payment status could not be refreshed."
+msgstr "Không thể làm mới trạng thái thanh toán."
+
+#: templates/components/payment-success.php:8 assets/js/components/customer-cart.js:27
+msgid "Payment successful"
+msgstr "Thanh toán thành công"
+
+#: templates/reports/content.php:83
+msgid "Peak hours"
+msgstr "Giờ cao điểm"
+
+#: templates/settings/content.php:201
+msgid "Phone"
+msgstr "Điện thoại"
+
+#: templates/settings/content.php:194
+msgid "Phone is always required and remains privacy-masked on Customer Display."
+msgstr "Số điện thoại luôn bắt buộc và luôn được che bớt trên Màn hình khách hàng."
+
+#: templates/components/context-dialogs.php:21 templates/components/context-dialogs.php:33 templates/settings/content.php:55
+msgid "Phone number"
+msgstr "Số điện thoại"
+
+#: includes/POS/SettingsScreen.php:205
+msgid "PHP version"
+msgstr "Phiên bản PHP"
+
+#: assets/js/components/customer-payment.js:24
+msgid "Please give the cash payment to the cashier"
+msgstr "Vui lòng đưa khoản thanh toán bằng tiền mặt cho nhân viên thu ngân"
+
+#: assets/js/components/customer-cart.js:27
+msgid "Please review your order"
+msgstr "Vui lòng xem lại đơn hàng của bạn"
+
+#: assets/js/components/customer-payment.js:23
+msgid "Please scan the QR to transfer payment"
+msgstr "Vui lòng quét QR để chuyển khoản thanh toán"
+
+#: templates/settings/content.php:138
+msgid "Polling intervals are limited to 3000–60000 milliseconds."
+msgstr "Khoảng thời gian cập nhật được giới hạn từ 3000 đến 60000 mili giây."
+
+#: templates/settings/content.php:211
+msgid "POS base URL"
+msgstr "URL cơ sở POS"
+
+#: includes/POS/SettingsScreen.php:184
+msgid "POS base URL may contain only lowercase letters, numbers, and hyphens."
+msgstr "URL cơ sở POS chỉ có thể chứa chữ cái viết thường, số và dấu gạch nối."
+
+#: templates/settings/content.php:66
+msgid "POS logo"
+msgstr "biểu tượng POS"
+
+#: includes/POS/SettingsScreen.php:207
+msgid "POS route"
+msgstr "Đường dẫn POS"
+
+#: templates/settings/content.php:53
+msgid "POS store name"
+msgstr "Tên cửa hàng POS"
+
+#: includes/POS/SettingsScreen.php:155
+msgid "POS store name is required."
+msgstr "Tên cửa hàng POS là bắt buộc."
+
+#: templates/kds/content.php:17 templates/order-queue/content.php:11
+msgid "Preparing"
+msgstr "Chuẩn bị"
+
+#: assets/js/screens/reports.js:114
+msgid "Preparing %s export…"
+msgstr "Đang chuẩn bị xuất %s…"
+
+#: assets/js/components/checkout.js:70
+msgid "Preparing QR…"
+msgstr "Đang chuẩn bị QR…"
+
+#: assets/js/components/checkout.js:56
+msgid "Preview change: %s"
+msgstr "Tiền thừa dự kiến: %s"
+
+#: templates/order-history/content.php:25
+msgid "Previous"
+msgstr "Trước"
+
+#: templates/components/payment-success.php:13 templates/order-history/content.php:38
+msgid "Print receipt"
+msgstr "In hóa đơn"
+
+#: templates/settings/content.php:187
+msgid "Print the private order note on receipts"
+msgstr "In ghi chú riêng của đơn hàng trên hóa đơn"
+
+#: templates/components/order-note-dialog.php:21
+msgid "Private note for the whole order"
+msgstr "Ghi chú riêng cho toàn bộ đơn hàng"
+
+#: assets/js/components/product-modal.js:95
+msgid "Product"
+msgstr "Sản phẩm"
+
+#: templates/cashier/menu-panel.php:38
+msgid "Product categories"
+msgstr "Danh mục sản phẩm"
+
+#: templates/components/product-modal.php:29
+msgid "Product configuration unavailable"
+msgstr "Không thể tải cấu hình sản phẩm"
+
+#: includes/Infrastructure/Assets/AssetLoader.php:131 assets/js/components/product-modal.js:109
+msgid "Product could not be loaded."
+msgstr "Không thể tải sản phẩm."
+
+#: templates/settings/content.php:152
+msgid "Product IDs"
+msgstr "ID sản phẩm"
+
+#: templates/reports/content.php:40
+msgid "Product rows"
+msgstr "Hàng sản phẩm"
+
+#: templates/reports/content.php:74
+msgid "Products sold"
+msgstr "Sản phẩm đã bán"
+
+#: templates/components/product-modal.php:63
+msgid "Quantity"
+msgstr "Số lượng"
+
+#: templates/components/product-modal.php:58
+msgid "Quick-note labels appear on separate lines. Add any other preparation instructions here."
+msgstr "Nhãn ghi chú nhanh xuất hiện trên các dòng riêng biệt. Thêm bất kỳ hướng dẫn chuẩn bị nào khác ở đây."
+
+#: includes/POS/SettingsScreen.php:141
+msgid "Quick note ID \"%s\" is duplicated. IDs must be unique."
+msgstr "ID ghi chú nhanh \"%s\" bị trùng lặp. ID phải là duy nhất."
+
+#: includes/POS/SettingsScreen.php:131
+msgid "Quick note IDs may contain only lowercase letters, numbers, underscores, and hyphens."
+msgstr "ID ghi chú nhanh chỉ có thể chứa chữ cái viết thường, số, dấu gạch dưới và dấu gạch nối."
+
+#: templates/components/product-modal.php:51
+msgid "Quick notes"
+msgstr "Ghi chú nhanh"
+
+#: templates/order-history/content.php:38
+msgid "Quick reorder"
+msgstr "Tạo lại đơn nhanh"
+
+#: templates/kds/content.php:18 templates/order-queue/content.php:11
+msgid "Ready"
+msgstr "Sẵn sàng"
+
+#: templates/customer/cart.php:8 assets/js/components/customer-cart.js:27
+msgid "Ready when you are"
+msgstr "Sẵn sàng phục vụ"
+
+#: templates/order-history/content.php:42
+msgid "Reason"
+msgstr "Lý do"
+
+#: templates/receipt/receipt.php:5 templates/settings/content.php:182
+msgid "Receipt"
+msgstr "Hóa đơn"
+
+#: assets/js/components/checkout.js:251 assets/js/screens/order-queue.js:40
+msgid "Receipt could not be loaded."
+msgstr "Không thể tải hóa đơn."
+
+#: assets/js/components/receipt-printer.js:13
+msgid "Receipt data is incomplete."
+msgstr "Dữ liệu hóa đơn chưa đầy đủ."
+
+#: templates/settings/content.php:190
+msgid "Receipt footer"
+msgstr "Nội dung cuối hóa đơn"
+
+#: assets/js/components/receipt-printer.js:8
+msgid "Receipt template is unavailable."
+msgstr "Mẫu hóa đơn không khả dụng."
+
+#: templates/components/order-queue-templates.php:8
+msgid "Received"
+msgstr "Đã nhận"
+
+#: templates/components/checkout-modal.php:19
+msgid "Received amount"
+msgstr "Số tiền nhận được"
+
+#: assets/js/components/checkout.js:57
+msgid "Received amount is below total."
+msgstr "Số tiền nhận được dưới tổng số tiền."
+
+#: templates/customer/cart.php:45
+msgid "Reconnect display"
+msgstr "Kết nối lại màn hình"
+
+#: assets/js/screens/customer.js:38
+msgid "Recovering display state…"
+msgstr "Đang khôi phục trạng thái hiển thị…"
+
+#: templates/kds/content.php:11 templates/order-queue/content.php:8
+msgid "Refresh"
+msgstr "Làm mới"
+
+#: assets/js/screens/kds.js:61 assets/js/screens/order-queue.js:54
+msgid "Refresh failed"
+msgstr "Làm mới không thành công"
+
+#: assets/js/screens/kds.js:59 assets/js/screens/order-queue.js:54
+msgid "Refreshing…"
+msgstr "Đang làm mới…"
+
+#: templates/components/checkout-modal.php:34
+msgid "Refresh status"
+msgstr "Trạng thái làm mới"
+
+#: templates/order-history/content.php:38
+msgid "Refund"
+msgstr "Hoàn tiền"
+
+#: templates/order-history/content.php:42
+msgid "Refund amount"
+msgstr "Số tiền hoàn lại"
+
+#: templates/order-history/content.php:36 templates/receipt/receipt.php:15
+msgid "Refunded"
+msgstr "Đã hoàn tiền"
+
+#: templates/reports/content.php:101
+msgid "refunded"
+msgstr "được hoàn lại tiền"
+
+#: templates/order-history/content.php:42
+msgid "Refund order"
+msgstr "Hoàn tiền đơn hàng"
+
+#: templates/reports/content.php:75
+msgid "Refunds"
+msgstr "Hoàn tiền"
+
+#: templates/order-history/content.php:42
+msgid "Refunds are recorded by WooCommerce. Return money to the customer using the original offline payment method."
+msgstr "Khoản tiền hoàn lại được WooCommerce ghi lại. Trả lại tiền cho khách hàng bằng phương thức thanh toán ngoại tuyến ban đầu."
+
+#: templates/login/content.php:49
+msgid "Remember me"
+msgstr "nhớ tôi"
+
+#: templates/cashier/cart-panel.php:61 templates/settings/content.php:66 templates/settings/content.php:162 templates/settings/content.php:176
+msgid "Remove"
+msgstr "Xóa"
+
+#: assets/js/screens/cashier.js:364
+msgid "Remove all items from the current cart?"
+msgstr "Xóa tất cả các mặt hàng khỏi giỏ hàng hiện tại?"
+
+#: templates/cashier/cart-panel.php:109 templates/components/cart-item.php:28
+msgid "Remove item"
+msgstr "Xóa món"
+
+#: assets/js/screens/order-history.js:106
+msgid "Reorder order #%s?"
+msgstr "Tạo lại đơn hàng #%s?"
+
+#: includes/Application/Reports/SalesReportService.php:225
+msgid "Report date range cannot exceed 366 days."
+msgstr "Phạm vi ngày báo cáo không được vượt quá 366 ngày."
+
+#: includes/POS/Router.php:188 templates/reports/index.php:9
+msgid "Reports"
+msgstr "Báo cáo"
+
+#: templates/reports/content.php:15
+msgid "Reports & Analytics"
+msgstr "Báo cáo & Phân tích"
+
+#: includes/Application/Reports/SalesReportService.php:222
+msgid "Report start date must not be after end date."
+msgstr "Ngày bắt đầu báo cáo không được sau ngày kết thúc."
+
+#: assets/js/screens/reports.js:52
+msgid "Report unavailable. Adjust the filters or try again."
+msgstr "Không thể tải báo cáo. Hãy điều chỉnh bộ lọc hoặc thử lại."
+
+#: templates/components/order-queue-templates.php:13
+msgid "Reprint"
+msgstr "In lại"
+
+#: templates/settings/content.php:105
+msgid "Require an open shift before checkout"
+msgstr "Yêu cầu ca mở trước khi thanh toán"
+
+#: templates/settings/content.php:104
+msgid "Require a table for Dine-in"
+msgstr "Yêu cầu một bàn để dùng bữa"
+
+#: templates/settings/content.php:200
+msgid "Required fields when creating a member"
+msgstr "Các trường bắt buộc khi tạo hội viên"
+
+#: includes/POS/SettingsScreen.php:206
+msgid "REST API"
+msgstr "API REST"
+
+#: templates/components/error-state.php:17 templates/kds/content.php:21 templates/order-queue/content.php:15
+msgid "Retry"
+msgstr "Thử lại"
+
+#: templates/customer/menu.php:16
+msgid "Retry menu"
+msgstr "Trình đơn thử lại"
+
+#: templates/settings/content.php:208
+msgid "Routing, data portability and diagnostics"
+msgstr "Định tuyến, khả năng di chuyển dữ liệu và chẩn đoán"
+
+#: templates/settings/content.php:100 templates/shifts/content.php:46
+msgid "Sales"
+msgstr "Bán hàng"
+
+#: assets/js/screens/cashier.js:391
+msgid "Saved"
+msgstr "Đã lưu"
+
+#: templates/components/order-note-dialog.php:28
+msgid "Save note"
+msgstr "Lưu ghi chú"
+
+#: templates/settings/content.php:223
+msgid "Save settings"
+msgstr "Lưu cài đặt"
+
+#: includes/Infrastructure/Assets/AssetLoader.php:127 assets/js/components/product-modal.js:262
+msgid "Saving..."
+msgstr "Đang lưu..."
+
+#: assets/js/screens/cashier.js:389 assets/js/screens/cashier.js:394
+msgid "Saving…"
+msgstr "Đang lưu…"
+
+#: templates/components/context-dialogs.php:24 templates/order-history/content.php:17
+msgid "Search"
+msgstr "Tìm kiếm"
+
+#: templates/cashier/menu-panel.php:29
+msgid "Searching..."
+msgstr "Đang tìm kiếm..."
+
+#: assets/js/components/cart-context.js:127
+msgid "Searching for member…"
+msgstr "Đang tìm kiếm hội viên…"
+
+#: templates/cashier/menu-panel.php:12 templates/cashier/menu-panel.php:18
+msgid "Search products"
+msgstr "Tìm kiếm sản phẩm"
+
+#: assets/js/components/coupon-selector.js:36
+msgid "Select a coupon or enter a code."
+msgstr "Chọn một mã giảm giá hoặc nhập mã."
+
+#: templates/cashier/cart-panel.php:75
+msgid "Select a product to start an order."
+msgstr "Chọn một sản phẩm để bắt đầu đặt hàng."
+
+#: includes/REST/RestResponder.php:143
+msgid "Select a table for dine-in service."
+msgstr "Chọn bàn để phục vụ dùng bữa tại chỗ."
+
+#: includes/POS/SettingsScreen.php:160
+msgid "Select a valid IANA timezone."
+msgstr "Chọn múi giờ IANA hợp lệ."
+
+#: assets/js/screens/settings.js:92
+msgid "Select CoffeePOS logo"
+msgstr "Chọn logo CoffeePOS"
+
+#: templates/settings/content.php:66
+msgid "Select logo"
+msgstr "Chọn logo"
+
+#: templates/components/product-modal.php:52
+msgid "Select one or more. Selected labels are added to the item note."
+msgstr "Chọn một hoặc nhiều. Nhãn đã chọn sẽ được thêm vào ghi chú mục."
+
+#: templates/cashier/cart-panel.php:32
+msgid "Select or change table"
+msgstr "Chọn hoặc đổi bàn"
+
+#: templates/cashier/cart-panel.php:34 templates/components/context-dialogs.php:64 assets/js/screens/cashier.js:259
+msgid "Select table"
+msgstr "Chọn bàn"
+
+#: templates/components/order-queue-templates.php:8 templates/order-history/content.php:33 templates/order-queue/content.php:12 templates/receipt/receipt.php:10
+msgid "Service"
+msgstr "Dịch vụ"
+
+#: includes/POS/Router.php:201 templates/settings/content.php:33 templates/settings/index.php:9
+msgid "Settings"
+msgstr "Cài đặt"
+
+#: includes/POS/SettingsScreen.php:263
+msgid "Settings imported successfully."
+msgstr "Cài đặt đã được nhập thành công."
+
+#: includes/POS/SettingsScreen.php:16
+msgid "Settings saved."
+msgstr "Đã lưu cài đặt."
+
+#: assets/js/screens/shifts.js:26 assets/js/screens/shifts.js:37
+msgid "Shift #%s"
+msgstr "Ca #%s"
+
+#: assets/js/screens/cashier.js:70
+msgid "Shift #%s open"
+msgstr "Ca #%s đang mở"
+
+#: templates/shifts/content.php:41
+msgid "Shift history"
+msgstr "Lịch sử ca"
+
+#: templates/shifts/content.php:7
+msgid "Shift Management"
+msgstr "Quản lý ca làm việc"
+
+#: assets/js/screens/shifts.js:42
+msgid "Shift request failed."
+msgstr "Không thể thực hiện yêu cầu về ca làm việc."
+
+#: includes/POS/Router.php:186 templates/shifts/index.php:9
+msgid "Shifts"
+msgstr "Ca làm việc"
+
+#: assets/js/screens/cashier.js:73
+msgid "Shift unavailable"
+msgstr "Không thể tải thông tin ca làm việc"
+
+#: templates/settings/content.php:89
+msgid "Show product images"
+msgstr "Hiển thị hình ảnh sản phẩm"
+
+#: templates/login/content.php:51
+msgid "Sign in to CoffeePOS"
+msgstr "Đăng nhập vào CoffeePOS"
+
+#: templates/components/staff-navigation.php:61 templates/components/staff-navigation.php:63 templates/login/content.php:29
+msgid "Sign out"
+msgstr "Đăng xuất"
+
+#: templates/components/error-state.php:9
+msgid "Something went wrong."
+msgstr "Đã xảy ra lỗi."
+
+#: templates/kds/content.php:10 assets/js/screens/kds.js:31
+msgid "Sound off"
+msgstr "Tắt âm thanh"
+
+#: assets/js/screens/kds.js:31
+msgid "Sound on"
+msgstr "Bật âm thanh"
+
+#: templates/login/index.php:9
+msgid "Staff sign in"
+msgstr "Nhân viên đăng nhập"
+
+#: templates/components/checkout-modal.php:35 templates/components/payment-success.php:14
+msgid "Start new order"
+msgstr "Bắt đầu đơn hàng mới"
+
+#: templates/order-history/content.php:15 templates/order-queue/content.php:11
+msgid "Status"
+msgstr "Trạng thái"
+
+#: templates/settings/content.php:182
+msgid "Store identity comes from General. Core order totals and payment information are always printed."
+msgstr "Thông tin cửa hàng lấy từ mục Tổng quan. Tổng tiền đơn hàng và thông tin thanh toán luôn được in."
+
+#: templates/cashier/cart-panel.php:125 templates/customer/cart.php:18 templates/customer/cart.php:33 templates/order-history/content.php:36 templates/receipt/receipt.php:15
+msgid "Subtotal"
+msgstr "Tạm tính"
+
+#: templates/settings/content.php:219
+msgid "System diagnostics"
+msgstr "Chẩn đoán hệ thống"
+
+#: includes/Infrastructure/Settings/Settings.php:420
+msgid "Table 01"
+msgstr "Bàn 01"
+
+#: includes/Infrastructure/Settings/Settings.php:421
+msgid "Table 02"
+msgstr "Bàn 02"
+
+#: includes/Infrastructure/Settings/Settings.php:422
+msgid "Table 03"
+msgstr "Bàn 03"
+
+#: includes/Infrastructure/Settings/Settings.php:423
+msgid "Table 04"
+msgstr "Bàn 04"
+
+#: includes/Infrastructure/Settings/Settings.php:424
+msgid "Table 05"
+msgstr "Bàn 05"
+
+#: templates/settings/content.php:116
+msgid "Table list"
+msgstr "Danh sách bàn"
+
+#: assets/js/components/cart-context.js:237
+msgid "Tables could not be loaded."
+msgstr "Không thể tải danh sách bàn."
+
+#: templates/cashier/cart-panel.php:28 templates/order-history/content.php:16 templates/order-queue/content.php:12 templates/settings/content.php:102 assets/js/components/customer-cart.js:25 assets/js/screens/order-history.js:28
+msgid "Takeaway"
+msgstr "Mang đi"
+
+#: templates/customer/cart.php:40 assets/js/components/customer-cart.js:27
+msgid "Thank you!"
+msgstr "Cảm ơn quý khách!"
+
+#: templates/components/modal.php:27
+msgid "The action could not be completed."
+msgstr "Không thể hoàn thành hành động này."
+
+#: assets/js/components/checkout.js:134
+msgid "The cart changed. Review the updated total before submitting."
+msgstr "Giỏ hàng đã thay đổi. Hãy kiểm tra tổng tiền mới trước khi xác nhận."
+
+#: assets/js/screens/cashier.js:147
+msgid "The cart changed and was refreshed."
+msgstr "Giỏ hàng đã thay đổi và được làm mới."
+
+#: includes/REST/RestResponder.php:162
+msgid "The cart changed on another request. Review the latest cart and try again."
+msgstr "Giỏ hàng đã thay đổi theo yêu cầu khác. Xem lại giỏ hàng mới nhất và thử lại."
+
+#: assets/js/screens/cashier.js:196
+msgid "The cart could not be loaded."
+msgstr "Không thể tải giỏ hàng."
+
+#: includes/Infrastructure/Assets/AssetLoader.php:133 templates/cashier/cart-panel.php:88 assets/js/components/product-modal.js:421 assets/js/screens/cashier.js:165
+msgid "The cart could not be updated."
+msgstr "Không thể cập nhật giỏ hàng."
+
+#: includes/REST/RestResponder.php:163
+msgid "The cart is empty."
+msgstr "Giỏ hàng trống rỗng."
+
+#: includes/REST/RestResponder.php:159
+msgid "The cart is not available for this action."
+msgstr "Giỏ hàng không có sẵn cho hành động này."
+
+#: assets/js/screens/cashier.js:203
+msgid "The cart is not ready."
+msgstr "Giỏ hàng chưa sẵn sàng."
+
+#: includes/REST/RestResponder.php:161
+msgid "The cart session was not found."
+msgstr "Phiên giỏ hàng không được tìm thấy."
+
+#: templates/cashier/menu-panel.php:67 assets/js/screens/cashier.js:136
+msgid "The catalog could not be loaded."
+msgstr "Không thể tải danh mục."
+
+#: templates/cashier/menu-panel.php:60
+msgid "The catalog is empty."
+msgstr "Danh mục trống."
+
+#: includes/REST/RestResponder.php:164
+msgid "The coupon cannot be applied to this cart."
+msgstr "Mã giảm giá không thể được áp dụng cho giỏ hàng này."
+
+#: includes/REST/RestResponder.php:157
+msgid "The coupon is invalid."
+msgstr "Mã giảm giá không hợp lệ."
+
+#: includes/REST/RestResponder.php:152
+msgid "The customer could not be created."
+msgstr "Không thể tạo khách hàng."
+
+#: includes/REST/RestResponder.php:147
+msgid "The customer lookup is temporarily unavailable."
+msgstr "Việc tra cứu khách hàng tạm thời không khả dụng."
+
+#: includes/REST/RestResponder.php:145
+msgid "The customer was not found."
+msgstr "Khách hàng không được tìm thấy."
+
+#: templates/settings/content.php:118
+msgid "The displayed order follows the line order. Cashier loads this list when Dine-in is selected."
+msgstr "Thứ tự hiển thị theo thứ tự dòng. Nhân viên thu ngân tải danh sách này khi chọn Ăn tại chỗ."
+
+#: assets/js/api/client.js:118
+msgid "The download failed."
+msgstr "Việc tải xuống không thành công."
+
+#: includes/POS/SettingsScreen.php:231
+msgid "The import contains no supported CoffeePOS settings."
+msgstr "Quá trình nhập không chứa cài đặt CoffeePOS được hỗ trợ."
+
+#: includes/POS/SettingsScreen.php:237
+msgid "The imported settings disable every payment method."
+msgstr "Cài đặt đã nhập sẽ vô hiệu hóa mọi phương thức thanh toán."
+
+#: assets/js/screens/customer.js:137
+msgid "The menu could not be loaded."
+msgstr "Không thể tải menu."
+
+#: assets/js/components/customer-catalog.js:25
+msgid "The menu is currently empty."
+msgstr "Menu hiện đang trống."
+
+#: includes/REST/RestResponder.php:172
+msgid "The order cannot perform this transition."
+msgstr "Không thể chuyển đơn hàng sang trạng thái này."
+
+#: includes/REST/RestResponder.php:175
+msgid "The order changed on another screen. Refresh and try again."
+msgstr "Đơn hàng đã thay đổi trên màn hình khác. Hãy làm mới và thử lại."
+
+#: includes/REST/RestResponder.php:186
+msgid "The order could not be reordered."
+msgstr "Không thể tạo lại đơn hàng."
+
+#: includes/REST/RestResponder.php:160
+msgid "The order note is invalid or too long."
+msgstr "Ghi chú đơn hàng không hợp lệ hoặc quá dài."
+
+#: templates/components/checkout-modal.php:30
+msgid "The order remains pending until a trusted provider verifies payment."
+msgstr "Đơn hàng vẫn đang chờ xử lý cho đến khi nhà cung cấp đáng tin cậy xác minh khoản thanh toán."
+
+#: includes/REST/RestResponder.php:173
+msgid "The order was not found."
+msgstr "Đơn hàng không được tìm thấy."
+
+#: assets/js/screens/customer.js:148
+msgid "The pairing link is invalid. Open Customer Display from Cashier."
+msgstr "Liên kết ghép nối không hợp lệ. Mở Màn hình hiển thị khách hàng từ nhân viên thu ngân."
+
+#: includes/REST/RestResponder.php:168
+msgid "The payment could not be completed."
+msgstr "Việc thanh toán không thể được hoàn thành."
+
+#: includes/REST/RestResponder.php:171
+msgid "The payment could not be verified."
+msgstr "Không thể xác minh khoản thanh toán."
+
+#: includes/REST/RestResponder.php:165
+msgid "The payment information is invalid."
+msgstr "Thông tin thanh toán không hợp lệ."
+
+#: includes/REST/RestResponder.php:170
+msgid "The payment provider is unavailable."
+msgstr "Nhà cung cấp dịch vụ thanh toán không khả dụng."
+
+#: assets/js/components/checkout.js:225
+msgid "The pending checkout could not be recovered."
+msgstr "Không thể khôi phục giao dịch thanh toán đang chờ xử lý."
+
+#: includes/REST/RestResponder.php:194
+msgid "The POS request could not be completed."
+msgstr "Yêu cầu POS không thể hoàn thành."
+
+#: includes/REST/RestResponder.php:137
+msgid "The product is invalid or unavailable."
+msgstr "Sản phẩm không hợp lệ hoặc không khả dụng."
+
+#: assets/js/components/checkout.js:80
+msgid "The QR is displayed on Customer Display. Confirm only after the transfer appears in the bank."
+msgstr "Mã QR đang hiển thị trên Màn hình khách hàng. Chỉ xác nhận sau khi giao dịch đã xuất hiện trong tài khoản ngân hàng."
+
+#: includes/REST/RestResponder.php:185
+msgid "The refund could not be completed."
+msgstr "Việc hoàn trả không thể được hoàn thành."
+
+#: includes/REST/RestResponder.php:184
+msgid "The refund information is invalid."
+msgstr "Thông tin hoàn tiền không hợp lệ."
+
+#: includes/REST/RestResponder.php:189 assets/js/screens/reports.js:50
+msgid "The report could not be loaded."
+msgstr "Không thể tải báo cáo."
+
+#: includes/REST/RestResponder.php:187
+msgid "The report date range is invalid."
+msgstr "Phạm vi ngày báo cáo không hợp lệ."
+
+#: includes/REST/RestResponder.php:188
+msgid "The report date range is too large."
+msgstr "Phạm vi ngày báo cáo quá lớn."
+
+#: includes/REST/RestResponder.php:190
+msgid "The report export could not be created."
+msgstr "Không thể tạo báo cáo xuất."
+
+#: assets/js/screens/order-history.js:29
+msgid "The request could not be completed."
+msgstr "Yêu cầu không thể được hoàn thành."
+
+#: includes/REST/RestResponder.php:141
+msgid "The requested item is out of stock."
+msgstr "Mặt hàng yêu cầu đã hết hàng."
+
+#: assets/js/api/client.js:10 assets/js/api/client.js:77
+msgid "The request failed."
+msgstr "Yêu cầu không thành công."
+
+#: includes/REST/RestResponder.php:155
+msgid "The selected customer is invalid."
+msgstr "Khách hàng đã chọn không hợp lệ."
+
+#: includes/POS/SettingsScreen.php:193
+msgid "The selected POS logo is not a valid image attachment."
+msgstr "Logo POS đã chọn không phải là tệp đính kèm hình ảnh hợp lệ."
+
+#: includes/REST/RestResponder.php:140
+msgid "The selected quantity is invalid."
+msgstr "Số lượng đã chọn không hợp lệ."
+
+#: includes/REST/RestResponder.php:142
+msgid "The selected service type is invalid."
+msgstr "Loại dịch vụ đã chọn không hợp lệ."
+
+#: includes/REST/RestResponder.php:156
+msgid "The selected table is invalid."
+msgstr "Bảng đã chọn không hợp lệ."
+
+#: includes/REST/RestResponder.php:138
+msgid "The selected variation is invalid."
+msgstr "Biến thể đã chọn không hợp lệ."
+
+#: includes/REST/RestResponder.php:139
+msgid "The selected variation was not found."
+msgstr "Không tìm thấy biến thể đã chọn."
+
+#: assets/js/api/client.js:59 assets/js/api/client.js:107
+msgid "The server could not be reached."
+msgstr "Máy chủ không thể kết nối được."
+
+#: assets/js/api/client.js:84
+msgid "The server returned an invalid data envelope."
+msgstr "Máy chủ trả về gói dữ liệu không hợp lệ."
+
+#: assets/js/api/client.js:67
+msgid "The server returned an invalid response."
+msgstr "Máy chủ trả về phản hồi không hợp lệ."
+
+#: includes/POS/SettingsScreen.php:33
+msgid "The settings form expired. Please try again."
+msgstr "Biểu mẫu cài đặt đã hết hạn. Vui lòng thử lại."
+
+#: includes/REST/RestResponder.php:179
+msgid "The shift changed on another request."
+msgstr "Ca làm việc đã thay đổi theo một yêu cầu khác."
+
+#: includes/REST/RestResponder.php:180
+msgid "The shift could not be saved."
+msgstr "Không thể lưu ca làm việc."
+
+#: includes/REST/RestResponder.php:182
+msgid "The shift note is invalid or too long."
+msgstr "Ghi chú ca không hợp lệ hoặc quá dài."
+
+#: includes/REST/RestResponder.php:178
+msgid "The shift was not found."
+msgstr "Không tìm thấy ca làm việc."
+
+#: includes/POS/Router.php:228
+msgid "The username/email or password is incorrect."
+msgstr "Tên người dùng/email hoặc mật khẩu không chính xác."
+
+#: includes/REST/RestResponder.php:167
+msgid "The WooCommerce order could not be created."
+msgstr "Không thể tạo đơn hàng WooCommerce."
+
+#: assets/js/screens/order-queue.js:47
+msgid "This cancels preparation and the WooCommerce order. It does not refund payment."
+msgstr "Điều này hủy bỏ việc chuẩn bị và đơn hàng WooCommerce. Nó không hoàn lại tiền thanh toán."
+
+#: assets/js/screens/order-history.js:105
+msgid "This cancels the WooCommerce order but does not return money. Use Refund when money must be returned."
+msgstr "Điều này sẽ hủy đơn hàng WooCommerce nhưng không trả lại tiền. Sử dụng Hoàn tiền khi phải trả lại tiền."
+
+#: includes/REST/RestResponder.php:177
+msgid "This cashier already has an open shift."
+msgstr "Nhân viên thu ngân này đã có ca mở."
+
+#: includes/REST/RestResponder.php:154
+msgid "This customer request was already used with different information."
+msgstr "Yêu cầu của khách hàng này đã được sử dụng với thông tin khác."
+
+#: assets/js/screens/customer.js:130
+msgid "This display must use the same browser profile and requires BroadcastChannel support."
+msgstr "Màn hình này phải sử dụng cùng một cấu hình trình duyệt và yêu cầu hỗ trợ BroadcastChannel."
+
+#: includes/REST/RestResponder.php:174
+msgid "This operation was already used with different information."
+msgstr "Hoạt động này đã được sử dụng với các thông tin khác nhau."
+
+#: assets/js/screens/customer.js:118
+msgid "This paired cart has expired. Open the display again from Cashier."
+msgstr "Giỏ hàng được ghép nối này đã hết hạn. Mở lại màn hình từ Thu ngân."
+
+#: assets/js/components/cart-context.js:204
+msgid "This phone already belongs to a member. Confirm to use it."
+msgstr "Điện thoại này đã thuộc về một hội viên. Xác nhận để sử dụng nó."
+
+#: includes/REST/RestResponder.php:191
+msgid "This report export format is unavailable on the server."
+msgstr "Máy chủ không hỗ trợ định dạng xuất báo cáo này."
+
+#: includes/Infrastructure/Assets/AssetLoader.php:132 assets/js/components/product-modal.js:306
+msgid "This variation is unavailable."
+msgstr "Biến thể này không khả dụng."
+
+#: templates/settings/content.php:61
+msgid "Time format"
+msgstr "Định dạng thời gian"
+
+#: includes/POS/SettingsScreen.php:208 templates/settings/content.php:59
+msgid "Timezone"
+msgstr "Múi giờ"
+
+#: templates/order-history/content.php:14 templates/reports/content.php:36
+msgid "To"
+msgstr "ĐẾN"
+
+#: templates/reports/content.php:24
+msgid "Today"
+msgstr "Hôm nay"
+
+#: templates/cashier/cart-panel.php:133 templates/components/checkout-modal.php:13 templates/components/order-queue-templates.php:8 templates/components/payment-success.php:10 templates/customer/cart.php:20 templates/customer/cart.php:35 templates/order-history/content.php:36 templates/receipt/receipt.php:15
+msgid "Total"
+msgstr "Tổng cộng"
+
+#: templates/shifts/content.php:29
+msgid "Total sales"
+msgstr "Tổng doanh thu"
+
+#: templates/settings/content.php:133
+msgid "Transfer reference prefix"
+msgstr "Tiền tố nội dung chuyển khoản"
+
+#: templates/reports/content.php:64
+msgid "Try another date range. Cancelled, pending, failed, and non-CoffeePOS orders are excluded."
+msgstr "Hãy thử một phạm vi ngày khác. Các đơn hàng bị hủy, đang chờ xử lý, không thành công và không phải CoffeePOS đều bị loại trừ."
+
+#: templates/components/error-state.php:13
+msgid "Unable to continue"
+msgstr "Không thể tiếp tục"
+
+#: assets/js/screens/kds.js:61 assets/js/screens/order-queue.js:54
+msgid "Unable to load orders."
+msgstr "Không thể tải đơn hàng."
+
+#: includes/POS/SettingsScreen.php:204 includes/POS/SettingsScreen.php:206
+msgid "Unavailable"
+msgstr "Không có sẵn"
+
+#: includes/REST/RestResponder.php:52
+msgid "Unexpected error while processing the POS request."
+msgstr "Lỗi không mong muốn khi xử lý yêu cầu POS."
+
+#: includes/Application/Reports/SalesReportService.php:313
+msgid "Unknown"
+msgstr "Không xác định"
+
+#: includes/Application/Reports/SalesReportService.php:192
+msgid "Unknown report date preset."
+msgstr "Đặt trước ngày báo cáo không xác định."
+
+#: includes/Application/Reports/ReportExporter.php:23
+msgid "Unsupported report export format."
+msgstr "Định dạng xuất báo cáo không được hỗ trợ."
+
+#: assets/js/screens/kds.js:60 assets/js/screens/order-queue.js:54
+msgid "Updated now"
+msgstr "Vừa cập nhật"
+
+#: includes/Infrastructure/Assets/AssetLoader.php:126 assets/js/components/product-modal.js:263
+msgid "Update item"
+msgstr "Cập nhật món"
+
+#: templates/cashier/cart-panel.php:82
+msgid "Updating cart..."
+msgstr "Đang cập nhật giỏ hàng..."
+
+#: assets/js/components/cart-context.js:247
+msgid "Updating service..."
+msgstr "Đang cập nhật dịch vụ..."
+
+#: templates/settings/content.php:66
+msgid "Used on Login, Customer Display and receipt."
+msgstr "Được sử dụng khi Đăng nhập, Hiển thị khách hàng và biên nhận."
+
+#: templates/cashier/cart-panel.php:51
+msgid "Use guest"
+msgstr "Sử dụng khách"
+
+#: templates/components/context-dialogs.php:56
+msgid "Use member"
+msgstr "Sử dụng hội viên"
+
+#: templates/login/content.php:40
+msgid "Username or email"
+msgstr "Tên người dùng hoặc email"
+
+#: assets/js/screens/settings.js:92
+msgid "Use this logo"
+msgstr "Sử dụng biểu tượng này"
+
+#: templates/shifts/content.php:46
+msgid "Variance"
+msgstr "Chênh lệch"
+
+#: templates/components/product-modal.php:40 templates/components/variation-selector.php:13
+msgid "Variations"
+msgstr "Các biến thể"
+
+#: assets/js/components/checkout.js:81
+msgid "VietQR beneficiary is not configured."
+msgstr "Người thụ hưởng VietQR chưa được cấu hình."
+
+#: assets/js/components/checkout.js:173
+msgid "VietQR beneficiary is not configured. Order remains pending."
+msgstr "Người thụ hưởng VietQR chưa được cấu hình. Đơn hàng vẫn đang chờ xử lý."
+
+#: assets/js/components/checkout.js:87
+msgid "VietQR could not be prepared."
+msgstr "Không thể tạo mã VietQR."
+
+#: templates/components/checkout-modal.php:31 templates/customer/cart.php:26
+msgid "VietQR payment code"
+msgstr "Mã thanh toán VietQR"
+
+#: templates/settings/content.php:132
+msgid "VietQR template"
+msgstr "Mẫu VietQR"
+
+#: assets/js/components/cart-context.js:157
+msgid "Waiting to search…"
+msgstr "Đang chờ tìm kiếm…"
+
+#: templates/customer/menu.php:10
+msgid "Welcome to"
+msgstr "Chào mừng đến với"
+
+#: templates/reports/content.php:75
+msgid "WooCommerce total refunded"
+msgstr "Tổng tiền đã hoàn trong WooCommerce"
+
+#: includes/POS/SettingsScreen.php:204
+msgid "WooCommerce version"
+msgstr "Phiên bản WooCommerce"
+
+#: includes/POS/SettingsScreen.php:203
+msgid "WordPress version"
+msgstr "Phiên bản WordPress"
+
+#: templates/components/modal.php:21
+msgid "Working..."
+msgstr "Đang làm việc..."
+
+#: templates/reports/content.php:25
+msgid "Yesterday"
+msgstr "Hôm qua"
+
+#: includes/POS/Router.php:121
+msgid "You are not allowed to access CoffeePOS."
+msgstr "Bạn không được phép truy cập CoffeePOS."
+
+#: includes/REST/CartController.php:187 includes/REST/CheckoutController.php:84 includes/REST/HealthController.php:36 includes/REST/ProductController.php:103
+msgid "You are not allowed to access CoffeePOS REST endpoints."
+msgstr "Bạn không được phép truy cập điểm cuối REST của CoffeePOS."
+
+#: includes/REST/OrderHistoryController.php:51
+msgid "You are not allowed to access order history."
+msgstr "Bạn không được phép truy cập lịch sử đơn hàng."
+
+#: includes/REST/ShiftController.php:45
+msgid "You are not allowed to access shifts."
+msgstr "Bạn không được phép truy cập ca làm việc."
+
+#: includes/REST/OperationalOrderController.php:79
+msgid "You are not allowed to perform this CoffeePOS operation."
+msgstr "Bạn không được phép thực hiện thao tác CoffeePOS này."
+
+#: includes/REST/CheckoutController.php:91
+msgid "You are not allowed to print receipts."
+msgstr "Bạn không có quyền in hóa đơn."
+
+#: includes/REST/OrderHistoryController.php:52
+msgid "You are not allowed to refund orders."
+msgstr "Bạn không có quyền hoàn tiền đơn hàng."
+
+#: includes/REST/OrderHistoryController.php:53
+msgid "You are not allowed to reorder orders."
+msgstr "Bạn không có quyền tạo lại đơn hàng."
+
+#: includes/POS/SettingsScreen.php:22
+msgid "You are not allowed to update CoffeePOS settings."
+msgstr "Bạn không được phép cập nhật cài đặt CoffeePOS."
+
+#: includes/REST/ReportController.php:49
+msgid "You are not allowed to view CoffeePOS reports."
+msgstr "Bạn không được phép xem báo cáo của CoffeePOS."
+
+#: templates/cashier/cart-panel.php:74
+msgid "Your cart is empty"
+msgstr "Giỏ hàng đang trống"
+
+#: includes/POS/Router.php:217
+msgid "Your login form expired. Please try again."
+msgstr "Mẫu đăng nhập của bạn đã hết hạn. Vui lòng thử lại."
+
+#: templates/customer/cart.php:7 assets/js/components/customer-cart.js:27
+msgid "Your order"
+msgstr "Đơn hàng của bạn"
+
+#: templates/customer/cart.php:41
+msgid "Your order has been received."
+msgstr "Đơn hàng của bạn đã được nhận."
+
+#: templates/customer/cart.php:16
+msgid "Your selected items will appear here."
+msgstr "Các mục đã chọn của bạn sẽ xuất hiện ở đây."
+
+#: templates/login/content.php:27
+msgid "Your WordPress account is signed in but has no CoffeePOS screen permission. Contact an administrator."
+msgstr "Tài khoản WordPress của bạn đã đăng nhập nhưng không có quyền truy cập màn hình CoffeePOS. Liên hệ với quản trị viên."

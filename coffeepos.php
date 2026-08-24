@@ -1,12 +1,16 @@
 <?php
 /**
  * Plugin Name: CoffeePOS
- * Description: CoffeePOS foundational infrastructure for WooCommerce-powered POS workflows.
- * Version: 0.0.13
+ * Description: A WooCommerce-powered point of sale for coffee shops, with cashier, customer display, kitchen, queue, shifts, reports, and receipts.
+ * Version: 1.0.0
  * Requires at least: 6.4
  * Requires PHP: 7.4
+ * Requires Plugins: woocommerce
  * Author: CoffeePOS
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: coffeepos
+ * Domain Path: /languages
  */
 
 declare(strict_types=1);
@@ -15,7 +19,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('COFFEEPOS_VERSION', '0.0.13');
+define('COFFEEPOS_VERSION', '1.0.0');
 define('COFFEEPOS_FILE', __FILE__);
 define('COFFEEPOS_PATH', plugin_dir_path(__FILE__));
 define('COFFEEPOS_URL', plugin_dir_url(__FILE__));
@@ -43,5 +47,6 @@ register_activation_hook(COFFEEPOS_FILE, ['CoffeePOS\\Core\\Lifecycle', 'activat
 register_deactivation_hook(COFFEEPOS_FILE, ['CoffeePOS\\Core\\Lifecycle', 'deactivate']);
 
 add_action('plugins_loaded', static function (): void {
+    load_plugin_textdomain('coffeepos', false, dirname(COFFEEPOS_BASENAME) . '/languages');
     (new CoffeePOS\Core\Bootstrap())->run();
 });

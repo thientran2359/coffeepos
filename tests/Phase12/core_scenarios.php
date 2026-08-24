@@ -68,7 +68,7 @@ foreach ([Capabilities::ACCESS_KDS, Capabilities::ACCESS_ORDER_QUEUE, Capabiliti
     $assert(strpos($controllers, strtoupper(str_replace('coffeepos_', '', $capability))) !== false, 'TC-14 granular endpoint capability missing: ' . $capability);
 }
 $settings = $source('includes/Infrastructure/Settings/Settings.php');
-$assert(strpos($settings, "'less_sugar', 'label' => 'Ít đường'") !== false && strpos($settings, 'OPTION_RECEIPT_PRINT_ORDER_NOTE') !== false, 'TC-15 Phase-12 quick-note/receipt defaults are missing.');
+$assert(strpos($settings, "'less_sugar', 'label' => __('Less sugar', 'coffeepos')") !== false && strpos($settings, 'OPTION_RECEIPT_PRINT_ORDER_NOTE') !== false, 'TC-15 Phase-12 quick-note/receipt defaults are missing.');
 $assert(strpos($settings, 'if ($ids === [] || $ids ===') !== false, 'TC-15 Phase-12 upgrade must seed quick notes when the legacy option is empty.');
 $settingsUi = $source('templates/settings/content.php') . $source('includes/POS/SettingsScreen.php') . $source('assets/js/screens/settings.js') . $source('includes/Infrastructure/Assets/AssetLoader.php') . $source('assets/js/app.js');
 $assert(strpos($settingsUi, '[product_ids]') !== false && strpos($settings, 'sanitizeIdList') !== false, 'TC-15 quick-note applicability must be settings-editable and normalized.');

@@ -1,6 +1,7 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     const TYPES = [
         'display.ready', 'state.requested', 'state.snapshot', 'cart.updated',
         'customer.updated', 'checkout.started', 'payment.started',
@@ -26,13 +27,13 @@
         } catch (error) { return id(source); }
     }
     function channelName(sessionId) {
-        if (!validSessionId(sessionId)) { throw new Error('Invalid POS session id.'); }
+        if (!validSessionId(sessionId)) { throw new Error(__('Invalid POS session id.', 'coffeepos')); }
         return 'coffeepos:' + sessionId;
     }
     function createEnvelope(type, options) {
         const settings = options || {};
         if (TYPES.indexOf(type) === -1 || !validSessionId(settings.posSessionId) || !plainObject(settings.payload || {})) {
-            throw new Error('Invalid synchronization envelope input.');
+            throw new Error(__('Invalid synchronization envelope input.', 'coffeepos'));
         }
         return {
             version: 1,

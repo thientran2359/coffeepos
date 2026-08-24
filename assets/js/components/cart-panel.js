@@ -2,6 +2,7 @@
     'use strict';
 
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     const setState = CoffeePOS.core.setState;
 
     CoffeePOS.components = CoffeePOS.components || {};
@@ -90,11 +91,11 @@
                 orderNoteStatus.textContent = '';
             }
             if (orderNoteSummary) {
-                orderNoteSummary.textContent = note || 'No order note';
+                orderNoteSummary.textContent = note || __('No order note', 'coffeepos');
             }
             if (orderNoteTrigger) {
                 setState(orderNoteTrigger, note ? 'set' : 'empty');
-                orderNoteTrigger.setAttribute('aria-label', note ? 'Edit order note' : 'Add order note');
+                orderNoteTrigger.setAttribute('aria-label', note ? __('Edit order note', 'coffeepos') : __('Add order note', 'coffeepos'));
             }
 
             const ready = Boolean(cart && cart.validation && cart.validation.checkout_ready);

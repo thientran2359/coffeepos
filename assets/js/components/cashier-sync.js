@@ -1,6 +1,7 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     CoffeePOS.components = CoffeePOS.components || {};
 
     CoffeePOS.components.createCashierSyncBridge = function (root, toast) {
@@ -21,7 +22,7 @@
                 snapshot();
             },
             onError: function () {
-                if (toast) { toast.show('Customer Display synchronization is unavailable.', 'warning'); }
+                if (toast) { toast.show(__('Customer Display synchronization is unavailable.', 'coffeepos'), 'warning'); }
             }
         });
 
@@ -64,7 +65,7 @@
                     syncAvailable = true;
                 } catch (error) {
                     syncAvailable = false;
-                    if (toast) { toast.show('Customer Display synchronization is unavailable.', 'warning'); }
+                    if (toast) { toast.show(__('Customer Display synchronization is unavailable.', 'coffeepos'), 'warning'); }
                 }
                 workflowSequence = loadSequence(cart.pos_session_id);
                 payment = null; order = null;

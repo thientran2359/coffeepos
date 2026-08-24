@@ -2,6 +2,7 @@
     'use strict';
 
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     CoffeePOS.screens = CoffeePOS.screens || {};
 
     CoffeePOS.screens.createSettingsController = function (root) {
@@ -88,7 +89,7 @@
             if (!window.wp || !window.wp.media || !logoId || !logoPreview) {
                 return;
             }
-            mediaFrame = mediaFrame || window.wp.media({ title: 'Select CoffeePOS logo', button: { text: 'Use this logo' }, multiple: false, library: { type: 'image' } });
+            mediaFrame = mediaFrame || window.wp.media({ title: __('Select CoffeePOS logo', 'coffeepos'), button: { text: __('Use this logo', 'coffeepos') }, multiple: false, library: { type: 'image' } });
             mediaFrame.off('select').on('select', function () {
                 const attachment = mediaFrame.state().get('selection').first().toJSON();
                 logoId.value = String(attachment.id || '');

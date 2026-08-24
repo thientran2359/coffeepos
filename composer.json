@@ -1,8 +1,8 @@
 {
   "name": "coffeepos/coffeepos",
-  "description": "CoffeePOS WooCommerce POS plugin foundation",
+  "description": "A WooCommerce-powered point of sale for coffee shops",
   "type": "wordpress-plugin",
-  "license": "proprietary",
+  "license": "GPL-2.0-or-later",
   "autoload": {
     "psr-4": {
       "CoffeePOS\\": "includes/"

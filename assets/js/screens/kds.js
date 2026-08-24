@@ -1,6 +1,7 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     CoffeePOS.screens = CoffeePOS.screens || {};
     CoffeePOS.screens.createKdsController = function (root) {
         const config = window.CoffeePOSConfig || {};
@@ -27,7 +28,7 @@
             root.querySelector('[data-component="kds-screen"]').setAttribute('data-state', state.loaded ? 'ready' : 'loading');
             loading.hidden = state.loaded; empty.hidden = !state.loaded || state.orders.length > 0; errorBox.hidden = state.error === '';
             errorText.textContent = state.error; grid.render(state.orders, state.pendingId); timer.tick();
-            if (soundButton) { soundButton.textContent = sound.isEnabled() ? 'Sound on' : 'Sound off'; soundButton.setAttribute('aria-pressed', sound.isEnabled() ? 'true' : 'false'); }
+            if (soundButton) { soundButton.textContent = sound.isEnabled() ? __('Sound on', 'coffeepos') : __('Sound off', 'coffeepos'); soundButton.setAttribute('aria-pressed', sound.isEnabled() ? 'true' : 'false'); }
         }
         function operationId() { return 'kds-' + (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Date.now() + '-' + Math.random().toString(16).slice(2)); }
         function findOrder(id) { return store.getState().orders.find(function (order) { return Number(order.id) === Number(id); }); }
@@ -36,10 +37,10 @@
             store.setPending(order.id); render();
             try {
                 const data = await api.transitionKdsOrder(order.id, { expected_state: order.kds.state, expected_revision: order.kds.revision, target_state: targetState, client_operation_id: operationId() });
-                store.replace(data.order); toast.show('Order updated.', 'success');
+                store.replace(data.order); toast.show(__('Order updated.', 'coffeepos'), 'success');
             } catch (error) {
                 if (error.code === 'order_state_conflict' && error.details && error.details.order) { store.replace(error.details.order); }
-                toast.show(error.message || 'Order could not be updated.', 'error');
+                toast.show(error.message || __('Order could not be updated.', 'coffeepos'), 'error');
             } finally { store.setPending(0); render(); }
         }
         function onClick(event) {
@@ -55,9 +56,9 @@
             poller = CoffeePOS.core.createPollingController({
                 interval: Number(config.pollIntervalMs) || 5000,
                 load: function (signal) { return api.loadKdsOrders(selectedStates(), signal); },
-                onStart: function () { status.textContent = store.isLoaded() ? 'Refreshing…' : 'Loading orders…'; },
-                onData: function (data) { sound.accept(data.orders || []); store.accept(data); status.textContent = 'Updated now'; render(); },
-                onError: function (error) { store.setError(error.message || 'Unable to load orders.'); status.textContent = 'Refresh failed'; render(); }
+                onStart: function () { status.textContent = store.isLoaded() ? __('Refreshing…', 'coffeepos') : __('Loading orders…', 'coffeepos'); },
+                onData: function (data) { sound.accept(data.orders || []); store.accept(data); status.textContent = __('Updated now', 'coffeepos'); render(); },
+                onError: function (error) { store.setError(error.message || __('Unable to load orders.', 'coffeepos')); status.textContent = __('Refresh failed', 'coffeepos'); render(); }
             });
             poller.start();
         }

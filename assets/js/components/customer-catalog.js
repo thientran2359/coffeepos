@@ -1,6 +1,7 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     CoffeePOS.components = CoffeePOS.components || {};
     CoffeePOS.components.createCustomerCatalog = function (root, renderer) {
         const menu = root.querySelector('[data-component="customer-menu"]');
@@ -21,7 +22,7 @@
                 const target = sections.querySelector('[data-category-products="' + String(category.id).replace(/"/g, '') + '"]');
                 renderer.renderList('coffeepos-customer-product-row-template', category.products, target);
             });
-            setStatus(categories.length ? 'normal' : 'empty', categories.length ? '' : 'The menu is currently empty.');
+            setStatus(categories.length ? 'normal' : 'empty', categories.length ? '' : __('The menu is currently empty.', 'coffeepos'));
         }
         return { render: render, setStatus: setStatus };
     };

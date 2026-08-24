@@ -1,6 +1,8 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
+    const sprintf = window.wp.i18n.sprintf;
     CoffeePOS.components = CoffeePOS.components || {};
 
     CoffeePOS.components.createCheckoutController = function (root, renderer, api, getCart, onNewCart, toast, onWorkflow) {
@@ -51,8 +53,8 @@
             const entered = Number(received.value);
             const due = Number(normalizedTotal(cart));
             change.textContent = Number.isFinite(entered) && entered >= due
-                ? 'Preview change: ' + (entered - due).toFixed(decimals())
-                : 'Received amount is below total.';
+                ? sprintf(__('Preview change: %s', 'coffeepos'), (entered - due).toFixed(decimals()))
+                : __('Received amount is below total.', 'coffeepos');
             submit.disabled = pending || !Number.isFinite(entered) || entered < due;
         }
         function customerPayment(cart, state) {
@@ -65,7 +67,7 @@
         }
         async function loadBankPreview(cart) {
             const sequence = ++previewSequence;
-            previewPending = true; submit.disabled = true; submit.textContent = 'Preparing QR…';
+            previewPending = true; submit.disabled = true; submit.textContent = __('Preparing QR…', 'coffeepos');
             try {
                 const data = await api.previewVietQr({ pos_session_id: cart.pos_session_id, expected_revision: cart.revision });
                 if (sequence !== previewSequence || method !== 'bank_transfer' || Number(getCart().revision) !== Number(cart.revision)) { return; }
@@ -75,15 +77,15 @@
                 const qr = bankPanel.querySelector('[data-component="vietqr"]');
                 qr.hidden = true; qr.querySelector('img').removeAttribute('src');
                 bankPanel.querySelector('[data-field="payment-status"]').textContent = payment.provider_available
-                    ? 'The QR is displayed on Customer Display. Confirm only after the transfer appears in the bank.'
-                    : 'VietQR beneficiary is not configured.';
+                    ? __('The QR is displayed on Customer Display. Confirm only after the transfer appears in the bank.', 'coffeepos')
+                    : __('VietQR beneficiary is not configured.', 'coffeepos');
                 submit.disabled = !payment.provider_available;
-                submit.textContent = 'Confirm received & complete';
+                submit.textContent = __('Confirm received & complete', 'coffeepos');
                 notify('payment.started', { order: null, payment: payment });
             } catch (error) {
                 if (sequence !== previewSequence) { return; }
-                errorBox.textContent = error.message || 'VietQR could not be prepared.'; errorBox.hidden = false;
-                submit.disabled = true; submit.textContent = 'Complete checkout';
+                errorBox.textContent = error.message || __('VietQR could not be prepared.', 'coffeepos'); errorBox.hidden = false;
+                submit.disabled = true; submit.textContent = __('Complete checkout', 'coffeepos');
             } finally { if (sequence === previewSequence) { previewPending = false; } }
         }
         function chooseMethod(next) {
@@ -101,7 +103,7 @@
             const cart = getCart();
             notify('checkout.started', { cart: cart.customer_display || null, payment: customerPayment(cart, method === 'cash' ? 'awaiting_cash' : 'preparing_qr') });
             if (method === 'bank_transfer') { loadBankPreview(cart); return; }
-            submit.textContent = 'Complete checkout'; submit.disabled = pending || previewPending; preview();
+            submit.textContent = __('Complete checkout', 'coffeepos'); submit.disabled = pending || previewPending; preview();
         }
         function setPendingControls(isFrozen) {
             modal.querySelectorAll('[data-action="close-checkout"]').forEach(function (button) { button.hidden = isFrozen; });
@@ -129,7 +131,7 @@
             if (!modal.hidden && Number(cart.revision) !== reviewedRevision) {
                 reviewedRevision = Number(cart.revision); operationId = newOperationId();
                 total.textContent = String(cart.total.display || normalizedTotal(cart));
-                errorBox.textContent = 'The cart changed. Review the updated total before submitting.'; errorBox.hidden = false;
+                errorBox.textContent = __('The cart changed. Review the updated total before submitting.', 'coffeepos'); errorBox.hidden = false;
                 preview();
             }
         }
@@ -153,10 +155,10 @@
                     const requiredMinor = Number(error.details.required_minor);
                     const divisor = Math.pow(10, decimals());
                     errorBox.textContent = Number.isFinite(receivedMinor) && Number.isFinite(requiredMinor)
-                        ? 'Cash received (' + (receivedMinor / divisor).toFixed(decimals()) + ') is below the required total (' + (requiredMinor / divisor).toFixed(decimals()) + ').'
-                        : (error.message || 'Checkout failed.');
+                        ? sprintf(__('Cash received (%1$s) is below the required total (%2$s).', 'coffeepos'), (receivedMinor / divisor).toFixed(decimals()), (requiredMinor / divisor).toFixed(decimals()))
+                        : (error.message || __('Checkout failed.', 'coffeepos'));
                 } else {
-                    errorBox.textContent = error.message || 'Checkout failed.';
+                    errorBox.textContent = error.message || __('Checkout failed.', 'coffeepos');
                 }
                 errorBox.hidden = false;
                 modal.setAttribute('data-state', 'error');
@@ -168,7 +170,7 @@
             cashPanel.hidden = true; bankPanel.hidden = false;
             bankPanel.setAttribute('data-state', data.payment.provider_available ? 'pending' : 'provider_unavailable');
             bankPanel.querySelector('[data-field="payment-reference"]').textContent = String(data.payment.reference || '');
-            bankPanel.querySelector('[data-field="payment-status"]').textContent = data.payment.provider_available ? 'Payment pending verification.' : 'VietQR beneficiary is not configured. Order remains pending.';
+            bankPanel.querySelector('[data-field="payment-status"]').textContent = data.payment.provider_available ? __('Payment pending verification.', 'coffeepos') : __('VietQR beneficiary is not configured. Order remains pending.', 'coffeepos');
             const qr = bankPanel.querySelector('[data-component="vietqr"]');
             qr.hidden = true; qr.querySelector('img').removeAttribute('src');
             bankPanel.querySelector('[data-action="refresh-payment-status"]').hidden = false;
@@ -181,7 +183,7 @@
         function showSuccess(data, allowAutoPrint) {
             success.querySelector('[data-field="success-order-number"]').textContent = String(data.order.number);
             success.querySelector('[data-field="success-total"]').textContent = String(data.order.total + ' ' + data.order.currency);
-            const cashChange = data.payment.change ? 'Change: ' + data.payment.change : '';
+            const cashChange = data.payment.change ? sprintf(__('Change: %s', 'coffeepos'), data.payment.change) : '';
             success.querySelector('[data-field="success-change"]').textContent = cashChange;
             setOpen(success, true, 'paid');
             const orderKey = String(data.order.id);
@@ -203,7 +205,7 @@
                 if (sequence !== statusSequence) { return; }
                 result = current;
                 if (current.payment.state === 'paid') { setOpen(modal, false); showSuccess(current, false); } else { showPending(current); }
-            } catch (error) { toast.show(error.message || 'Payment status could not be refreshed.', 'error'); }
+            } catch (error) { toast.show(error.message || __('Payment status could not be refreshed.', 'coffeepos'), 'error'); }
         }
         async function resumeCart(cart) {
             const recoverableState = cart && (cart.state === 'checkout' || cart.state === 'completed');
@@ -220,7 +222,7 @@
                 if (result.payment && result.payment.state === 'paid') { setOpen(modal, false); showSuccess(result, false); }
                 else { showPending(result); }
             } catch (error) {
-                errorBox.textContent = error.message || 'The pending checkout could not be recovered.';
+                errorBox.textContent = error.message || __('The pending checkout could not be recovered.', 'coffeepos');
                 errorBox.hidden = false; modal.setAttribute('data-state', 'error');
             } finally { pending = false; }
         }
@@ -237,7 +239,7 @@
                 onNewCart(data.cart, true);
                 setOpen(modal, false); result = null; resumedOrderId = 0;
             } catch (error) {
-                errorBox.textContent = error.message || 'A new order could not be started.';
+                errorBox.textContent = error.message || __('A new order could not be started.', 'coffeepos');
                 errorBox.hidden = false;
             } finally { pending = false; }
         }
@@ -246,7 +248,7 @@
             try {
                 const data = await api.loadReceipt(result.order.id);
                 await receiptPrinter.print(data.receipt);
-            } catch (error) { toast.show(error.message || 'Receipt could not be loaded.', 'error'); }
+            } catch (error) { toast.show(error.message || __('Receipt could not be loaded.', 'coffeepos'), 'error'); }
         }
         function startNewOrder() {
             if (result && result.next_cart) {

@@ -406,10 +406,10 @@ final class Settings
             self::OPTION_QUICK_NOTES => [
                 'type' => 'array',
                 'default' => [
-                    ['id' => 'less_sugar', 'label' => 'Ít đường', 'enabled' => true, 'sort_order' => 10],
-                    ['id' => 'extra_sugar', 'label' => 'Nhiều đường', 'enabled' => true, 'sort_order' => 20],
-                    ['id' => 'less_milk', 'label' => 'Ít sữa', 'enabled' => true, 'sort_order' => 30],
-                    ['id' => 'less_ice', 'label' => 'Ít đá', 'enabled' => true, 'sort_order' => 40],
+                    ['id' => 'less_sugar', 'label' => __('Less sugar', 'coffeepos'), 'enabled' => true, 'sort_order' => 10],
+                    ['id' => 'extra_sugar', 'label' => __('Extra sugar', 'coffeepos'), 'enabled' => true, 'sort_order' => 20],
+                    ['id' => 'less_milk', 'label' => __('Less milk', 'coffeepos'), 'enabled' => true, 'sort_order' => 30],
+                    ['id' => 'less_ice', 'label' => __('Less ice', 'coffeepos'), 'enabled' => true, 'sort_order' => 40],
                 ],
                 'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => null,
@@ -417,11 +417,11 @@ final class Settings
             self::OPTION_SERVICE_TABLES => [
                 'type' => 'array',
                 'default' => [
-                    ['id' => 1, 'label' => 'Table 01', 'enabled' => true, 'sort_order' => 10],
-                    ['id' => 2, 'label' => 'Table 02', 'enabled' => true, 'sort_order' => 20],
-                    ['id' => 3, 'label' => 'Table 03', 'enabled' => true, 'sort_order' => 30],
-                    ['id' => 4, 'label' => 'Table 04', 'enabled' => true, 'sort_order' => 40],
-                    ['id' => 5, 'label' => 'Table 05', 'enabled' => true, 'sort_order' => 50],
+                    ['id' => 1, 'label' => __('Table 01', 'coffeepos'), 'enabled' => true, 'sort_order' => 10],
+                    ['id' => 2, 'label' => __('Table 02', 'coffeepos'), 'enabled' => true, 'sort_order' => 20],
+                    ['id' => 3, 'label' => __('Table 03', 'coffeepos'), 'enabled' => true, 'sort_order' => 30],
+                    ['id' => 4, 'label' => __('Table 04', 'coffeepos'), 'enabled' => true, 'sort_order' => 40],
+                    ['id' => 5, 'label' => __('Table 05', 'coffeepos'), 'enabled' => true, 'sort_order' => 50],
                 ],
                 'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => null,

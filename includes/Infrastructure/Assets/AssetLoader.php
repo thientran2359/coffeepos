@@ -34,7 +34,7 @@ final class AssetLoader
         wp_register_script(
             'coffeepos-core-app',
             COFFEEPOS_URL . 'assets/js/core/app.js',
-            [],
+            ['wp-i18n'],
             $version,
             true
         );
@@ -134,6 +134,7 @@ final class AssetLoader
             ],
         ]);
 
+        $this->setScriptTranslations();
         wp_enqueue_script('coffeepos-app');
     }
 
@@ -397,5 +398,18 @@ final class AssetLoader
     private function registerReceiptPrinter(string $version, string $rendererHandle): void
     {
         wp_register_script('coffeepos-component-receipt-printer', COFFEEPOS_URL . 'assets/js/components/receipt-printer.js', [$rendererHandle], $version, true);
+    }
+
+    private function setScriptTranslations(): void
+    {
+        $scripts = wp_scripts();
+
+        foreach (array_keys($scripts->registered) as $handle) {
+            if (strpos((string) $handle, 'coffeepos-') !== 0) {
+                continue;
+            }
+
+            wp_set_script_translations((string) $handle, 'coffeepos', COFFEEPOS_PATH . 'languages');
+        }
     }
 }

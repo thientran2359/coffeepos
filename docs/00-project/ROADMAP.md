@@ -420,17 +420,26 @@ print entry point.
 
 ---
 
-# Phase 13 — Production Operations
+# Phase 13 — WordPress.org Release Readiness
 
 ## Goal
 
-Add the operational controls and observability needed for sustained production
-use after the Phase-12 staff-access foundation.
+Prepare the completed CoffeePOS application for a stable, reviewable
+WordPress.org release.
 
 ## Work
 
-The exact production-operations scope and acceptance criteria MUST be defined in
-`docs/05-phases/PHASE-13.md` before implementation.
+- GPL-compatible licensing and synchronized release metadata
+- WordPress.org readme and third-party service disclosures
+- complete PHP/JavaScript internationalization foundation
+- translation template generation
+- deterministic release packaging
+- Plugin Check, compatibility, regression, clean-install, and browser evidence
+
+## Exit Criteria
+
+The repository can produce a reviewable release ZIP with no known directory
+submission blocker. Publishing remains an explicit owner action.
 
 ---
 

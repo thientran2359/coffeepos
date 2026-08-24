@@ -239,10 +239,10 @@ a parallel note system. Default definitions are:
 
 | Stable ID | Default label |
 |---|---|
-| `less_sugar` | Ít đường |
-| `extra_sugar` | Nhiều đường |
-| `less_milk` | Ít sữa |
-| `less_ice` | Ít đá |
+| `less_sugar` | Less sugar |
+| `extra_sugar` | Extra sugar |
+| `less_milk` | Less milk |
+| `less_ice` | Less ice |
 
 An administrator with `coffeepos_manage_settings` may create or remove
 definitions and edit label, enabled state, sort order, and optional

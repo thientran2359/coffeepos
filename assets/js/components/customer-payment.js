@@ -1,6 +1,8 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
+    const sprintf = window.wp.i18n.sprintf;
     CoffeePOS.components = CoffeePOS.components || {};
     CoffeePOS.components.createCustomerPayment = function (root, renderer) {
         const protocol = CoffeePOS.sync.protocol;
@@ -16,14 +18,14 @@
             panel.setAttribute('data-state', screenState);
             const method = payment && payment.method;
             const stateText = screenState === 'payment_success'
-                ? 'Order completed successfully'
+                ? __('Order completed successfully', 'coffeepos')
                 : (method === 'bank_transfer'
-                    ? (payment && payment.provider_available === false ? 'Bank transfer is unavailable.' : 'Please scan the QR to transfer payment')
-                    : 'Please give the cash payment to the cashier');
+                    ? (payment && payment.provider_available === false ? __('Bank transfer is unavailable.', 'coffeepos') : __('Please scan the QR to transfer payment', 'coffeepos'))
+                    : __('Please give the cash payment to the cashier', 'coffeepos'));
             text('customer-payment-status', stateText);
             text('customer-payment-amount', payment && payment.amount ? payment.amount + ' ' + String(payment.currency || order && order.currency || '') : '');
             text('customer-payment-reference', payment && payment.reference);
-            text('customer-payment-change', payment && payment.change ? 'Change: ' + payment.change : '');
+            text('customer-payment-change', payment && payment.change ? sprintf(__('Change: %s', 'coffeepos'), payment.change) : '');
             renderer.renderList('coffeepos-customer-payment-item-template', cart && Array.isArray(cart.items) ? cart.items : [], itemsTarget);
             const summary = payment && payment.summary ? payment.summary : cart;
             text('customer-payment-subtotal', summary && summary.subtotal && summary.subtotal.display);

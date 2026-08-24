@@ -1,15 +1,16 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     CoffeePOS.components = CoffeePOS.components || {};
     CoffeePOS.components.createReceiptPrinter = function (root, renderer) {
         const view = root.querySelector('[data-component="receipt"]');
-        if (!view) { return { print: function () { return Promise.reject(new Error('Receipt template is unavailable.')); } }; }
+        if (!view) { return { print: function () { return Promise.reject(new Error(__('Receipt template is unavailable.', 'coffeepos'))); } }; }
         function field(name, value) { const node = view.querySelector('[data-field="' + name + '"]'); if (node) { node.textContent = String(value || ''); } }
         function display(value) { return value && typeof value === 'object' ? String(value.display || '') : String(value || ''); }
         function cleanup() { window.document.body.classList.remove('coffeepos-printing'); view.hidden = true; view.setAttribute('data-state', 'idle'); }
         function render(receipt) {
-            if (!receipt || !receipt.store || !receipt.order || !receipt.totals || !Array.isArray(receipt.items) || !receipt.order.number || !display(receipt.totals.total)) { throw new Error('Receipt data is incomplete.'); }
+            if (!receipt || !receipt.store || !receipt.order || !receipt.totals || !Array.isArray(receipt.items) || !receipt.order.number || !display(receipt.totals.total)) { throw new Error(__('Receipt data is incomplete.', 'coffeepos')); }
             const service = receipt.service || {}; const payment = receipt.payment || {};
             const paperWidth = String(receipt.paper_width || window.CoffeePOSConfig && window.CoffeePOSConfig.receiptPaperWidth || '80');
             view.setAttribute('data-paper-width', paperWidth === '58' ? '58' : '80');

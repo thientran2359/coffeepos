@@ -1,0 +1,1 @@
+{"translation-revision-date":"2026-08-24 00:00+0000","generator":"CoffeePOS Phase 13 translation builder","source":"assets/js/screens/shifts.js","domain":"messages","locale_data":{"messages":{"":{"domain":"messages","lang":"vi","plural-forms":"nplurals=1; plural=0;"},"Shift #%s":["Ca #%s"],"Shift request failed.":["Không thể thực hiện yêu cầu về ca làm việc."]}}}

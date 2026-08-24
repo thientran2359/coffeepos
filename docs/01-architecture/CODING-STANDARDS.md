@@ -321,3 +321,19 @@ Good CoffeePOS code should be:
 - WooCommerce-aware
 - minimally coupled
 - explicit about state transitions
+
+---
+
+# 17. Internationalization and Releases
+
+All fixed user-visible source strings use English and the `coffeepos` text
+domain. PHP uses WordPress gettext functions with output escaping appropriate to
+the context. JavaScript uses `wp.i18n` and its registered handle is connected to
+`wp_set_script_translations()`.
+
+Merchant-entered WooCommerce and CoffeePOS configuration data is not a gettext
+source string and must not be rewritten during locale changes or upgrades.
+
+Release metadata, the plugin constant, Composer license, and `readme.txt` stable
+tag must agree. A distribution build excludes internal specifications, tests,
+VCS metadata, and local tooling while including every runtime dependency.

@@ -2,6 +2,7 @@
     'use strict';
 
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
 
     CoffeePOS.components = CoffeePOS.components || {};
 
@@ -31,11 +32,11 @@
             }
 
             if (stock) {
-                stock.textContent = unavailable ? (labels.outOfStock || 'Out of stock') : (labels.inStock || 'In stock');
+                stock.textContent = unavailable ? (labels.outOfStock || __('Out of stock', 'coffeepos')) : (labels.inStock || __('In stock', 'coffeepos'));
             }
 
             if (variation) {
-                variation.textContent = product.is_variable === true ? (labels.optionsAvailable || 'Options available') : '';
+                variation.textContent = product.is_variable === true ? (labels.optionsAvailable || __('Options available', 'coffeepos')) : '';
             }
 
             if (initial) {

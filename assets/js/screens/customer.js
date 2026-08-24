@@ -1,6 +1,7 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
     CoffeePOS.screens = CoffeePOS.screens || {};
 
     CoffeePOS.screens.createCustomerController = function (root) {
@@ -34,7 +35,7 @@
         }
         function requestSnapshot() {
             if (!transport) { return; }
-            recoveryPending = true; setConnection('reconnecting', 'Recovering display state…', false);
+            recoveryPending = true; setConnection('reconnecting', __('Recovering display state…', 'coffeepos'), false);
             const state = store.getState();
             transport.post('state.requested', { last_known_revision: Math.max(0, state.revision) }, Math.max(0, state.revision), Math.max(0, state.workflowSequence), 'cashier');
             scheduleHandshake(2000);
@@ -55,7 +56,7 @@
             const snapshot = message.payload;
             if (!protocol.plainObject(snapshot) || !validCart(snapshot.cart) || !Number.isInteger(snapshot.workflow_sequence)) { return; }
             store.hydrate(snapshot, message.revision, snapshot.workflow_sequence);
-            recoveryPending = false; setConnection('connected', 'Display connected', false); render(); scheduleHandshake(8000);
+            recoveryPending = false; setConnection('connected', __('Display connected', 'coffeepos'), false); render(); scheduleHandshake(8000);
         }
         function acceptCart(message) {
             const state = store.getState();
@@ -92,10 +93,10 @@
                 const nextId = message.payload.next_pos_session_id;
                 try {
                     transport.bind(nextId); store.pair(nextId); rolloverPending = false;
-                    setConnection('hydrating', 'Connecting next order…', false);
+                    setConnection('hydrating', __('Connecting next order…', 'coffeepos'), false);
                     transport.post('display.ready', { last_known_revision: 0 }, 0, 0, 'cashier');
                     recoverCart(nextId);
-                } catch (error) { setConnection('reconnecting', 'Could not pair the next order. Reconnect this display.', true); }
+                } catch (error) { setConnection('reconnecting', __('Could not pair the next order. Reconnect this display.', 'coffeepos'), true); }
             }, 0);
         }
         function onMessage(message) {
@@ -111,29 +112,29 @@
                 const data = await api.getCustomerCart(sessionId);
                 if (sessionId !== store.getState().posSessionId || !validCart(data.cart)) { return; }
                 store.acceptCart(data.cart, data.cart.revision); render();
-                setConnection('reconnecting', 'Cart recovered; waiting for Cashier state…', false); requestSnapshot();
+                setConnection('reconnecting', __('Cart recovered; waiting for Cashier state…', 'coffeepos'), false); requestSnapshot();
             } catch (error) {
                 const state = error && error.code === 'cart_session_not_found' ? 'expired' : 'reconnecting';
-                setConnection(state, state === 'expired' ? 'This paired cart has expired. Open the display again from Cashier.' : 'Display sync is unavailable. Reconnect to try again.', true);
+                setConnection(state, state === 'expired' ? __('This paired cart has expired. Open the display again from Cashier.', 'coffeepos') : __('Display sync is unavailable. Reconnect to try again.', 'coffeepos'), true);
             }
         }
         function connect(sessionId) {
             store.pair(sessionId);
             try {
-                transport = CoffeePOS.sync.createChannel({ source: 'customer', target: 'cashier', onMessage: onMessage, onError: function () { setConnection('reconnecting', 'Display connection was interrupted.', true); } });
+                transport = CoffeePOS.sync.createChannel({ source: 'customer', target: 'cashier', onMessage: onMessage, onError: function () { setConnection('reconnecting', __('Display connection was interrupted.', 'coffeepos'), true); } });
                 transport.bind(sessionId);
-                setConnection('hydrating', 'Connecting display…', false);
+                setConnection('hydrating', __('Connecting display…', 'coffeepos'), false);
                 transport.post('display.ready', { last_known_revision: 0 }, 0, 0, 'cashier');
                 scheduleHandshake(2000);
             } catch (error) {
-                setConnection('unsupported', 'This display must use the same browser profile and requires BroadcastChannel support.', true);
+                setConnection('unsupported', __('This display must use the same browser profile and requires BroadcastChannel support.', 'coffeepos'), true);
             }
             recoverCart(sessionId);
         }
         async function loadCatalog() {
-            catalog.setStatus('loading', 'Loading menu…');
+            catalog.setStatus('loading', __('Loading menu…', 'coffeepos'));
             try { const data = await api.loadCatalog(); store.setCatalog(data.catalog); catalog.render(data.catalog); }
-            catch (error) { store.setCatalogStatus('error'); catalog.setStatus('error', error.message || 'The menu could not be loaded.'); }
+            catch (error) { store.setCatalogStatus('error'); catalog.setStatus('error', error.message || __('The menu could not be loaded.', 'coffeepos')); }
         }
         function onClick(event) {
             const trigger = event.target.closest('[data-action]'); if (!trigger) { return; }
@@ -144,7 +145,7 @@
         function init() {
             root.addEventListener('click', onClick); loadCatalog();
             if (config.pairingState !== 'paired' || !protocol.validSessionId(config.posSessionId)) {
-                setConnection('unpaired', config.pairingState === 'invalid' ? 'The pairing link is invalid. Open Customer Display from Cashier.' : 'Open Customer Display from the Cashier screen to pair it.', false);
+                setConnection('unpaired', config.pairingState === 'invalid' ? __('The pairing link is invalid. Open Customer Display from Cashier.', 'coffeepos') : __('Open Customer Display from the Cashier screen to pair it.', 'coffeepos'), false);
                 render(); return;
             }
             connect(config.posSessionId);

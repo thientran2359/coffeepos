@@ -1,6 +1,8 @@
 (function (window) {
     'use strict';
     const CoffeePOS = window.CoffeePOS || {};
+    const __ = window.wp.i18n.__;
+    const sprintf = window.wp.i18n.sprintf;
     CoffeePOS.screens = CoffeePOS.screens || {};
     CoffeePOS.screens.createShiftsController = function (root) {
         const api = CoffeePOS.api.createPosApi(CoffeePOS.api.createClient());
@@ -21,7 +23,7 @@
         function renderCurrent(value) {
             shift = value || null; openPanel.hidden = !!shift; activePanel.hidden = !shift;
             if (!shift) { return; }
-            field('shift-number', 'Shift #' + shift.id);
+            field('shift-number', sprintf(__('Shift #%s', 'coffeepos'), shift.id));
             field('shift-meta', shift.cashier_name + ' · ' + (shift.opened_at_display || new Date(shift.opened_at).toLocaleString()));
             field('opening-cash', money(shift.opening_cash, shift.currency)); field('cash-sales', money(shift.cash_sales, shift.currency));
             field('bank-sales', money(shift.bank_sales, shift.currency)); field('total-sales', money(shift.total_sales, shift.currency));
@@ -32,12 +34,12 @@
             historyNode.replaceChildren(); emptyNode.hidden = items.length > 0;
             items.forEach(function (item) {
                 const node = rowTemplate.content.firstElementChild.cloneNode(true);
-                const values = {number: 'Shift #' + item.id, period: (item.opened_at_display || new Date(item.opened_at).toLocaleString()) + ' – ' + (item.closed_at_display || new Date(item.closed_at).toLocaleString()), sales: money(item.total_sales, item.currency), expected: money(item.expected_cash, item.currency), actual: money(item.actual_cash, item.currency), variance: money(item.variance, item.currency)};
+                const values = {number: sprintf(__('Shift #%s', 'coffeepos'), item.id), period: (item.opened_at_display || new Date(item.opened_at).toLocaleString()) + ' – ' + (item.closed_at_display || new Date(item.closed_at).toLocaleString()), sales: money(item.total_sales, item.currency), expected: money(item.expected_cash, item.currency), actual: money(item.actual_cash, item.currency), variance: money(item.variance, item.currency)};
                 Object.keys(values).forEach(function (key) { node.querySelector('[data-field="' + key + '"]').textContent = values[key]; });
                 historyNode.appendChild(node);
             });
         }
-        function fail(error) { errorNode.textContent = error.message || 'Shift request failed.'; errorNode.hidden = false; }
+        function fail(error) { errorNode.textContent = error.message || __('Shift request failed.', 'coffeepos'); errorNode.hidden = false; }
         async function load() {
             errorNode.hidden = true;
             try { const results = await Promise.all([api.getCurrentShift(), api.loadShiftHistory(50)]); renderCurrent(results[0].shift); renderHistory(results[1].items || []); screen.setAttribute('data-state', 'ready'); } catch (error) { fail(error); screen.setAttribute('data-state', 'error'); }

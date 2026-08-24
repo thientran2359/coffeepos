@@ -5,8 +5,11 @@ declare(strict_types=1);
 if (! defined('ABSPATH')) {
     exit;
 }
+$membershipEnabled = (bool) \CoffeePOS\Infrastructure\Settings\Settings::get(\CoffeePOS\Infrastructure\Settings\Settings::OPTION_MEMBERSHIP_ENABLED);
+$memberCreateEnabled = (bool) \CoffeePOS\Infrastructure\Settings\Settings::get(\CoffeePOS\Infrastructure\Settings\Settings::OPTION_MEMBER_CREATE_ENABLED);
+$requiredMemberFields = \CoffeePOS\Infrastructure\Settings\Settings::memberRequiredFields();
 ?>
-<div class="coffeepos-modal" data-component="customer-lookup" data-state="closed" hidden>
+<div class="coffeepos-modal" data-component="customer-lookup" data-state="closed" data-membership-enabled="<?php echo $membershipEnabled ? 'true' : 'false'; ?>" data-member-create-enabled="<?php echo $memberCreateEnabled ? 'true' : 'false'; ?>" hidden>
     <div class="coffeepos-modal-backdrop" data-action="close-customer-lookup"></div>
     <section class="coffeepos-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="coffeepos-customer-title" tabindex="-1">
         <header class="coffeepos-modal-header">
@@ -32,11 +35,11 @@ if (! defined('ABSPATH')) {
                 </label>
                 <label class="coffeepos-field">
                     <span><?php esc_html_e('Member name', 'coffeepos'); ?></span>
-                    <input type="text" data-component="customer-create-name" autocomplete="name" maxlength="200" required>
+                    <input type="text" data-component="customer-create-name" autocomplete="name" maxlength="200" <?php echo in_array('name', $requiredMemberFields, true) ? 'required' : ''; ?>>
                 </label>
                 <label class="coffeepos-field">
-                    <span><?php esc_html_e('Email (optional)', 'coffeepos'); ?></span>
-                    <input type="email" data-component="customer-create-email" autocomplete="email" maxlength="254">
+                    <span><?php echo in_array('email', $requiredMemberFields, true) ? esc_html__('Email', 'coffeepos') : esc_html__('Email (optional)', 'coffeepos'); ?></span>
+                    <input type="email" data-component="customer-create-email" autocomplete="email" maxlength="254" <?php echo in_array('email', $requiredMemberFields, true) ? 'required' : ''; ?>>
                 </label>
                 <button type="submit" class="coffeepos-btn coffeepos-btn-primary" data-action="create-customer"><?php esc_html_e('Create and use member', 'coffeepos'); ?></button>
             </form>

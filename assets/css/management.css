@@ -7,6 +7,7 @@ body.coffeepos-screen-settings {
     overflow-x: hidden;
     overflow-y: auto;
 }
+
 body.coffeepos-screen-shifts #coffeepos-app,
 body.coffeepos-screen-order-history #coffeepos-app,
 body.coffeepos-screen-reports #coffeepos-app,
@@ -15,6 +16,7 @@ body.coffeepos-screen-settings #coffeepos-app {
     overflow-y: auto;
     overscroll-behavior-y: contain;
 }
+
 .coffeepos-inline-error {
     max-width: 1180px;
     margin: 0 auto 16px;
@@ -23,6 +25,7 @@ body.coffeepos-screen-settings #coffeepos-app {
     background: #fee8e7;
     color: #9b231d;
 }
+
 .coffeepos-status-badge {
     padding: 5px 10px;
     border-radius: 999px;
@@ -30,6 +33,7 @@ body.coffeepos-screen-settings #coffeepos-app {
     color: #176b3a;
     font-weight: 700;
 }
+
 /* Shared management-screen presentation follows the Order Queue shell. */
 .coffeepos-shifts,
 .coffeepos-history,
@@ -40,6 +44,7 @@ body.coffeepos-screen-settings #coffeepos-app {
     color: var(--coffeepos-text);
     background: #e9eee9;
 }
+
 .coffeepos-shifts .coffeepos-operations__header,
 .coffeepos-history .coffeepos-operations__header,
 .coffeepos-reports .coffeepos-operations__header,
@@ -47,11 +52,13 @@ body.coffeepos-screen-settings #coffeepos-app {
     margin: -20px -20px 18px;
     max-width: none;
 }
+
 .coffeepos-operations__header .coffeepos-eyebrow {
     display: block;
     margin: 0 0 3px;
     color: #cbd8d1;
 }
+
 .coffeepos-shift-card,
 .coffeepos-history-filters,
 .coffeepos-history-order-card,
@@ -59,8 +66,9 @@ body.coffeepos-screen-settings #coffeepos-app {
 .coffeepos-report-currency,
 .coffeepos-settings__card {
     border-color: #cfd8d2;
-    box-shadow: 0 8px 22px rgba(27,48,38,.08);
+    box-shadow: 0 8px 22px rgba(27, 48, 38, .08);
 }
+
 .coffeepos-history-pagination .coffeepos-btn,
 .coffeepos-history-dialog footer .coffeepos-btn,
 .coffeepos-report-export-actions .coffeepos-btn {
@@ -70,16 +78,19 @@ body.coffeepos-screen-settings #coffeepos-app {
     border: 1px solid var(--coffeepos-border-strong);
     border-radius: var(--coffeepos-radius);
 }
+
 .coffeepos-history-dialog footer .coffeepos-btn-danger {
     color: var(--coffeepos-danger);
     background: #fff5f4;
     border-color: #e7b9b4;
 }
+
 .coffeepos-settings__header {
     width: auto;
     margin-right: -20px;
     margin-left: -20px;
 }
+
 @media (max-width: 720px) {
     .coffeepos-shifts,
     .coffeepos-history,
@@ -87,6 +98,7 @@ body.coffeepos-screen-settings #coffeepos-app {
     .coffeepos-settings {
         padding: 14px;
     }
+
     .coffeepos-shifts .coffeepos-operations__header,
     .coffeepos-history .coffeepos-operations__header,
     .coffeepos-reports .coffeepos-operations__header,

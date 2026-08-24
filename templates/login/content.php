@@ -10,12 +10,15 @@ $context = \CoffeePOS\Infrastructure\Templates\TemplateLoader::context();
 $error = (string) ($context['error'] ?? '');
 $noAccess = ! empty($context['no_access']);
 $redirectTo = (string) ($context['redirect_to'] ?? '');
+$storeName = \CoffeePOS\Infrastructure\Settings\Settings::getStoreName();
+$logoUrl = \CoffeePOS\Infrastructure\Settings\Settings::getLogoUrl();
 ?>
 <section class="coffeepos-login" data-component="staff-login" data-state="<?php echo $noAccess ? 'no_access' : ($error !== '' ? 'error' : 'idle'); ?>">
     <div class="coffeepos-login__card">
         <header>
+            <?php if ($logoUrl !== '') : ?><img class="coffeepos-store-logo" src="<?php echo esc_url($logoUrl); ?>" alt=""><?php endif; ?>
             <p class="coffeepos-eyebrow"><?php esc_html_e('CoffeePOS staff', 'coffeepos'); ?></p>
-            <h1><?php bloginfo('name'); ?></h1>
+            <h1><?php echo esc_html($storeName); ?></h1>
         </header>
 
         <?php if ($noAccess) : ?>

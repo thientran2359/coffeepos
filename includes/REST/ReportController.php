@@ -6,6 +6,7 @@ namespace CoffeePOS\REST;
 
 use CoffeePOS\Application\Reports\ReportExporter;
 use CoffeePOS\Application\Reports\SalesReportService;
+use CoffeePOS\Infrastructure\Settings\Settings;
 use CoffeePOS\Integration\WooCommerce\WooCommerceMoneyFormatter;
 use CoffeePOS\Integration\WooCommerce\WooCommerceReportOrderGateway;
 use CoffeePOS\Support\Capabilities;
@@ -22,7 +23,7 @@ final class ReportController
 
     public function __construct(?SalesReportService $service = null, ?ReportExporter $exporter = null)
     {
-        $this->service = $service ?? new SalesReportService(new WooCommerceReportOrderGateway(), new WooCommerceMoneyFormatter());
+        $this->service = $service ?? new SalesReportService(new WooCommerceReportOrderGateway(), new WooCommerceMoneyFormatter(), null, Settings::getTimezone());
         $this->exporter = $exporter ?? new ReportExporter();
     }
 

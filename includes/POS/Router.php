@@ -131,6 +131,7 @@ final class Router
             'rest_namespace' => RouteRegistrar::NAMESPACE,
             'navigation' => self::navigationItems(),
             'settings_notice' => $settingsNotice,
+            'settings_diagnostics' => $screen === 'settings' ? $this->settingsScreen->diagnostics() : [],
         ]);
 
         if ($resolvedTemplate === null) {

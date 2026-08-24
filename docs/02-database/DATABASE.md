@@ -765,6 +765,40 @@ Phase 12 adds the boolean option
 projection/rendering and does not change storage or staff-screen visibility of
 the order note.
 
+The frontend Appearance card owns these CoffeePOS-only options:
+
+| Option | Type | Default | Contract |
+|---|---|---|---|
+| `coffeepos_brand_color` | six-digit hex string | `#12715b` | Overrides the POS primary and derived dark-primary CSS variables |
+| `coffeepos_nav_default_collapsed` | boolean | `true` | Determines the server-rendered initial staff-navigation state |
+| `coffeepos_interface_density` | enum | `normal` | `normal` or `compact` |
+| `coffeepos_show_product_images` | boolean | `true` | Controls Cashier product visuals without changing catalog data |
+| `coffeepos_custom_css` | string | empty | Maximum 20 KB, loaded only on POS routes after owned styles |
+
+Custom CSS rejects HTML delimiters, all `url()` references, `@import`,
+`expression`, `behavior`, `-moz-binding`, and JavaScript URL syntax. It is
+presentation configuration only and must never contain business or permission
+rules.
+
+The reduced frontend Settings model also owns these options (all through the
+WordPress Options API; none alter WordPress or WooCommerce store settings):
+
+| Group | Options | Contract/defaults |
+|---|---|---|
+| General | `coffeepos_store_name`, `coffeepos_branch_name`, `coffeepos_logo_id`, `coffeepos_store_address`, `coffeepos_store_phone` | POS-owned identity; name defaults to `CoffeePOS`; logo is an attachment ID |
+| General | `coffeepos_timezone`, `coffeepos_date_format`, `coffeepos_time_format` | Defaults `Asia/Ho_Chi_Minh`, `d/m/Y`, `H:i`; controls POS operational dates and receipt presentation |
+| Sales | `coffeepos_default_order_type`, `coffeepos_require_dine_in_table`, `coffeepos_require_open_shift` | Defaults `takeaway`, `true`, `true`; enforced again by server services |
+| Payments | `coffeepos_cash_enabled`, `coffeepos_bank_transfer_enabled`, `coffeepos_vietqr_reference_prefix` | Both methods default enabled; at least one remains enabled; prefix defaults `POS` |
+| Payments | `coffeepos_vietqr_bank_id`, `coffeepos_vietqr_account_number`, `coffeepos_vietqr_account_name`, `coffeepos_vietqr_template` | Existing VietQR configuration; template is `qronly`, `compact`, or `compact2` |
+| Receipt | `coffeepos_receipt_paper_width`, `coffeepos_receipt_auto_print`, `coffeepos_receipt_footer` | Defaults `80`, `false`, `Thank you!`; width is `58` or `80` |
+| Membership | `coffeepos_membership_enabled`, `coffeepos_member_create_enabled`, `coffeepos_member_required_fields` | Defaults enabled/enabled and phone+name; phone is always required |
+| Operations | `coffeepos_kds_poll_interval_ms`, `coffeepos_order_queue_poll_interval_ms`, `coffeepos_kds_sound_enabled` | Polling remains bounded to 3000–60000 ms; sound defaults enabled |
+| Advanced | `coffeepos_pos_base_slug`, `coffeepos_uninstall_delete_data` | Base defaults `pos`; uninstall deletion defaults false; internal page IDs are not importable/exported settings |
+
+Settings export is a versioned JSON projection of importable option values.
+Import accepts only the documented allowlist and is capability/nonce protected.
+Diagnostics is read-only runtime information and is not persisted.
+
 ---
 
 # 19. User/Staff Data

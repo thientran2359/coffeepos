@@ -23,8 +23,10 @@ final class CheckoutService
     private OrderGatewayInterface $orders;
     private PaymentGatewayInterface $bankGateway;
     private MoneyFormatterInterface $formatter;
+    private array $allowedPaymentMethods;
+    private string $bankReferencePrefix;
 
-    public function __construct(CartSessionStoreInterface $store, CartValidationService $validator, PricingGatewayInterface $pricing, OrderGatewayInterface $orders, PaymentGatewayInterface $bankGateway, MoneyFormatterInterface $formatter)
+    public function __construct(CartSessionStoreInterface $store, CartValidationService $validator, PricingGatewayInterface $pricing, OrderGatewayInterface $orders, PaymentGatewayInterface $bankGateway, MoneyFormatterInterface $formatter, array $allowedPaymentMethods = ['cash', 'bank_transfer'], string $bankReferencePrefix = 'POS')
     {
         $this->store = $store;
         $this->validator = $validator;
@@ -32,6 +34,9 @@ final class CheckoutService
         $this->orders = $orders;
         $this->bankGateway = $bankGateway;
         $this->formatter = $formatter;
+        $this->allowedPaymentMethods = array_values(array_intersect(['cash', 'bank_transfer'], $allowedPaymentMethods));
+        $prefix = strtoupper(preg_replace('/[^A-Za-z0-9_-]/', '', $bankReferencePrefix) ?? '');
+        $this->bankReferencePrefix = $prefix !== '' ? substr($prefix, 0, 12) : 'POS';
     }
 
     public function checkout(string $sessionId, int $revision, string $clientOperationId, array $payment, int $cashierId, int $shiftId = 0): array
@@ -40,8 +45,8 @@ final class CheckoutService
             throw Phase01Exception::withCode(Phase01ErrorCodes::DUPLICATE_OPERATION_CONFLICT, 'A valid client operation id is required.');
         }
         $method = (string) ($payment['method'] ?? '');
-        if (! in_array($method, ['cash', 'bank_transfer'], true)) {
-            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_PAYMENT, 'Payment method must be cash or bank transfer.');
+        if (! in_array($method, $this->allowedPaymentMethods, true)) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_PAYMENT, 'Payment method is disabled or invalid.');
         }
         foreach (['change', 'paid', 'total', 'cashier_id'] as $forbidden) {
             if (array_key_exists($forbidden, $payment)) {
@@ -112,6 +117,9 @@ final class CheckoutService
 
     public function previewBankTransfer(string $sessionId, int $revision): array
     {
+        if (! in_array('bank_transfer', $this->allowedPaymentMethods, true)) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_PAYMENT, 'Bank transfer is disabled.');
+        }
         $cart = $this->store->load($sessionId);
         if ($cart === null) {
             throw Phase01Exception::withCode(Phase01ErrorCodes::CART_SESSION_NOT_FOUND, 'Cart session was not found.');
@@ -187,7 +195,7 @@ final class CheckoutService
 
     private function bankReference(string $sessionId, int $revision): string
     {
-        return 'POS-' . strtoupper(substr(hash('sha256', $sessionId . '|' . $revision), 0, 12));
+        return $this->bankReferencePrefix . '-' . strtoupper(substr(hash('sha256', $sessionId . '|' . $revision), 0, 12));
     }
 
     private function pricingSummary(array $pricing): array

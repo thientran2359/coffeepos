@@ -20,6 +20,7 @@ use CoffeePOS\Infrastructure\Shift\WpdbShiftRepository;
 use CoffeePOS\Integration\WooCommerce\WooCommerceShiftTotalsGateway;
 use CoffeePOS\Support\Capabilities;
 use CoffeePOS\Support\ErrorFactory;
+use CoffeePOS\Infrastructure\Settings\Settings;
 use WP_REST_Request;
 use WP_REST_Server;
 
@@ -37,13 +38,15 @@ final class CheckoutController
         $this->coupons = $coupons ?? new CartCouponService($store, $pricing, $formatter);
         $this->checkout = $checkout ?? new CheckoutService(
             $store,
-            new CartValidationService(),
+            new CartValidationService((bool) Settings::get(Settings::OPTION_REQUIRE_DINE_IN_TABLE)),
             $pricing,
             new WooCommerceOrderGateway(),
             new PendingVietQrGateway(),
-            $formatter
+            $formatter,
+            Settings::enabledPaymentMethods(),
+            (string) Settings::get(Settings::OPTION_VIETQR_REFERENCE_PREFIX)
         );
-        $this->shifts = new ShiftService(new WpdbShiftRepository(), new WooCommerceShiftTotalsGateway(), new MySqlLockProvider());
+        $this->shifts = new ShiftService(new WpdbShiftRepository(), new WooCommerceShiftTotalsGateway(), new MySqlLockProvider(), [Settings::class, 'formatTimestamp']);
     }
 
     public function register(string $namespace): void
@@ -115,14 +118,16 @@ final class CheckoutController
     {
         return $this->respond(function () use ($request): array {
             $payload = $this->payload($request);
-            $shift = $this->shifts->requireOpen(get_current_user_id());
+            $shift = (bool) Settings::get(Settings::OPTION_REQUIRE_OPEN_SHIFT)
+                ? $this->shifts->requireOpen(get_current_user_id())
+                : $this->shifts->current(get_current_user_id());
             return $this->checkout->checkout(
                 $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
                 $this->revision($payload),
                 sanitize_text_field((string) ($payload['client_operation_id'] ?? '')),
                 is_array($payload['payment'] ?? null) ? $payload['payment'] : [],
                 get_current_user_id(),
-                (int) $shift['id']
+                (int) ($shift['id'] ?? 0)
             );
         });
     }

@@ -30,6 +30,32 @@ final class Settings
     public const OPTION_KDS_POLL_INTERVAL = 'coffeepos_kds_poll_interval_ms';
     public const OPTION_ORDER_QUEUE_POLL_INTERVAL = 'coffeepos_order_queue_poll_interval_ms';
     public const OPTION_RECEIPT_PRINT_ORDER_NOTE = 'coffeepos_receipt_print_order_note';
+    public const OPTION_BRAND_COLOR = 'coffeepos_brand_color';
+    public const OPTION_NAV_DEFAULT_COLLAPSED = 'coffeepos_nav_default_collapsed';
+    public const OPTION_INTERFACE_DENSITY = 'coffeepos_interface_density';
+    public const OPTION_SHOW_PRODUCT_IMAGES = 'coffeepos_show_product_images';
+    public const OPTION_CUSTOM_CSS = 'coffeepos_custom_css';
+    public const OPTION_STORE_NAME = 'coffeepos_store_name';
+    public const OPTION_BRANCH_NAME = 'coffeepos_branch_name';
+    public const OPTION_LOGO_ID = 'coffeepos_logo_id';
+    public const OPTION_STORE_ADDRESS = 'coffeepos_store_address';
+    public const OPTION_STORE_PHONE = 'coffeepos_store_phone';
+    public const OPTION_TIMEZONE = 'coffeepos_timezone';
+    public const OPTION_DATE_FORMAT = 'coffeepos_date_format';
+    public const OPTION_TIME_FORMAT = 'coffeepos_time_format';
+    public const OPTION_DEFAULT_ORDER_TYPE = 'coffeepos_default_order_type';
+    public const OPTION_REQUIRE_DINE_IN_TABLE = 'coffeepos_require_dine_in_table';
+    public const OPTION_REQUIRE_OPEN_SHIFT = 'coffeepos_require_open_shift';
+    public const OPTION_CASH_ENABLED = 'coffeepos_cash_enabled';
+    public const OPTION_BANK_TRANSFER_ENABLED = 'coffeepos_bank_transfer_enabled';
+    public const OPTION_VIETQR_REFERENCE_PREFIX = 'coffeepos_vietqr_reference_prefix';
+    public const OPTION_RECEIPT_PAPER_WIDTH = 'coffeepos_receipt_paper_width';
+    public const OPTION_RECEIPT_AUTO_PRINT = 'coffeepos_receipt_auto_print';
+    public const OPTION_RECEIPT_FOOTER = 'coffeepos_receipt_footer';
+    public const OPTION_MEMBERSHIP_ENABLED = 'coffeepos_membership_enabled';
+    public const OPTION_MEMBER_CREATE_ENABLED = 'coffeepos_member_create_enabled';
+    public const OPTION_MEMBER_REQUIRED_FIELDS = 'coffeepos_member_required_fields';
+    public const OPTION_KDS_SOUND_ENABLED = 'coffeepos_kds_sound_enabled';
 
     public function register(): void
     {
@@ -118,6 +144,123 @@ final class Settings
         return self::boundedPollInterval(self::get(self::OPTION_ORDER_QUEUE_POLL_INTERVAL));
     }
 
+    public static function getBrandColor(): string
+    {
+        $color = strtolower((string) self::get(self::OPTION_BRAND_COLOR));
+
+        return preg_match('/^#[0-9a-f]{6}$/', $color) === 1 ? $color : '#12715b';
+    }
+
+    public static function getBrandDarkColor(): string
+    {
+        $color = ltrim(self::getBrandColor(), '#');
+        $channels = [];
+
+        for ($offset = 0; $offset < 6; $offset += 2) {
+            $channels[] = max(0, min(255, (int) round(hexdec(substr($color, $offset, 2)) * 0.72)));
+        }
+
+        return sprintf('#%02x%02x%02x', $channels[0], $channels[1], $channels[2]);
+    }
+
+    public static function isStaffNavCollapsed(): bool
+    {
+        return (bool) self::get(self::OPTION_NAV_DEFAULT_COLLAPSED);
+    }
+
+    public static function getInterfaceDensity(): string
+    {
+        $density = (string) self::get(self::OPTION_INTERFACE_DENSITY);
+
+        return in_array($density, ['compact', 'normal'], true) ? $density : 'normal';
+    }
+
+    public static function shouldShowProductImages(): bool
+    {
+        return (bool) self::get(self::OPTION_SHOW_PRODUCT_IMAGES);
+    }
+
+    public static function getCustomCss(): string
+    {
+        return (string) self::get(self::OPTION_CUSTOM_CSS);
+    }
+
+    public static function getStoreName(): string
+    {
+        $name = trim((string) self::get(self::OPTION_STORE_NAME));
+
+        return $name !== '' ? $name : 'CoffeePOS';
+    }
+
+    public static function getLogoUrl(): string
+    {
+        $logoId = (int) self::get(self::OPTION_LOGO_ID);
+        $url = $logoId > 0 && function_exists('wp_get_attachment_image_url')
+            ? wp_get_attachment_image_url($logoId, 'medium')
+            : false;
+
+        return is_string($url) ? $url : '';
+    }
+
+    public static function getTimezone(): \DateTimeZone
+    {
+        try {
+            return new \DateTimeZone((string) self::get(self::OPTION_TIMEZONE));
+        } catch (\Throwable $throwable) {
+            return new \DateTimeZone('Asia/Ho_Chi_Minh');
+        }
+    }
+
+    public static function formatTimestamp(int $timestamp): string
+    {
+        $format = (string) self::get(self::OPTION_DATE_FORMAT) . ' ' . (string) self::get(self::OPTION_TIME_FORMAT);
+        $date = new \DateTimeImmutable('@' . $timestamp);
+
+        return $date->setTimezone(self::getTimezone())->format(trim($format));
+    }
+
+    public static function formatTime(int $timestamp): string
+    {
+        $date = new \DateTimeImmutable('@' . $timestamp);
+
+        return $date->setTimezone(self::getTimezone())->format((string) self::get(self::OPTION_TIME_FORMAT));
+    }
+
+    public static function enabledPaymentMethods(): array
+    {
+        $methods = [];
+        if ((bool) self::get(self::OPTION_CASH_ENABLED)) {
+            $methods[] = 'cash';
+        }
+        if ((bool) self::get(self::OPTION_BANK_TRANSFER_ENABLED)) {
+            $methods[] = 'bank_transfer';
+        }
+
+        return $methods !== [] ? $methods : ['cash'];
+    }
+
+    public static function memberRequiredFields(): array
+    {
+        $fields = array_values(array_intersect(['phone', 'name', 'email'], (array) self::get(self::OPTION_MEMBER_REQUIRED_FIELDS)));
+
+        return array_values(array_unique(array_merge(['phone'], $fields)));
+    }
+
+    public static function exportValues(): array
+    {
+        $values = [];
+        foreach (self::importableOptionNames() as $optionName) {
+            $values[$optionName] = self::get($optionName);
+        }
+
+        return ['schema_version' => 1, 'settings' => $values];
+    }
+
+    public static function importableOptionNames(): array
+    {
+        return array_values(array_diff(self::optionNames(), [self::OPTION_POS_PAGE_ID, self::OPTION_CUSTOMER_PAGE_ID]));
+    }
+
     public static function update(string $optionName, $value): void
     {
         $definitions = self::definitions();
@@ -198,6 +341,38 @@ final class Settings
     private static function definitions(): array
     {
         return [
+            self::OPTION_STORE_NAME => [
+                'type' => 'string', 'default' => 'CoffeePOS',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_text_field',
+            ],
+            self::OPTION_BRANCH_NAME => [
+                'type' => 'string', 'default' => '',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_text_field',
+            ],
+            self::OPTION_LOGO_ID => [
+                'type' => 'integer', 'default' => 0,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'absint',
+            ],
+            self::OPTION_STORE_ADDRESS => [
+                'type' => 'string', 'default' => '',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_textarea_field',
+            ],
+            self::OPTION_STORE_PHONE => [
+                'type' => 'string', 'default' => '',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_text_field',
+            ],
+            self::OPTION_TIMEZONE => [
+                'type' => 'string', 'default' => 'Asia/Ho_Chi_Minh',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_text_field',
+            ],
+            self::OPTION_DATE_FORMAT => [
+                'type' => 'string', 'default' => 'd/m/Y',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_text_field',
+            ],
+            self::OPTION_TIME_FORMAT => [
+                'type' => 'string', 'default' => 'H:i',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_text_field',
+            ],
             self::OPTION_POS_BASE_SLUG => [
                 'type' => 'string',
                 'default' => 'pos',
@@ -279,6 +454,78 @@ final class Settings
                 'type' => 'boolean', 'default' => false,
                 'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
             ],
+            self::OPTION_BRAND_COLOR => [
+                'type' => 'string', 'default' => '#12715b',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_NAV_DEFAULT_COLLAPSED => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_INTERFACE_DENSITY => [
+                'type' => 'string', 'default' => 'normal',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_SHOW_PRODUCT_IMAGES => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_CUSTOM_CSS => [
+                'type' => 'string', 'default' => '',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_DEFAULT_ORDER_TYPE => [
+                'type' => 'string', 'default' => 'takeaway',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_key',
+            ],
+            self::OPTION_REQUIRE_DINE_IN_TABLE => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_REQUIRE_OPEN_SHIFT => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_CASH_ENABLED => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_BANK_TRANSFER_ENABLED => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_VIETQR_REFERENCE_PREFIX => [
+                'type' => 'string', 'default' => 'POS',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_RECEIPT_PAPER_WIDTH => [
+                'type' => 'string', 'default' => '80',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_key',
+            ],
+            self::OPTION_RECEIPT_AUTO_PRINT => [
+                'type' => 'boolean', 'default' => false,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_RECEIPT_FOOTER => [
+                'type' => 'string', 'default' => 'Thank you!',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'sanitize_textarea_field',
+            ],
+            self::OPTION_MEMBERSHIP_ENABLED => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_MEMBER_CREATE_ENABLED => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_MEMBER_REQUIRED_FIELDS => [
+                'type' => 'array', 'default' => ['phone', 'name'],
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_KDS_SOUND_ENABLED => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
         ];
     }
 
@@ -297,8 +544,73 @@ final class Settings
             return get_option($optionName, $definition['default']);
         }
 
-        if (in_array($optionName, [self::OPTION_UNINSTALL_DELETE_DATA, self::OPTION_RECEIPT_PRINT_ORDER_NOTE], true)) {
+        if (in_array($optionName, [
+            self::OPTION_UNINSTALL_DELETE_DATA,
+            self::OPTION_RECEIPT_PRINT_ORDER_NOTE,
+            self::OPTION_NAV_DEFAULT_COLLAPSED,
+            self::OPTION_SHOW_PRODUCT_IMAGES,
+            self::OPTION_REQUIRE_DINE_IN_TABLE,
+            self::OPTION_REQUIRE_OPEN_SHIFT,
+            self::OPTION_CASH_ENABLED,
+            self::OPTION_BANK_TRANSFER_ENABLED,
+            self::OPTION_RECEIPT_AUTO_PRINT,
+            self::OPTION_MEMBERSHIP_ENABLED,
+            self::OPTION_MEMBER_CREATE_ENABLED,
+            self::OPTION_KDS_SOUND_ENABLED,
+        ], true)) {
             return (bool) $value;
+        }
+
+        if ($optionName === self::OPTION_BRAND_COLOR) {
+            $color = strtolower(trim((string) $value));
+
+            return preg_match('/^#[0-9a-f]{6}$/', $color) === 1 ? $color : $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_INTERFACE_DENSITY) {
+            return in_array($value, ['compact', 'normal'], true) ? $value : $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_CUSTOM_CSS) {
+            return self::sanitizeCustomCss((string) $value);
+        }
+
+        if ($optionName === self::OPTION_TIMEZONE) {
+            $timezone = trim((string) $value);
+
+            return in_array($timezone, timezone_identifiers_list(), true) ? $timezone : $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_DATE_FORMAT) {
+            return in_array($value, ['d/m/Y', 'm/d/Y', 'Y-m-d'], true) ? $value : $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_TIME_FORMAT) {
+            return in_array($value, ['H:i', 'g:i a'], true) ? $value : $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_DEFAULT_ORDER_TYPE) {
+            return in_array($value, ['dine_in', 'takeaway'], true) ? $value : $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_VIETQR_TEMPLATE) {
+            return in_array($value, ['qronly', 'compact', 'compact2'], true) ? $value : $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_VIETQR_REFERENCE_PREFIX) {
+            $prefix = strtoupper((string) preg_replace('/[^A-Za-z0-9_-]/', '', (string) $value));
+
+            return substr($prefix, 0, 12) ?: $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_RECEIPT_PAPER_WIDTH) {
+            return in_array((string) $value, ['58', '80'], true) ? (string) $value : $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_MEMBER_REQUIRED_FIELDS) {
+            $fields = array_values(array_intersect(['phone', 'name', 'email'], is_array($value) ? $value : []));
+
+            return array_values(array_unique(array_merge(['phone'], $fields)));
         }
 
         if ($optionName === self::OPTION_MODIFIER_GROUPS) {
@@ -333,6 +645,22 @@ final class Settings
     private static function boundedPollInterval($value): int
     {
         return max(3000, min(60000, (int) $value));
+    }
+
+    private static function sanitizeCustomCss(string $value): string
+    {
+        $value = trim(str_replace(["\r\n", "\r", "\0"], ["\n", "\n", ''], $value));
+
+        if (strlen($value) > 20000 || self::customCssHasUnsafeSyntax($value)) {
+            return '';
+        }
+
+        return $value;
+    }
+
+    public static function customCssHasUnsafeSyntax(string $value): bool
+    {
+        return preg_match('/[<>]|@import\b|url\s*\(|expression\s*\(|(?:^|[;{])\s*behavior\s*:|-moz-binding\s*:|javascript\s*:/i', $value) === 1;
     }
 
     private static function normalizedLabel(string $label): string

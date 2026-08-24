@@ -8,6 +8,9 @@
     CoffeePOS.screens = CoffeePOS.screens || {};
 
     CoffeePOS.screens.createCashierController = function (root) {
+        const config = window.CoffeePOSConfig || {};
+        const requireDineInTable = config.requireDineInTable === true || config.requireDineInTable === 1 || config.requireDineInTable === '1';
+        const requireOpenShift = config.requireOpenShift === true || config.requireOpenShift === 1 || config.requireOpenShift === '1';
         const renderer = new CoffeePOS.ui.TemplateRenderer();
         renderer.registerUrlValidator('src', function (value) {
             if (value === undefined || value === null || value === '') {
@@ -42,7 +45,11 @@
                 return;
             }
             if (requested === 'dine_in') {
-                contextController.openTables();
+                if (!requireDineInTable) {
+                    setServiceContext('dine_in', 0).catch(function () {});
+                } else {
+                    contextController.openTables();
+                }
                 return;
             }
             setServiceContext('takeaway', 0).catch(function () {});
@@ -169,12 +176,14 @@
                     ? await api.getCart(existingSessionId)
                     : await api.createCartSession();
                 applyCart(data.cart);
+                applyDefaultService(data.cart, !existingSessionId);
             } catch (error) {
                 if (existingSessionId && error && error.code === 'cart_session_not_found') {
                     rememberPosSessionId('');
                     try {
                         const replacement = await api.createCartSession();
                         applyCart(replacement.cart);
+                        applyDefaultService(replacement.cart, true);
                         return;
                     } catch (replacementError) {
                         error = replacementError;
@@ -262,6 +271,23 @@
             }
         }
 
+        function applyDefaultService(cart, isFresh) {
+            if (!isFresh || !cart || config.defaultOrderType !== 'dine_in' || cart.order_type === 'dine_in') {
+                return;
+            }
+            if (!requireDineInTable) {
+                setServiceContext('dine_in', 0).catch(function () {});
+            } else {
+                orderType.setSelected('dine_in', false);
+                contextController.openTables();
+            }
+        }
+
+        function acceptCheckoutCart(cart, isFresh) {
+            applyCart(cart);
+            applyDefaultService(cart, isFresh === true);
+        }
+
         function attachCustomer(customerId) {
             const cart = store.getState().cart;
             return mutate(function () {
@@ -303,7 +329,7 @@
             renderer,
             api,
             function () { return store.getState().cart; },
-            applyCart,
+            acceptCheckoutCart,
             toast,
             function (type, payload) {
                 if (type === 'checkout.closed') { syncBridge.returnToCart(); return; }
@@ -368,7 +394,7 @@
                     .then(function () { cartPanel.setOrderNoteStatus('Cleared'); })
                     .catch(function () { cartPanel.setOrderNoteStatus('Could not clear'); });
             } else if (action === 'checkout' && cart) {
-                if (!activeShift) {
+                if (requireOpenShift && !activeShift) {
                     toast.show('Open a shift before checkout.', 'error');
                     return;
                 }

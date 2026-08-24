@@ -4,17 +4,20 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
 }
+
 .coffeepos-queue-card {
     background: #fff;
     border: 1px solid #cfd8d2;
     border-radius: 14px;
-    box-shadow: 0 8px 22px rgba(27,48,38,.08);
+    box-shadow: 0 8px 22px rgba(27, 48, 38, .08);
     overflow: hidden;
 }
+
 .coffeepos-queue-card dl {
     margin: 0;
     padding: 12px 16px;
 }
+
 .coffeepos-queue-card dl div {
     display: flex;
     justify-content: space-between;
@@ -22,20 +25,24 @@
     padding: 7px 0;
     border-bottom: 1px solid #edf0ee;
 }
+
 .coffeepos-queue-card dt {
     color: var(--coffeepos-text-muted);
 }
+
 .coffeepos-queue-card dd {
     margin: 0;
     font-weight: 700;
     text-align: right;
 }
+
 .coffeepos-queue-card__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     padding: 12px 16px 16px;
 }
+
 .coffeepos-queue-card__actions .coffeepos-btn {
     flex: 1;
     min-width: 90px;

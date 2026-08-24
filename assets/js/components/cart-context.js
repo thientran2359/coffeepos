@@ -16,6 +16,7 @@
         const createPhone = customerElement.querySelector('[data-component="customer-create-phone"]');
         const createName = customerElement.querySelector('[data-component="customer-create-name"]');
         const createEmail = customerElement.querySelector('[data-component="customer-create-email"]');
+        const memberCreateEnabled = customerElement.getAttribute('data-member-create-enabled') === 'true';
         const tableElement = root.querySelector('[data-component="table-selector"]');
         const tableStatus = tableElement.querySelector('[data-component="table-selector-status"]');
         const tableList = tableElement.querySelector('[data-component="table-list"]');
@@ -87,6 +88,11 @@
 
         function showCreate(phone) {
             customerResult.replaceChildren();
+            if (!memberCreateEnabled) {
+                createPanel.hidden = true;
+                setCustomerStatus('not_found', 'No member was found. Member creation is disabled.');
+                return;
+            }
             createPhone.value = String(phone || '');
             createPanel.hidden = false;
             setCustomerStatus('not_found', 'No member was found. You can create one below.');

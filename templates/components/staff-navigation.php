@@ -21,11 +21,14 @@ $icons = [
 ];
 $displayName = (string) $user->display_name;
 $userInitial = function_exists('mb_substr') ? mb_substr($displayName, 0, 1) : substr($displayName, 0, 1);
+$isCollapsed = \CoffeePOS\Infrastructure\Settings\Settings::isStaffNavCollapsed();
+$toggleLabel = $isCollapsed ? __('Expand navigation', 'coffeepos') : __('Collapse navigation', 'coffeepos');
+$storeName = \CoffeePOS\Infrastructure\Settings\Settings::getStoreName();
 ?>
-<nav class="coffeepos-staff-nav is-collapsed" data-component="staff-navigation" aria-label="<?php esc_attr_e('CoffeePOS staff navigation', 'coffeepos'); ?>">
+<nav class="coffeepos-staff-nav<?php echo $isCollapsed ? ' is-collapsed' : ''; ?>" data-component="staff-navigation" aria-label="<?php esc_attr_e('CoffeePOS staff navigation', 'coffeepos'); ?>">
     <a class="coffeepos-staff-nav__brand" href="<?php echo esc_url(\CoffeePOS\POS\Router::routeUrl()); ?>" aria-label="<?php esc_attr_e('CoffeePOS home', 'coffeepos'); ?>">
         <span class="coffeepos-staff-nav__brand-mark" aria-hidden="true">CP</span>
-        <span class="coffeepos-staff-nav__label">CoffeePOS</span>
+        <span class="coffeepos-staff-nav__label"><?php echo esc_html($storeName); ?></span>
     </a>
     <button
         class="coffeepos-staff-nav__toggle"
@@ -34,10 +37,10 @@ $userInitial = function_exists('mb_substr') ? mb_substr($displayName, 0, 1) : su
         data-label-collapse="<?php esc_attr_e('Collapse navigation', 'coffeepos'); ?>"
         data-label-expand="<?php esc_attr_e('Expand navigation', 'coffeepos'); ?>"
         aria-controls="coffeepos-staff-navigation-links"
-        aria-expanded="false"
-        aria-label="<?php esc_attr_e('Expand navigation', 'coffeepos'); ?>"
-        title="<?php esc_attr_e('Expand navigation', 'coffeepos'); ?>"
-    ><span aria-hidden="true">›</span></button>
+        aria-expanded="<?php echo $isCollapsed ? 'false' : 'true'; ?>"
+        aria-label="<?php echo esc_attr($toggleLabel); ?>"
+        title="<?php echo esc_attr($toggleLabel); ?>"
+    ><span aria-hidden="true"><?php echo $isCollapsed ? '›' : '‹'; ?></span></button>
     <div class="coffeepos-staff-nav__links" id="coffeepos-staff-navigation-links">
         <?php foreach ($items as $item) :
             $itemScreen = (string) ($item['screen'] ?? '');

@@ -457,9 +457,11 @@ Do not build advanced table CRUD unless required.
 Atomically sets the service context using `pos_session_id`,
 `expected_revision`, `order_type`, and, for dine-in, `table_id`.
 
-`dine_in` requires a valid enabled table. `takeaway` clears table context in the
-same mutation. The server resolves the table label and returns the full
-incremented `CartView`.
+When `coffeepos_require_dine_in_table` is enabled, `dine_in` requires a valid
+enabled table. When disabled, `table_id=0` selects dine-in without table
+context. `takeaway` always clears table context in the same mutation. The
+server resolves any supplied table label and returns the full incremented
+`CartView`.
 
 ---
 

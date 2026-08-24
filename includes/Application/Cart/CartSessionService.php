@@ -43,6 +43,8 @@ final class CartSessionService implements CartReconstructorInterface
 
     private ?TableProviderInterface $tableProvider;
 
+    private bool $requireDineInTable;
+
     public function __construct(
         CartSessionStoreInterface $sessionStore,
         CartService $cartService,
@@ -51,7 +53,8 @@ final class CartSessionService implements CartReconstructorInterface
         ProductConfigurationService $configurationService,
         MoneyFormatterInterface $moneyFormatter,
         ?CustomerService $customerService = null,
-        ?TableProviderInterface $tableProvider = null
+        ?TableProviderInterface $tableProvider = null,
+        bool $requireDineInTable = true
     ) {
         $this->sessionStore = $sessionStore;
         $this->cartService = $cartService;
@@ -61,6 +64,7 @@ final class CartSessionService implements CartReconstructorInterface
         $this->moneyFormatter = $moneyFormatter;
         $this->customerService = $customerService;
         $this->tableProvider = $tableProvider;
+        $this->requireDineInTable = $requireDineInTable;
     }
 
     public function createSession(string $currency): CartView
@@ -249,6 +253,12 @@ final class CartSessionService implements CartReconstructorInterface
                 Phase01ErrorCodes::INVALID_CONFIGURATION,
                 'Table provider is not configured.'
             );
+        }
+
+        if ($tableId <= 0 && ! $this->requireDineInTable) {
+            $this->cartService->setOrderType($cart, OrderType::DINE_IN, TableContext::none());
+
+            return $this->persist($cart, $expectedRevision);
         }
 
         $table = $this->tableProvider->findAvailableById($tableId);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CoffeePOS\REST;
 
+use CoffeePOS\Infrastructure\Settings\Settings;
+
 use CoffeePOS\Application\Shift\ShiftService;
 use CoffeePOS\Infrastructure\Concurrency\MySqlLockProvider;
 use CoffeePOS\Infrastructure\Shift\WpdbShiftRepository;
@@ -19,7 +21,7 @@ final class ShiftController
 
     public function __construct(?ShiftService $service = null)
     {
-        $this->service = $service ?? new ShiftService(new WpdbShiftRepository(), new WooCommerceShiftTotalsGateway(), new MySqlLockProvider());
+        $this->service = $service ?? new ShiftService(new WpdbShiftRepository(), new WooCommerceShiftTotalsGateway(), new MySqlLockProvider(), [Settings::class, 'formatTimestamp']);
     }
 
     public function register(string $namespace): void

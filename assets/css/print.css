@@ -2,30 +2,52 @@
 .coffeepos-receipt {
     display: none;
 }
+
+.coffeepos-receipt[data-paper-width="58"] {
+    width: min(100%, 58mm);
+    font-size: 11px;
+}
+
+.coffeepos-receipt__header img {
+    display: block;
+    width: auto;
+    max-width: 42mm;
+    max-height: 22mm;
+    margin: 0 auto 5px;
+    object-fit: contain;
+}
+
 .coffeepos-receipt-item {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     gap: 8px;
 }
+
 .coffeepos-receipt-item small {
     grid-column: 1 / -1;
 }
+
 @media print {
     body.coffeepos:not(.coffeepos-printing) > * {
         display: none !important;
     }
+
     body.coffeepos:not(.coffeepos-printing) #coffeepos-app {
         display: block !important;
     }
+
     body.coffeepos:not(.coffeepos-printing) #coffeepos-app > * {
         display: none !important;
     }
+
     body.coffeepos:not(.coffeepos-printing) #coffeepos-app [data-component="overlay-root"] {
         display: block !important;
     }
+
     body.coffeepos:not(.coffeepos-printing) #coffeepos-app [data-component="overlay-root"] > * {
         display: none !important;
     }
+
     body.coffeepos:not(.coffeepos-printing) #coffeepos-app .coffeepos-receipt {
         display: block !important;
         position: static;
@@ -33,14 +55,17 @@
         color: #000;
     }
 }
+
 @media print {
     body.coffeepos-screen-order-queue:not(.coffeepos-printing) #coffeepos-app .coffeepos-operations > * {
         display: none !important;
     }
+
     body.coffeepos-screen-order-queue:not(.coffeepos-printing) #coffeepos-app .coffeepos-operations {
         display: block !important;
         padding: 0;
     }
+
     body.coffeepos-screen-order-queue:not(.coffeepos-printing) #coffeepos-app [data-component="receipt"] {
         display: block !important;
         position: static;
@@ -48,6 +73,7 @@
         color: #000;
     }
 }
+
 .coffeepos-receipt {
     width: min(100%, 80mm);
     margin: 0 auto;
@@ -55,60 +81,75 @@
     background: #fff;
     color: #000;
 }
+
 .coffeepos-receipt__header {
     text-align: center;
 }
+
 .coffeepos-receipt__header h1, .coffeepos-receipt__header h2, .coffeepos-receipt__header p {
     margin: 3px 0;
 }
+
 .coffeepos-receipt__meta, .coffeepos-receipt__totals {
     margin: 10px 0;
 }
+
 .coffeepos-receipt__meta div, .coffeepos-receipt__totals div {
     display: flex;
     justify-content: space-between;
     gap: 10px;
 }
+
 .coffeepos-receipt__meta dd, .coffeepos-receipt__totals dd {
     margin: 0;
     text-align: right;
 }
+
 .coffeepos-receipt__items {
     border-top: 1px dashed #333;
     border-bottom: 1px dashed #333;
 }
+
 .coffeepos-receipt-item {
     padding: 7px 0;
 }
+
 .coffeepos-receipt-item small:empty {
     display: none;
 }
+
 .coffeepos-receipt__totals .is-total {
     margin-top: 5px;
     padding-top: 5px;
     border-top: 1px solid #333;
     font-size: 16px;
 }
+
 .coffeepos-receipt__order-note {
     padding: 8px;
     border: 1px dashed #555;
     white-space: pre-wrap;
 }
+
 .coffeepos-receipt footer {
     margin-top: 14px;
     text-align: center;
 }
+
 @page {
     margin: 5mm;
 }
+
 @media print {
     body.coffeepos-printing * {
         visibility: hidden !important;
     }
+
     body.coffeepos-printing .coffeepos-receipt,
     body.coffeepos-printing .coffeepos-receipt * {
         visibility: visible !important;
     }
+
     body.coffeepos-printing .coffeepos-receipt {
         display: block !important;
         position: absolute !important;
@@ -116,5 +157,9 @@
         width: 80mm;
         max-width: 100%;
         padding: 0 !important;
+    }
+
+    body.coffeepos-printing .coffeepos-receipt[data-paper-width="58"] {
+        width: 58mm;
     }
 }

@@ -4,6 +4,9 @@
     CoffeePOS.components = CoffeePOS.components || {};
 
     CoffeePOS.components.createCheckoutController = function (root, renderer, api, getCart, onNewCart, toast, onWorkflow) {
+        const config = window.CoffeePOSConfig || {};
+        const paymentMethods = Array.isArray(config.paymentMethods) && config.paymentMethods.length ? config.paymentMethods : ['cash'];
+        const autoPrintReceipt = config.autoPrintReceipt === true || config.autoPrintReceipt === 1 || config.autoPrintReceipt === '1';
         const modal = root.querySelector('[data-component="checkout-modal"]');
         const success = root.querySelector('[data-component="payment-success"]');
         const cashPanel = root.querySelector('[data-component="cash-payment"]');
@@ -14,7 +17,7 @@
         const change = modal.querySelector('[data-field="cash-change"]');
         const errorBox = modal.querySelector('[data-component="checkout-error"]');
         const submit = modal.querySelector('[data-action="submit-checkout"]');
-        let method = 'cash';
+        let method = paymentMethods[0] === 'bank_transfer' ? 'bank_transfer' : 'cash';
         let operationId = '';
         let pending = false;
         let result = null;
@@ -23,6 +26,7 @@
         let publishedPaymentKey = '';
         let publishedCompletedOrder = '';
         let resumedOrderId = 0;
+        let autoPrintedOrderId = 0;
         let previewSequence = 0;
         let previewPending = false;
 
@@ -83,6 +87,7 @@
             } finally { if (sequence === previewSequence) { previewPending = false; } }
         }
         function chooseMethod(next) {
+            if (paymentMethods.indexOf(next) === -1) { return; }
             method = next === 'bank_transfer' ? 'bank_transfer' : 'cash';
             modal.querySelectorAll('[data-payment-method]').forEach(function (button) {
                 const active = button.getAttribute('data-payment-method') === method;
@@ -111,7 +116,8 @@
             total.textContent = String(cart.total.display || normalizedTotal(cart));
             received.value = ''; errorBox.hidden = true; submit.hidden = false;
             setPendingControls(false);
-            chooseMethod('cash'); setOpen(modal, true, 'normal'); received.focus();
+            chooseMethod(paymentMethods[0]); setOpen(modal, true, 'normal');
+            if (method === 'cash') { received.focus(); }
         }
         function close() {
             if (!pending && !(result && result.payment && result.payment.state === 'pending')) {
@@ -137,11 +143,11 @@
             try {
                 result = await api.checkout({ pos_session_id: cart.pos_session_id, expected_revision: cart.revision, client_operation_id: operationId, payment: payment });
                 if (result.payment.state === 'paid') {
-                    setOpen(modal, false); showSuccess(result); return;
+                    setOpen(modal, false); showSuccess(result, true); return;
                 }
                 showPending(result);
             } catch (error) {
-                if (error.code === 'cart_revision_conflict' && error.details && error.details.cart) { onNewCart(error.details.cart); reconcileCart(error.details.cart); }
+                if (error.code === 'cart_revision_conflict' && error.details && error.details.cart) { onNewCart(error.details.cart, false); reconcileCart(error.details.cart); }
                 if (error.code === 'insufficient_cash' && error.details) {
                     const receivedMinor = Number(error.details.received_minor);
                     const requiredMinor = Number(error.details.required_minor);
@@ -172,7 +178,7 @@
                 notify('payment.started', { order: data.order, payment: data.payment });
             }
         }
-        function showSuccess(data) {
+        function showSuccess(data, allowAutoPrint) {
             success.querySelector('[data-field="success-order-number"]').textContent = String(data.order.number);
             success.querySelector('[data-field="success-total"]').textContent = String(data.order.total + ' ' + data.order.currency);
             const cashChange = data.payment.change ? 'Change: ' + data.payment.change : '';
@@ -184,6 +190,10 @@
                 notify('payment.updated', { order: data.order, payment: data.payment });
                 notify('sale.completed', { order: data.order, payment: data.payment });
             }
+            if (allowAutoPrint === true && autoPrintReceipt && autoPrintedOrderId !== Number(data.order.id)) {
+                autoPrintedOrderId = Number(data.order.id);
+                printReceipt();
+            }
         }
         async function refreshStatus() {
             if (!result || !result.order) { return; }
@@ -192,7 +202,7 @@
                 const current = await api.paymentStatus(result.order.id);
                 if (sequence !== statusSequence) { return; }
                 result = current;
-                if (current.payment.state === 'paid') { setOpen(modal, false); showSuccess(current); } else { showPending(current); }
+                if (current.payment.state === 'paid') { setOpen(modal, false); showSuccess(current, false); } else { showPending(current); }
             } catch (error) { toast.show(error.message || 'Payment status could not be refreshed.', 'error'); }
         }
         async function resumeCart(cart) {
@@ -207,7 +217,7 @@
             pending = true;
             try {
                 result = await api.paymentStatus(orderId);
-                if (result.payment && result.payment.state === 'paid') { setOpen(modal, false); showSuccess(result); }
+                if (result.payment && result.payment.state === 'paid') { setOpen(modal, false); showSuccess(result, false); }
                 else { showPending(result); }
             } catch (error) {
                 errorBox.textContent = error.message || 'The pending checkout could not be recovered.';
@@ -224,7 +234,7 @@
                     next_pos_session_id: data.cart.pos_session_id,
                     next_revision: Number(data.cart.revision) || 0
                 });
-                onNewCart(data.cart);
+                onNewCart(data.cart, true);
                 setOpen(modal, false); result = null; resumedOrderId = 0;
             } catch (error) {
                 errorBox.textContent = error.message || 'A new order could not be started.';
@@ -246,7 +256,7 @@
                     next_revision: Number(result.next_cart.revision) || 0
                 });
             }
-            if (result && result.next_cart) { onNewCart(result.next_cart); }
+            if (result && result.next_cart) { onNewCart(result.next_cart, true); }
             setOpen(success, false); result = null;
         }
         received.addEventListener('input', function () { operationId = newOperationId(); preview(); });

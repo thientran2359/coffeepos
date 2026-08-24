@@ -80,6 +80,9 @@ final class AssetLoader
         }
 
         if ($screen === 'settings') {
+            if (current_user_can('upload_files') && function_exists('wp_enqueue_media')) {
+                wp_enqueue_media();
+            }
             $this->registerSettingsScripts($version);
             $appDependencies[] = 'coffeepos-screen-settings';
         }
@@ -101,6 +104,17 @@ final class AssetLoader
             'posSessionId' => $screen === 'customer' && $pairingValid ? $pairingInput : '',
             'pairingState' => $screen === 'customer' ? ($pairingValid ? 'paired' : ($pairingInput === '' ? 'missing' : 'invalid')) : '',
             'pollIntervalMs' => $screen === 'kds' ? Settings::getKdsPollInterval() : ($screen === 'order-queue' ? Settings::getOrderQueuePollInterval() : 0),
+            'storeName' => Settings::getStoreName(),
+            'defaultOrderType' => (string) Settings::get(Settings::OPTION_DEFAULT_ORDER_TYPE),
+            'requireDineInTable' => (bool) Settings::get(Settings::OPTION_REQUIRE_DINE_IN_TABLE),
+            'requireOpenShift' => (bool) Settings::get(Settings::OPTION_REQUIRE_OPEN_SHIFT),
+            'paymentMethods' => Settings::enabledPaymentMethods(),
+            'receiptPaperWidth' => (string) Settings::get(Settings::OPTION_RECEIPT_PAPER_WIDTH),
+            'autoPrintReceipt' => (bool) Settings::get(Settings::OPTION_RECEIPT_AUTO_PRINT),
+            'membershipEnabled' => (bool) Settings::get(Settings::OPTION_MEMBERSHIP_ENABLED),
+            'memberCreateEnabled' => (bool) Settings::get(Settings::OPTION_MEMBER_CREATE_ENABLED),
+            'memberRequiredFields' => Settings::memberRequiredFields(),
+            'kdsSoundEnabled' => (bool) Settings::get(Settings::OPTION_KDS_SOUND_ENABLED),
             'canRefundOrders' => current_user_can(\CoffeePOS\Support\Capabilities::REFUND_ORDERS),
             'canCancelOrders' => current_user_can(\CoffeePOS\Support\Capabilities::CANCEL_ORDERS),
             'canReorderOrders' => current_user_can(\CoffeePOS\Support\Capabilities::REORDER_ORDERS),
@@ -135,6 +149,7 @@ final class AssetLoader
                 $version
             );
             wp_enqueue_style('coffeepos-screen-customer');
+            $this->enqueueAppearanceStyles('coffeepos-screen-customer');
 
             return;
         }
@@ -181,6 +196,23 @@ final class AssetLoader
         }
 
         wp_enqueue_style($lastHandle);
+        $this->enqueueAppearanceStyles($lastHandle);
+    }
+
+    private function enqueueAppearanceStyles(string $handle): void
+    {
+        $appearanceCss = sprintf(
+            ':root{--coffeepos-primary:%s;--coffeepos-primary-dark:%s;}',
+            Settings::getBrandColor(),
+            Settings::getBrandDarkColor()
+        );
+        $customCss = Settings::getCustomCss();
+
+        if ($customCss !== '') {
+            $appearanceCss .= "\n" . $customCss;
+        }
+
+        wp_add_inline_style($handle, $appearanceCss);
     }
 
     private function registerStyle(string $handle, string $path, array $dependencies, string $version, string $media = 'all'): void

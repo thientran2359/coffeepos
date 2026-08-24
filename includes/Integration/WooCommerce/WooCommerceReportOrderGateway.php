@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CoffeePOS\Integration\WooCommerce;
 
 use CoffeePOS\Application\Contracts\ReportOrderGatewayInterface;
+use CoffeePOS\Infrastructure\Settings\Settings;
 
 final class WooCommerceReportOrderGateway implements ReportOrderGatewayInterface
 {
@@ -52,7 +53,7 @@ final class WooCommerceReportOrderGateway implements ReportOrderGatewayInterface
     private function project($order): array
     {
         $date = $order->get_date_created();
-        $zone = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone('UTC');
+        $zone = Settings::getTimezone();
         $hour = $date ? (int) $date->setTimezone($zone)->format('G') : 0;
         $items = [];
 

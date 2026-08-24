@@ -25,7 +25,7 @@
 
         };
 
-        update(true);
+        update(root.classList.contains('is-staff-nav-collapsed'));
         toggle.addEventListener('click', function () {
             update(!root.classList.contains('is-staff-nav-collapsed'));
         });

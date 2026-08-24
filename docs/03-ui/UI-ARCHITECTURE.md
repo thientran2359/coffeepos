@@ -621,6 +621,33 @@ Changing it requires:
 2. documentation update
 3. consumer update
 4. verification
+
+## CoffeePOS Appearance Settings
+
+The POS shell renders its initial navigation, density, and product-image state
+from CoffeePOS options before JavaScript boots. JavaScript may toggle the staff
+navigation during the current page lifetime, but must not overwrite the
+configured initial state on boot.
+
+The selected brand color overrides the shared `--coffeepos-primary` and
+`--coffeepos-primary-dark` variables. Custom CSS is appended after the last
+route-owned stylesheet only for `Router::isPosRequest()` pages. It does not load
+in wp-admin or the WooCommerce storefront. Custom CSS is an advanced visual
+override and cannot define application behavior.
+
+The protected `/pos/settings/` screen groups its bounded controls as General,
+Appearance, Sales, Tables, Payments, Operations, Item Quick Notes, Receipt,
+Membership, and a collapsed Advanced section. General identity is the only
+store identity rendered by CoffeePOS Login, staff/customer shells, VietQR, and
+receipts; these surfaces do not fall back to the WordPress site title or
+WooCommerce store address.
+
+Sales, payment-method and membership flags are projections for the browser,
+not authorization. Their REST/application services repeat the configured rule.
+The success overlay remains visible until a new cart by fixed workflow contract
+and is not configurable. Receipt auto-print is triggered only once after the
+checkout request that created the order; recovery and refresh never print
+implicitly. Advanced export/import is JSON and excludes internal POS page IDs.
 ## Phase 09 Shift Management
 
 `/pos/shifts/` owns the open, active/reconciliation, and history states. The

@@ -7,6 +7,7 @@
     padding: 24px;
     background: radial-gradient(circle at top, #f4e7d3, #ece7df 55%, #d9d0c3);
 }
+
 .coffeepos-login__card {
     width: min(100%, 440px);
     padding: 32px;
@@ -14,18 +15,22 @@
     background: #fff;
     box-shadow: 0 24px 70px rgba(53, 35, 20, .18);
 }
+
 .coffeepos-login__card form,
 .coffeepos-login__card label:not(.coffeepos-login__remember) {
     display: grid;
     gap: 8px;
 }
+
 .coffeepos-login__card form [type=checkbox],
 .coffeepos-login__card form [type=radio] {
     margin-bottom: 0;
 }
+
 .coffeepos-login__card form {
     gap: 18px;
 }
+
 .coffeepos-login__card input[type="text"],
 .coffeepos-login__card input[type="password"] {
     min-height: 48px;
@@ -35,15 +40,26 @@
     margin-bottom: 0;
     font: inherit;
 }
+
 .coffeepos-login__remember {
     display: flex;
     gap: 8px;
     align-items: center;
 }
+
 .coffeepos-login__error,
 .coffeepos-login__notice {
     padding: 12px;
     border-radius: 10px;
     background: #fff0ed;
     color: #8c261d;
+}
+
+.coffeepos-store-logo {
+    display: block;
+    width: auto;
+    max-width: 180px;
+    max-height: 90px;
+    margin: 0 auto 12px;
+    object-fit: contain;
 }

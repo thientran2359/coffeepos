@@ -17,10 +17,12 @@ final class OrderHistoryService
     private CartReconstructorInterface $carts;
     private OperationalOrderService $operations;
     private LockProviderInterface $locks;
+    private \DateTimeZone $timezone;
 
-    public function __construct(OrderHistoryGatewayInterface $orders, CartReconstructorInterface $carts, OperationalOrderService $operations, LockProviderInterface $locks)
+    public function __construct(OrderHistoryGatewayInterface $orders, CartReconstructorInterface $carts, OperationalOrderService $operations, LockProviderInterface $locks, ?\DateTimeZone $timezone = null)
     {
         $this->orders = $orders; $this->carts = $carts; $this->operations = $operations; $this->locks = $locks;
+        $this->timezone = $timezone ?? (function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone('UTC'));
     }
 
     public function list(array $input): array
@@ -94,8 +96,7 @@ final class OrderHistoryService
     {
         $value = trim($value); if ($value === '') { return 0; }
         if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) { throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_ORDER_FILTER, 'Date filter must use YYYY-MM-DD.'); }
-        $zone = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone('UTC');
-        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value, $zone);
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value, $this->timezone);
         if (! $date || $date->format('Y-m-d') !== $value) { throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_ORDER_FILTER, 'Date filter is invalid.'); }
         return $end ? $date->setTime(23, 59, 59)->getTimestamp() : $date->getTimestamp();
     }

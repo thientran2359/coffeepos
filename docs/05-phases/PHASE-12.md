@@ -187,8 +187,9 @@ current route, displays the staff display name, may show current shift state,
 and includes WordPress logout. The Settings destination points to the protected
 frontend `/pos/settings/` screen only for `coffeepos_manage_settings` users.
 
-The component is a persistent left sidebar that starts as a compact icon rail
-on every page load and may be expanded by staff for the current page. Desktop
+The component is a persistent left sidebar whose initial compact or expanded
+state is server rendered from CoffeePOS Appearance settings and may be toggled
+by staff for the current page. Desktop
 links show icons and labels when expanded; compact links retain accessible
 labels and titles, and the toggle exposes its current expanded state. Its route
 list may scroll vertically while staff identity and WordPress logout remain
@@ -197,6 +198,39 @@ has no hidden keyboard trap. Login and Customer Display do not render it.
 
 Menu filtering is not authorization. Direct routes, REST data, exports, receipt,
 refund, cancel, and reorder repeat exact server checks.
+
+### 10.1 Reduced frontend settings
+
+The approved Phase-12 extension moves the reduced CoffeePOS configuration to
+the protected frontend Settings screen. It exposes General POS identity,
+Appearance, Sales defaults/requirements, the existing Tables and Quick Notes,
+Payments, Receipt, Membership, Operations, and a collapsed Advanced section.
+CoffeePOS identity is independent from WordPress site identity and WooCommerce
+store-address settings.
+
+Appearance contains brand color, initial staff-menu state, normal/compact
+density, product-image visibility, and Custom CSS. These options affect
+`/pos/*` only and do not modify the WordPress theme, wp-admin, the WooCommerce
+storefront, catalog values, or transaction rules.
+
+Custom CSS is limited to 20 KB and loaded after the route-owned stylesheet. It
+rejects HTML delimiters, URL references, `@import`, `expression`, `behavior`,
+`-moz-binding`, and JavaScript URL syntax. Initial shell classes are emitted by
+PHP so a configured menu, density, or product-image state does not flash through
+a different default while JavaScript starts.
+
+Sales defaults new carts to takeaway or dine-in and lets an administrator
+require table context and an open shift. Payment settings may enable cash,
+bank transfer, or both, but never neither. The same choices are enforced by the
+server. Membership may be disabled, member creation may be disabled, and the
+required creation fields may include name/email while phone remains mandatory.
+
+Receipt supports 58/80 mm width, one-time auto-print after successful checkout,
+private order-note inclusion, and footer text. General identity supplies its
+store header. Operations retains bounded polling and adds global permission for
+the existing KDS sound control. Advanced owns base URL, uninstall behavior,
+versioned JSON export/import, and read-only diagnostics; internal page IDs are
+not editable or importable.
 
 ## 11. Item Quick Notes
 
@@ -281,7 +315,7 @@ Required projection:
 ```text
 store name and address
 order ID/number
-created time in WordPress timezone
+created time in the configured CoffeePOS timezone/date/time format
 cashier display name
 customer-safe identity
 order type and table
@@ -343,6 +377,9 @@ coffeepos_receipt_print_order_note    new boolean option, default false
 _coffeepos_order_note                 new private WooCommerce order meta
 _coffeepos_quick_notes                version-compatible order-item meta
 ```
+
+The CoffeePOS settings options and defaults are enumerated in `DATABASE.md`.
+This extension adds no custom table and no transaction data to options.
 
 No new custom database table is permitted. WordPress users/roles/capabilities,
 the WooCommerce session, WooCommerce order/order-item CRUD, and WordPress Options

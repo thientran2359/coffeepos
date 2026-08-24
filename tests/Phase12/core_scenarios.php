@@ -49,6 +49,8 @@ $restored = $serializer->fromPayload($serializer->toPayload($cart));
 $assert($restored->orderNote() === 'Deliver all drinks together', 'TC-09 session serializer lost the order note.');
 $cart->clearItems();
 $assert($cart->orderNote() === '', 'TC-10 clearing the cart did not clear its order note.');
+$cart->setOrderType(\CoffeePOS\Domain\Order\OrderType::dineIn(), \CoffeePOS\Domain\Order\TableContext::none());
+$assert($cart->orderType()->isDineIn() && ! $cart->tableContext()->hasTable(), 'TC-10 configurable Dine-in without table is blocked by the cart domain.');
 try {
     $restored->setOrderNote(str_repeat('a', 2001));
     $assert(false, 'TC-11 oversized order note was accepted.');
@@ -72,6 +74,18 @@ $settingsUi = $source('templates/settings/content.php') . $source('includes/POS/
 $assert(strpos($settingsUi, '[product_ids]') !== false && strpos($settings, 'sanitizeIdList') !== false, 'TC-15 quick-note applicability must be settings-editable and normalized.');
 $assert(strpos($settingsUi, 'service_tables_text') !== false && strpos($settingsUi, 'coffeepos_save_settings') !== false && strpos($settings, 'serviceTablesFromText') !== false, 'TC-15 Dine-in table textarea/settings save contract is incomplete.');
 $assert(strpos($settingsUi, 'coffeepos-quick-note-row-template') !== false && strpos($settingsUi, 'add-quick-note') !== false && strpos($settingsUi, 'remove-quick-note') !== false && strpos($settingsUi, 'createSettingsController') !== false && strpos($settingsUi, 'validateQuickNotes') !== false && strpos($settingsUi, 'coffeepos-screen-settings') !== false, 'TC-15 dynamic quick-note settings management is incomplete.');
+$reducedSettings = $settingsUi . $source('includes/REST/CartController.php') . $source('includes/REST/CheckoutController.php') . $source('includes/Application/Checkout/CheckoutService.php') . $source('includes/Integration/WooCommerce/WooCommerceOrderGateway.php');
+foreach (['OPTION_STORE_NAME', 'OPTION_DEFAULT_ORDER_TYPE', 'OPTION_CASH_ENABLED', 'OPTION_RECEIPT_PAPER_WIDTH', 'OPTION_MEMBERSHIP_ENABLED', 'OPTION_KDS_SOUND_ENABLED'] as $optionConstant) {
+    $assert(strpos($reducedSettings, $optionConstant) !== false, 'TC-15 reduced Settings group is not wired: ' . $optionConstant);
+}
+$assert(strpos($reducedSettings, 'enabledPaymentMethods') !== false && strpos($reducedSettings, 'Payment method is disabled') !== false, 'TC-15 disabled payment methods are not enforced server-side.');
+$assert(strpos($reducedSettings, 'settings_action') !== false && strpos($reducedSettings, 'schema_version') !== false && strpos($reducedSettings, 'settings_diagnostics') !== false, 'TC-15 Advanced export/import/diagnostics contract is incomplete.');
+$appearance = $settingsUi . $source('templates/components/screen-shell.php') . $source('templates/components/staff-navigation.php') . $source('assets/css/components.css') . $source('assets/css/screens/cashier.css');
+$assert(strpos($appearance, 'OPTION_BRAND_COLOR') !== false && strpos($appearance, 'OPTION_CUSTOM_CSS') !== false && strpos($appearance, 'enqueueAppearanceStyles') !== false && strpos($appearance, 'is-density-') !== false && strpos($appearance, 'is-product-images-hidden') !== false, 'TC-15 CoffeePOS Appearance settings are not applied by the POS shell.');
+$assert(strpos($settings, 'customCssHasUnsafeSyntax') !== false && strpos($settings, 'strlen($value) > 20000') !== false && strpos($appearance, 'maxlength="20000"') !== false, 'TC-15 Custom CSS safety and size boundaries are incomplete.');
+$assert(! \CoffeePOS\Infrastructure\Settings\Settings::customCssHasUnsafeSyntax('#coffeepos-app { --coffeepos-radius: 12px; }'), 'TC-15 safe scoped Custom CSS was rejected.');
+$assert(\CoffeePOS\Infrastructure\Settings\Settings::customCssHasUnsafeSyntax('@import "https://example.test/theme.css";'), 'TC-15 external Custom CSS import was accepted.');
+$assert(\CoffeePOS\Infrastructure\Settings\Settings::customCssHasUnsafeSyntax('.card { background: url(https://example.test/a.png); }'), 'TC-15 external Custom CSS URL was accepted.');
 $quickNoteValidator = new ReflectionMethod(\CoffeePOS\POS\SettingsScreen::class, 'validateQuickNotes');
 $quickNoteValidator->setAccessible(true);
 $settingsScreen = new \CoffeePOS\POS\SettingsScreen();
@@ -98,7 +112,7 @@ $assert(strpos($orderGateway, "'_coffeepos_order_note'") !== false && strpos($or
 $receipt = $source('templates/receipt/receipt.php') . $source('assets/js/components/receipt-printer.js');
 $assert(strpos($receipt, 'coffeepos-receipt-item-template') !== false && strpos($receipt, 'Receipt data is incomplete') !== false && strpos($receipt, 'innerHTML') === false, 'TC-18 authoritative PHP-owned receipt rendering is incomplete.');
 $navigation = $source('templates/components/staff-navigation.php') . $source('templates/components/screen-shell.php') . $source('assets/css/components.css') . $source('assets/js/app.js');
-$assert(strpos($navigation, 'staff-navigation') !== false && strpos($navigation, "['login', 'customer']") !== false && strpos($navigation, 'coffeepos-staff-nav__icon') !== false && strpos($navigation, 'grid-template-columns: 220px') !== false && strpos($navigation, 'toggle-staff-navigation') !== false && strpos($navigation, 'update(true)') !== false && strpos($navigation, "class=\"<?php echo \$isStaffScreen ? 'is-staff-nav-collapsed' : ''; ?>\"") !== false, 'TC-19 shared default-collapsed left-sidebar navigation boundary is incomplete.');
+$assert(strpos($navigation, 'staff-navigation') !== false && strpos($navigation, "['login', 'customer']") !== false && strpos($navigation, 'coffeepos-staff-nav__icon') !== false && strpos($navigation, 'grid-template-columns: 220px') !== false && strpos($navigation, 'toggle-staff-navigation') !== false && strpos($navigation, "update(root.classList.contains('is-staff-nav-collapsed'))") !== false && strpos($navigation, 'Settings::isStaffNavCollapsed()') !== false, 'TC-19 shared configurable left-sidebar navigation boundary is incomplete.');
 $managementHeaders = $source('templates/shifts/content.php') . $source('templates/order-history/content.php') . $source('templates/reports/content.php') . $source('templates/settings/content.php');
 $assert(substr_count($managementHeaders, 'coffeepos-operations__header') === 4 && substr_count($managementHeaders, 'coffeepos-operations__tools') === 4 && strpos($managementHeaders, 'coffeepos-operations-header') === false && strpos($managementHeaders, 'coffeepos-reports-header') === false && strpos($managementHeaders, 'coffeepos-settings__header') === false, 'TC-20 management screens do not share the Order Queue header contract.');
 $assetLoader = $source('includes/Infrastructure/Assets/AssetLoader.php');

@@ -265,7 +265,9 @@ dine_in
 takeaway
 ```
 
-Dine-in requires table context.
+Dine-in may carry table context. When `coffeepos_require_dine_in_table` is
+enabled (the default), application validation requires a configured table;
+when disabled, the domain permits dine-in with `TableContext::none()`.
 
 Takeaway does not require a table.
 
@@ -559,7 +561,8 @@ WooCommerce remains outside CoffeePOS domain aggregates and is accessed through 
 
 ### Order Type
 
-- dine-in requires table context
+- dine-in requires table context when the CoffeePOS table requirement is enabled
+- dine-in without table context is valid only when that requirement is disabled
 - takeaway does not require table context
 
 ### Payment

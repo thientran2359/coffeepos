@@ -432,7 +432,9 @@ decision.
 
 # 14. Dine-in Transition
 
-Selecting dine-in requires table context.
+Selecting dine-in requires table context by default. The approved frontend
+Settings extension may disable that requirement; the server remains
+authoritative for the configured rule.
 
 Recommended UI flow:
 
@@ -970,7 +972,7 @@ Phase 04 is complete when:
 20. The initial UI renders order type from `CartView`.
 21. Selecting dine-in opens the table-selection flow.
 22. Canceling table selection preserves the previous cart context.
-23. Dine-in cannot persist without a valid table.
+23. Dine-in cannot persist without a valid table while the table requirement is enabled.
 24. Table choices load through `TableProviderInterface` or equivalent boundary.
 25. The client submits table ID, not a trusted table label.
 26. Unknown or disabled table IDs are rejected server-side.

@@ -31,7 +31,7 @@
             orders = Array.isArray(data.items) ? data.items : []; pages = Number(data.pages || 0); list.replaceChildren();
             orders.forEach(function (order) {
                 const node = cardTemplate.content.firstElementChild.cloneNode(true); node.setAttribute('data-order-id', String(order.id));
-                setField(node, 'number', 'Order #' + order.number); setField(node, 'created', new Date(order.created_at).toLocaleString());
+                setField(node, 'number', 'Order #' + order.number); setField(node, 'created', order.created_at_display || new Date(order.created_at).toLocaleString());
                 setField(node, 'customer', order.customer.display_name || 'Guest'); setField(node, 'service', service(order));
                 setField(node, 'status', order.status_label); setField(node, 'total', order.totals.total.display); list.appendChild(node);
             });
@@ -47,7 +47,7 @@
         }
         function renderDetail(order) {
             selected = order; setField(detailDialog, 'detail-status', order.status_label); setField(detailDialog, 'detail-number', 'Order #' + order.number);
-            setField(detailDialog, 'detail-created', new Date(order.created_at).toLocaleString()); setField(detailDialog, 'detail-customer', order.customer.display_name || 'Guest');
+            setField(detailDialog, 'detail-created', order.created_at_display || new Date(order.created_at).toLocaleString()); setField(detailDialog, 'detail-customer', order.customer.display_name || 'Guest');
             setField(detailDialog, 'detail-service', service(order)); setField(detailDialog, 'detail-payment', order.payment.method_label || order.payment.method || '—');
             setField(detailDialog, 'detail-subtotal', order.totals.subtotal.display); setField(detailDialog, 'detail-discount', order.totals.discount.display);
             setField(detailDialog, 'detail-refunded', order.totals.refunded.display); setField(detailDialog, 'detail-total', order.totals.total.display);

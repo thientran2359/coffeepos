@@ -20,16 +20,19 @@ final class CustomerService
     private ?MembershipProviderInterface $membershipProvider;
 
     private ?LockProviderInterface $lockProvider;
+    private array $requiredCreationFields;
 
     public function __construct(
         ?CustomerGatewayInterface $customerGateway = null,
         ?MembershipProviderInterface $membershipProvider = null,
-        ?LockProviderInterface $lockProvider = null
+        ?LockProviderInterface $lockProvider = null,
+        array $requiredCreationFields = ['phone', 'name']
     )
     {
         $this->customerGateway = $customerGateway;
         $this->membershipProvider = $membershipProvider;
         $this->lockProvider = $lockProvider;
+        $this->requiredCreationFields = array_values(array_unique(array_merge(['phone'], array_intersect(['phone', 'name', 'email'], $requiredCreationFields))));
     }
 
     public function guestContext(): CustomerContext
@@ -177,7 +180,7 @@ final class CustomerService
         $email = trim((string) ($input['email'] ?? ''));
         $operationId = trim((string) ($input['client_operation_id'] ?? ''));
 
-        if ($displayName === '') {
+        if ($displayName === '' && in_array('name', $this->requiredCreationFields, true)) {
             throw Phase01Exception::withCode(
                 Phase01ErrorCodes::INVALID_CUSTOMER_NAME,
                 'Enter a member name.'
@@ -196,6 +199,17 @@ final class CustomerService
             throw Phase01Exception::withCode(
                 Phase01ErrorCodes::INVALID_CUSTOMER_PHONE,
                 'Enter a valid phone number.'
+            );
+        }
+
+        if ($displayName === '') {
+            $displayName = 'Member ' . substr($phone, -4);
+        }
+
+        if ($email === '' && in_array('email', $this->requiredCreationFields, true)) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::INVALID_CUSTOMER_EMAIL,
+                'Enter a member email address.'
             );
         }
 

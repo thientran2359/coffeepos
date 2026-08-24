@@ -170,15 +170,22 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
         $cashier = $cashierId > 0 ? get_userdata($cashierId) : false;
         $phone = preg_replace('/\D+/', '', (string) $order->get_billing_phone()) ?? '';
         $maskedPhone = strlen($phone) > 6 ? substr($phone, 0, 4) . '***' . substr($phone, -3) : $phone;
-        $address = array_filter([
-            (string) get_option('woocommerce_store_address', ''),
-            (string) get_option('woocommerce_store_address_2', ''),
-            (string) get_option('woocommerce_store_city', ''),
-        ]);
         $orderNote = Settings::shouldPrintOrderNote() ? (string) $order->get_meta('_coffeepos_order_note', true) : '';
+        $created = $order->get_date_created();
         return [
-            'store' => ['name' => get_bloginfo('name'), 'address' => implode(', ', $address)],
-            'order' => ['id' => $order->get_id(), 'number' => $order->get_order_number(), 'created_at' => $order->get_date_created() ? $order->get_date_created()->date('c') : ''],
+            'store' => [
+                'name' => Settings::getStoreName(),
+                'branch_name' => (string) Settings::get(Settings::OPTION_BRANCH_NAME),
+                'logo_url' => Settings::getLogoUrl(),
+                'address' => (string) Settings::get(Settings::OPTION_STORE_ADDRESS),
+                'phone' => (string) Settings::get(Settings::OPTION_STORE_PHONE),
+            ],
+            'order' => [
+                'id' => $order->get_id(),
+                'number' => $order->get_order_number(),
+                'created_at' => $created ? $created->date('c') : '',
+                'created_at_display' => $created ? Settings::formatTimestamp($created->getTimestamp()) : '',
+            ],
             'cashier' => ['id' => $cashierId, 'display_name' => $cashier ? (string) $cashier->display_name : ''],
             'customer' => ['name' => trim($order->get_billing_first_name() . ' ' . $order->get_billing_last_name()) ?: __('Guest', 'coffeepos'), 'phone_masked' => $maskedPhone],
             'service' => ['order_type' => (string) $order->get_meta('_coffeepos_order_type', true), 'table_label' => (string) $order->get_meta('_coffeepos_table_label', true)],
@@ -193,6 +200,8 @@ final class WooCommerceOrderGateway implements OrderGatewayInterface
             'payment' => $this->paymentProjection($order),
             'order_note' => $orderNote,
             'show_order_note' => $orderNote !== '',
+            'paper_width' => (string) Settings::get(Settings::OPTION_RECEIPT_PAPER_WIDTH),
+            'footer' => (string) Settings::get(Settings::OPTION_RECEIPT_FOOTER),
         ];
     }
 

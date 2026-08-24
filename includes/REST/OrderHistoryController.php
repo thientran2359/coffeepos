@@ -14,6 +14,7 @@ use CoffeePOS\Application\Product\ProductService;
 use CoffeePOS\Application\Product\VariationService;
 use CoffeePOS\Infrastructure\Concurrency\MySqlLockProvider;
 use CoffeePOS\Infrastructure\Settings\SettingsProductConfigurationProvider;
+use CoffeePOS\Infrastructure\Settings\Settings;
 use CoffeePOS\Integration\WooCommerce\WooCommerceCartSessionStore;
 use CoffeePOS\Integration\WooCommerce\WooCommerceMoneyFormatter;
 use CoffeePOS\Integration\WooCommerce\WooCommerceOperationalOrderGateway;
@@ -36,7 +37,7 @@ final class OrderHistoryController
         $variation = new VariationService(new WooCommerceVariationGateway());
         $configuration = new ProductConfigurationService($product, $variation, new SettingsProductConfigurationProvider());
         $carts = new CartSessionService(new WooCommerceCartSessionStore(), new CartService(new CartValidationService(), new WooCommerceStockGateway()), $product, $variation, $configuration, new WooCommerceMoneyFormatter());
-        $this->service = $service ?? new OrderHistoryService(new WooCommerceOrderHistoryGateway(), $carts, new OperationalOrderService(new WooCommerceOperationalOrderGateway()), new MySqlLockProvider());
+        $this->service = $service ?? new OrderHistoryService(new WooCommerceOrderHistoryGateway(), $carts, new OperationalOrderService(new WooCommerceOperationalOrderGateway()), new MySqlLockProvider(), Settings::getTimezone());
     }
 
     public function register(string $namespace): void

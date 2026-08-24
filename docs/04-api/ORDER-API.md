@@ -54,6 +54,11 @@ manual input. The server revalidates the same revision, creates one order,
 marks it paid, records cashier/time audit metadata, completes the source cart,
 and returns a fresh cart. Client-supplied totals or paid states remain forbidden.
 
+Cash and bank transfer availability comes from CoffeePOS settings. The server
+rejects a disabled method even if a client submits it directly. The configured
+VietQR reference prefix is normalized server-side; it changes only the payment
+reference and never proves payment success.
+
 ## 1. Purpose
 
 This document defines the server contract for turning a POS cart into a WooCommerce order and performing operational order actions.
@@ -512,6 +517,8 @@ browser operation that can mark an order paid. Receipt data comes only from the
 saved order.
 ## Phase 09 Order-to-Shift Association
 
-Checkout resolves the authenticated cashier's active shift before order
-creation. The client cannot provide a shift ID. Every new POS order persists
-the resolved ID in `_coffeepos_shift_id`; shift totals query this association.
+When `coffeepos_require_open_shift` is enabled (the default), checkout resolves
+the authenticated cashier's active shift before order creation. When disabled,
+checkout may create an order with shift ID `0`. The client can never provide a
+shift ID. Orders created during a resolved shift persist it in
+`_coffeepos_shift_id`; shift totals query this association.

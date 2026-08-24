@@ -29,8 +29,8 @@ final class PendingVietQrGateway implements PaymentGatewayInterface
                 'amount' => (string) ($order['total'] ?? ''),
                 'des' => $reference,
                 'holder' => $name,
-                'store' => (string) get_bloginfo('name'),
-                'template' => 'qronly',
+                'store' => Settings::getStoreName(),
+                'template' => (string) Settings::get(Settings::OPTION_VIETQR_TEMPLATE),
                 'showinfo' => 'false',
             ], '', '&', PHP_QUERY_RFC3986)];
         }

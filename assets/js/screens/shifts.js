@@ -22,7 +22,7 @@
             shift = value || null; openPanel.hidden = !!shift; activePanel.hidden = !shift;
             if (!shift) { return; }
             field('shift-number', 'Shift #' + shift.id);
-            field('shift-meta', shift.cashier_name + ' · ' + new Date(shift.opened_at).toLocaleString());
+            field('shift-meta', shift.cashier_name + ' · ' + (shift.opened_at_display || new Date(shift.opened_at).toLocaleString()));
             field('opening-cash', money(shift.opening_cash, shift.currency)); field('cash-sales', money(shift.cash_sales, shift.currency));
             field('bank-sales', money(shift.bank_sales, shift.currency)); field('total-sales', money(shift.total_sales, shift.currency));
             field('expected-cash', money(shift.expected_cash, shift.currency)); field('order-count', String(shift.order_count));
@@ -32,7 +32,7 @@
             historyNode.replaceChildren(); emptyNode.hidden = items.length > 0;
             items.forEach(function (item) {
                 const node = rowTemplate.content.firstElementChild.cloneNode(true);
-                const values = {number: 'Shift #' + item.id, period: new Date(item.opened_at).toLocaleString() + ' – ' + new Date(item.closed_at).toLocaleString(), sales: money(item.total_sales, item.currency), expected: money(item.expected_cash, item.currency), actual: money(item.actual_cash, item.currency), variance: money(item.variance, item.currency)};
+                const values = {number: 'Shift #' + item.id, period: (item.opened_at_display || new Date(item.opened_at).toLocaleString()) + ' – ' + (item.closed_at_display || new Date(item.closed_at).toLocaleString()), sales: money(item.total_sales, item.currency), expected: money(item.expected_cash, item.currency), actual: money(item.actual_cash, item.currency), variance: money(item.variance, item.currency)};
                 Object.keys(values).forEach(function (key) { node.querySelector('[data-field="' + key + '"]').textContent = values[key]; });
                 historyNode.appendChild(node);
             });

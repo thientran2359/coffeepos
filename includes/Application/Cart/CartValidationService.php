@@ -12,6 +12,13 @@ use CoffeePOS\Domain\Order\TableContext;
 
 final class CartValidationService
 {
+    private bool $requireDineInTable;
+
+    public function __construct(bool $requireDineInTable = true)
+    {
+        $this->requireDineInTable = $requireDineInTable;
+    }
+
     public function validateQuantity(int $quantity): void
     {
         if ($quantity < 1) {
@@ -24,7 +31,7 @@ final class CartValidationService
 
     public function validateOrderTypeAndTable(OrderType $orderType, TableContext $tableContext): void
     {
-        if ($orderType->isDineIn() && ! $tableContext->hasTable()) {
+        if ($this->requireDineInTable && $orderType->isDineIn() && ! $tableContext->hasTable()) {
             throw Phase01Exception::withCode(
                 Phase01ErrorCodes::TABLE_REQUIRED,
                 'Dine-in orders require table context.'

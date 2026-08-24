@@ -4,12 +4,13 @@
     CoffeePOS.screens = CoffeePOS.screens || {};
     CoffeePOS.screens.createKdsController = function (root) {
         const config = window.CoffeePOSConfig || {};
+        const kdsSoundEnabled = config.kdsSoundEnabled === true || config.kdsSoundEnabled === 1 || config.kdsSoundEnabled === '1';
         const renderer = new CoffeePOS.ui.TemplateRenderer();
         const toast = CoffeePOS.ui.createToastController(root, renderer);
         const api = CoffeePOS.api.createPosApi(CoffeePOS.api.createClient());
         const store = CoffeePOS.state.createKdsStore();
         const grid = CoffeePOS.components.createKdsOrderGrid(root, renderer);
-        const sound = CoffeePOS.components.createKdsSound();
+        const sound = CoffeePOS.components.createKdsSound(kdsSoundEnabled);
         const timer = CoffeePOS.components.createKdsTimer(root, function () { return store.getState().serverOffset; });
         const status = root.querySelector('[data-component="kds-refresh-status"]');
         const loading = root.querySelector('[data-component="kds-loading"]');
@@ -17,6 +18,7 @@
         const errorBox = root.querySelector('[data-component="kds-error"]');
         const errorText = root.querySelector('[data-field="kds-error-message"]');
         const soundButton = root.querySelector('[data-action="toggle-kds-sound"]');
+        if (soundButton && !kdsSoundEnabled) { soundButton.hidden = true; }
         let poller = null;
 
         function selectedStates() { const filter = store.getState().filter; return filter === 'all' ? ['new', 'preparing', 'ready'] : [filter]; }

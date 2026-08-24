@@ -198,10 +198,6 @@ final class Cart
 
         $nextTableContext = $tableContext ?? $this->tableContext;
 
-        if (! $nextTableContext->hasTable()) {
-            throw new \InvalidArgumentException('Dine-in orders require table context.');
-        }
-
         $this->orderType = $orderType;
         $this->tableContext = $nextTableContext;
     }
@@ -210,10 +206,6 @@ final class Cart
     {
         if ($this->orderType->isTakeaway() && $tableContext->hasTable()) {
             throw new \InvalidArgumentException('Takeaway orders cannot retain table context.');
-        }
-
-        if ($this->orderType->isDineIn() && ! $tableContext->hasTable()) {
-            throw new \InvalidArgumentException('Dine-in orders require table context.');
         }
 
         $this->tableContext = $tableContext;

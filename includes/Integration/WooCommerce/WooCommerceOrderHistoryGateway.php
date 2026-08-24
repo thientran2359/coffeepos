@@ -7,8 +7,8 @@ namespace CoffeePOS\Integration\WooCommerce;
 use CoffeePOS\Application\Contracts\OrderHistoryGatewayInterface;
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
 use CoffeePOS\Application\Error\Phase01Exception;
-use CoffeePOS\Support\Capabilities;
 use CoffeePOS\Infrastructure\Settings\Settings;
+use CoffeePOS\Support\Capabilities;
 
 final class WooCommerceOrderHistoryGateway implements OrderHistoryGatewayInterface
 {
@@ -204,7 +204,9 @@ final class WooCommerceOrderHistoryGateway implements OrderHistoryGatewayInterfa
         $canRefund = $order->is_paid() && $refundable > 0 && ! in_array($status, ['cancelled', 'failed', 'refunded'], true);
         return [
             'id' => (int) $order->get_id(), 'number' => (string) $order->get_order_number(),
-            'created_at' => $created ? $created->date('c') : '', 'status' => $status,
+            'created_at' => $created ? $created->date('c') : '',
+            'created_at_display' => $created ? Settings::formatTimestamp($created->getTimestamp()) : '',
+            'status' => $status,
             'status_label' => function_exists('wc_get_order_status_name') ? wc_get_order_status_name($status) : ucfirst($status),
             'customer' => ['display_name' => $customerName !== '' ? $customerName : 'Guest', 'phone' => (string) $order->get_billing_phone()],
             'service' => ['order_type' => in_array($orderType, ['dine_in', 'takeaway'], true) ? $orderType : 'takeaway', 'table_label' => (string) $order->get_meta('_coffeepos_table_label', true)],

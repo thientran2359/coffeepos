@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 if (! defined('ABSPATH')) { exit; }
+$paymentMethods = \CoffeePOS\Infrastructure\Settings\Settings::enabledPaymentMethods();
 ?>
 <div class="coffeepos-modal" data-component="checkout-modal" data-state="closed" hidden>
     <div class="coffeepos-modal-backdrop" data-action="close-checkout"></div>
@@ -11,10 +12,10 @@ if (! defined('ABSPATH')) { exit; }
         </header>
         <div class="coffeepos-checkout-total"><span><?php esc_html_e('Total', 'coffeepos'); ?></span><strong data-field="payment-total"></strong></div>
         <div class="coffeepos-order-type-options" role="tablist">
-            <button type="button" class="coffeepos-segment is-active" data-action="select-payment-method" data-payment-method="cash" aria-pressed="true"><?php esc_html_e('Cash', 'coffeepos'); ?></button>
-            <button type="button" class="coffeepos-segment" data-action="select-payment-method" data-payment-method="bank_transfer" aria-pressed="false"><?php esc_html_e('Bank transfer', 'coffeepos'); ?></button>
+            <?php if (in_array('cash', $paymentMethods, true)) : ?><button type="button" class="coffeepos-segment" data-action="select-payment-method" data-payment-method="cash" aria-pressed="false"><?php esc_html_e('Cash', 'coffeepos'); ?></button><?php endif; ?>
+            <?php if (in_array('bank_transfer', $paymentMethods, true)) : ?><button type="button" class="coffeepos-segment" data-action="select-payment-method" data-payment-method="bank_transfer" aria-pressed="false"><?php esc_html_e('Bank transfer', 'coffeepos'); ?></button><?php endif; ?>
         </div>
-        <section data-component="cash-payment">
+        <section data-component="cash-payment" hidden>
             <label for="coffeepos-cash-received"><?php esc_html_e('Received amount', 'coffeepos'); ?></label>
             <input id="coffeepos-cash-received" inputmode="decimal" data-field="cash-received" autocomplete="off">
             <div class="coffeepos-quick-cash">

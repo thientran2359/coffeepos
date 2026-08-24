@@ -165,6 +165,7 @@ invalid_shift_note
 - [ ] Totals distinguish cash and bank transfer and account for refunds.
 - [ ] Expected cash is calculated server-side.
 - [ ] A cashier can close only their own open shift.
+- [ ] Checkout requires an active shift when the CoffeePOS Sales setting is enabled; disabling it never allows a client-supplied shift ID.
 - [ ] Actual cash and closing note are persisted.
 - [ ] Variance is calculated server-side.
 - [ ] Closed shifts appear in history and cannot be reopened.

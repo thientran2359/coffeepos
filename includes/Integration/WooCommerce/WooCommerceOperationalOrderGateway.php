@@ -231,7 +231,7 @@ final class WooCommerceOperationalOrderGateway implements OperationalOrderGatewa
     private function displayTime(string $value): string
     {
         $timestamp = strtotime($value);
-        return $timestamp === false ? '' : (function_exists('wp_date') ? wp_date(get_option('time_format', 'H:i'), $timestamp) : gmdate('H:i', $timestamp));
+        return $timestamp === false ? '' : Settings::formatTime($timestamp);
     }
 
     private function plainText(string $value): string

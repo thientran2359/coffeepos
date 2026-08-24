@@ -5,6 +5,7 @@ declare(strict_types=1);
 if (! defined('ABSPATH')) {
     exit;
 }
+$membershipEnabled = (bool) \CoffeePOS\Infrastructure\Settings\Settings::get(\CoffeePOS\Infrastructure\Settings\Settings::OPTION_MEMBERSHIP_ENABLED);
 
 ?>
 <header class="coffeepos-cart-header">
@@ -35,7 +36,7 @@ if (! defined('ABSPATH')) {
 </section>
 
 <div class="coffeepos-cart-context-row" data-component="cart-context-row">
-    <section class="coffeepos-customer-summary" data-component="customer-summary" data-state="empty">
+    <section class="coffeepos-customer-summary" data-component="customer-summary" data-state="empty" <?php echo $membershipEnabled ? '' : 'hidden'; ?>>
         <div>
             <h3><?php esc_html_e('Customer', 'coffeepos'); ?></h3>
             <p data-component="customer-name"><?php esc_html_e('Guest customer', 'coffeepos'); ?></p>

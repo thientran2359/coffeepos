@@ -16,6 +16,7 @@ use CoffeePOS\Application\Product\ProductService;
 use CoffeePOS\Application\Product\VariationService;
 use CoffeePOS\Infrastructure\Settings\SettingsProductConfigurationProvider;
 use CoffeePOS\Infrastructure\Settings\SettingsTableProvider;
+use CoffeePOS\Infrastructure\Settings\Settings;
 use CoffeePOS\Infrastructure\Customer\NullMembershipProvider;
 use CoffeePOS\Infrastructure\Concurrency\MySqlLockProvider;
 use CoffeePOS\Integration\WooCommerce\WooCommerceCartSessionStore;
@@ -60,18 +61,20 @@ final class CartController
         $this->customerService = $customerService ?? new CustomerService(
             new WooCommerceCustomerGateway(),
             new NullMembershipProvider(),
-            new MySqlLockProvider()
+            new MySqlLockProvider(),
+            Settings::memberRequiredFields()
         );
         $this->tableProvider = $tableProvider ?? new SettingsTableProvider();
         $this->cartSessionService = $cartSessionService ?? new CartSessionService(
             new WooCommerceCartSessionStore(),
-            new CartService(new CartValidationService(), new WooCommerceStockGateway()),
+            new CartService(new CartValidationService((bool) Settings::get(Settings::OPTION_REQUIRE_DINE_IN_TABLE)), new WooCommerceStockGateway()),
             $productService,
             $variationService,
             $configurationService,
             new WooCommerceMoneyFormatter(),
             $this->customerService,
-            $this->tableProvider
+            $this->tableProvider,
+            (bool) Settings::get(Settings::OPTION_REQUIRE_DINE_IN_TABLE)
         );
         $this->money = $money ?? new WooCommerceMoney();
     }
@@ -309,6 +312,7 @@ final class CartController
     public function lookupCustomer(WP_REST_Request $request)
     {
         try {
+            $this->assertMembershipEnabled();
             return RestResponder::success([
                 'customer' => $this->customerService->findByPhone(
                     sanitize_text_field((string) $request->get_param('phone'))
@@ -322,6 +326,10 @@ final class CartController
     public function createCustomer(WP_REST_Request $request)
     {
         try {
+            $this->assertMembershipEnabled();
+            if (! (bool) Settings::get(Settings::OPTION_MEMBER_CREATE_ENABLED)) {
+                throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_CONFIGURATION, 'Member creation is disabled.');
+            }
             $payload = $this->payload($request);
             $result = $this->customerService->createMember([
                 'display_name' => sanitize_text_field((string) ($payload['display_name'] ?? '')),
@@ -350,6 +358,7 @@ final class CartController
     public function attachCustomer(WP_REST_Request $request)
     {
         try {
+            $this->assertMembershipEnabled();
             $payload = $this->payload($request);
             return RestResponder::success(['cart' => $this->cartSessionService->attachCustomer(
                 $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
@@ -371,6 +380,13 @@ final class CartController
             )->toArray()]);
         } catch (\Throwable $throwable) {
             return RestResponder::fromThrowable($throwable);
+        }
+    }
+
+    private function assertMembershipEnabled(): void
+    {
+        if (! (bool) Settings::get(Settings::OPTION_MEMBERSHIP_ENABLED)) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_CONFIGURATION, 'Customer and membership features are disabled.');
         }
     }
 

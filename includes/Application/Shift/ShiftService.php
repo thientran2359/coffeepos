@@ -15,12 +15,15 @@ final class ShiftService
     private ShiftRepositoryInterface $repository;
     private ShiftTotalsGatewayInterface $totals;
     private LockProviderInterface $locks;
+    /** @var callable|null */
+    private $dateFormatter;
 
-    public function __construct(ShiftRepositoryInterface $repository, ShiftTotalsGatewayInterface $totals, LockProviderInterface $locks)
+    public function __construct(ShiftRepositoryInterface $repository, ShiftTotalsGatewayInterface $totals, LockProviderInterface $locks, ?callable $dateFormatter = null)
     {
         $this->repository = $repository;
         $this->totals = $totals;
         $this->locks = $locks;
+        $this->dateFormatter = $dateFormatter;
     }
 
     public function current(int $userId): ?array
@@ -72,10 +75,13 @@ final class ShiftService
         $opening = (float) $row['opening_cash'];
         $expected = $opening + (float) $derived['cash_sales'];
         $actual = $row['actual_cash'] === null ? null : (float) $row['actual_cash'];
+        $openedAt = mysql2date('c', (string) $row['opened_at'], false);
+        $closedAt = $row['closed_at'] ? mysql2date('c', (string) $row['closed_at'], false) : null;
         return [
             'id' => (int) $row['id'], 'user_id' => (int) $row['user_id'], 'status' => (string) $row['status'],
             'cashier_name' => (string) get_the_author_meta('display_name', (int) $row['user_id']),
-            'opened_at' => mysql2date('c', (string) $row['opened_at'], false), 'closed_at' => $row['closed_at'] ? mysql2date('c', (string) $row['closed_at'], false) : null,
+            'opened_at' => $openedAt, 'closed_at' => $closedAt,
+            'opened_at_display' => $this->displayDate($openedAt), 'closed_at_display' => $closedAt ? $this->displayDate($closedAt) : '',
             'opening_cash' => $this->decimal($opening), 'opening_note' => (string) ($row['opening_note'] ?? ''),
             'cash_sales' => $this->decimal((float) $derived['cash_sales']), 'bank_sales' => $this->decimal((float) $derived['bank_sales']),
             'total_sales' => $this->decimal((float) $derived['total_sales']), 'order_count' => (int) $derived['order_count'],
@@ -83,6 +89,16 @@ final class ShiftService
             'variance' => $actual === null ? null : $this->decimal($actual - $expected), 'closing_note' => (string) ($row['closing_note'] ?? ''),
             'currency' => function_exists('get_woocommerce_currency') ? get_woocommerce_currency() : '',
         ];
+    }
+
+    private function displayDate(string $value): string
+    {
+        $timestamp = strtotime($value);
+        if ($timestamp === false) { return ''; }
+
+        return $this->dateFormatter !== null
+            ? (string) ($this->dateFormatter)($timestamp)
+            : (function_exists('wp_date') ? wp_date('Y-m-d H:i', $timestamp) : gmdate('Y-m-d H:i', $timestamp));
     }
 
     private function money(string $value, string $label): string

@@ -19,15 +19,18 @@ final class SalesReportService
 
     /** @var callable|null */
     private $nowProvider;
+    private \DateTimeZone $timezone;
 
     public function __construct(
         ReportOrderGatewayInterface $orders,
         MoneyFormatterInterface $moneyFormatter,
-        ?callable $nowProvider = null
+        ?callable $nowProvider = null,
+        ?\DateTimeZone $timezone = null
     ) {
         $this->orders = $orders;
         $this->moneyFormatter = $moneyFormatter;
         $this->nowProvider = $nowProvider;
+        $this->timezone = $timezone ?? (function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone('UTC'));
     }
 
     public function generate(array $input): array
@@ -189,7 +192,7 @@ final class SalesReportService
             throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_REPORT_RANGE, __('Unknown report date preset.', 'coffeepos'));
         }
 
-        $zone = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone('UTC');
+        $zone = $this->timezone;
         $now = $this->nowProvider !== null
             ? ($this->nowProvider)()
             : new \DateTimeImmutable('now', $zone);

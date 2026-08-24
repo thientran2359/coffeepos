@@ -1,192 +1,287 @@
 /* CoffeePOS Order History screen. */
 /* Phase 10: Order History */
-.coffeepos-history{
-    min-height:100vh;
-    background:#f4f1ea;
-    padding:24px;
-    color:#201d18}
-    .coffeepos-history>.coffeepos-operations-header,.coffeepos-history-filters,.coffeepos-history-list,.coffeepos-history-summary,.coffeepos-history-pagination,.coffeepos-history-empty{
-        max-width:1240px;
-        margin-left:auto;
-        margin-right:auto}
-        .coffeepos-history-filters{
-            display:grid;
-            grid-template-columns:repeat(4,minmax(130px,1fr)) minmax(220px,2fr) auto;
-            gap:12px;
-            align-items:end;
-            margin-bottom:18px;
-            padding:16px;
-            border:1px solid #ded7ca;
-            border-radius:14px;
-            background:#fff}
-            .coffeepos-history-filters label{
-                display:grid;
-                gap:6px;
-                font-size:13px;
-                font-weight:700}
-                .coffeepos-history-filters input,.coffeepos-history-filters select,.coffeepos-history-dialog input,.coffeepos-history-dialog textarea{
-                    box-sizing:border-box;
-                    width:100%;
-                    min-height:42px;
-                    padding:9px 11px;
-                    border:1px solid #cfc5b5;
-                    border-radius:9px;
-                    background:#fff;
-                    font:inherit}
-                    .coffeepos-history-summary{
-                        margin-bottom:10px;
-                        color:#6c6255}
-                        .coffeepos-history-list{
-                            display:grid;
-                            gap:10px}
-                            .coffeepos-history-order-card{
-                                border:1px solid #ded7ca;
-                                border-radius:13px;
-                                background:#fff;
-                                box-shadow:0 5px 18px rgba(44,35,22,.05);
-                                overflow:hidden}
-                                .coffeepos-history-order-main{
-                                    display:grid;
-                                    grid-template-columns:1.1fr 1.4fr 1fr;
-                                    gap:18px;
-                                    align-items:center;
-                                    width:100%;
-                                    padding:16px;
-                                    border:0;
-                                    background:transparent;
-                                    color:inherit;
-                                    text-align:left;
-                                    cursor:pointer}
-                                    .coffeepos-history-order-main>span{
-                                        display:grid;
-                                        gap:4px}
-                                        .coffeepos-history-order-main>span:last-child{
-                                            text-align:right}
-                                            .coffeepos-history-order-main small{
-                                                color:#776e62}
-                                                .coffeepos-history-pagination{
-                                                    display:flex;
-                                                    justify-content:center;
-                                                    align-items:center;
-                                                    gap:14px;
-                                                    margin-top:18px}
-                                                    .coffeepos-history-pagination button{
-                                                        padding:9px 16px;
-                                                        border:1px solid #cfc5b5;
-                                                        border-radius:9px;
-                                                        background:#fff}
-                                                        .coffeepos-history-dialog{
-                                                            width:min(760px,calc(100vw - 28px));
-                                                            max-height:90vh;
-                                                            padding:0;
-                                                            border:0;
-                                                            border-radius:16px;
-                                                            background:#fff;
-                                                            color:#201d18;
-                                                            box-shadow:0 20px 70px rgba(20,16,10,.3)}
-                                                            .coffeepos-history-dialog::backdrop{
-                                                                background:rgba(25,20,14,.58)}
-                                                                .coffeepos-history-dialog>header,.coffeepos-history-dialog form>header{
-                                                                    display:flex;
-                                                                    align-items:flex-start;
-                                                                    justify-content:space-between;
-                                                                    padding:20px 22px;
-                                                                    border-bottom:1px solid #e8e1d6}
-                                                                    .coffeepos-history-dialog header h2,.coffeepos-history-dialog header p{
-                                                                        margin:0}
-                                                                        .coffeepos-history-dialog header button{
-                                                                            border:0;
-                                                                            background:transparent;
-                                                                            font-size:28px}
-                                                                            .coffeepos-history-detail-meta{
-                                                                                display:grid;
-                                                                                grid-template-columns:repeat(2,1fr);
-                                                                                gap:10px;
-                                                                                padding:18px 22px}
-                                                                                .coffeepos-history-detail-meta p{
-                                                                                    display:grid;
-                                                                                    gap:3px;
-                                                                                    margin:0}
-                                                                                    .coffeepos-history-detail-meta span{
-                                                                                        font-size:12px;
-                                                                                        color:#776e62}
-                                                                                        .coffeepos-history-detail-items{
-                                                                                            display:grid;
-                                                                                            gap:8px;
-                                                                                            padding:0 22px}
-                                                                                            .coffeepos-history-detail-item{
-                                                                                                display:grid;
-                                                                                                grid-template-columns:1fr auto auto;
-                                                                                                gap:14px;
-                                                                                                align-items:center;
-                                                                                                padding:11px;
-                                                                                                border-radius:10px;
-                                                                                                background:#f7f4ee}
-                                                                                                .coffeepos-history-detail-item>div{
-                                                                                                    display:grid}
-                                                                                                    .coffeepos-history-detail-item small{
-                                                                                                        color:#776e62}
-                                                                                                        .coffeepos-history-totals{
-                                                                                                            display:grid;
-                                                                                                            gap:7px;
-                                                                                                            margin:18px 22px}
-                                                                                                            .coffeepos-history-totals div{
-                                                                                                                display:flex;
-                                                                                                                justify-content:space-between}
-                                                                                                                .coffeepos-history-totals .is-total{
-                                                                                                                    padding-top:9px;
-                                                                                                                    border-top:1px solid #ddd2c2;
-                                                                                                                    font-size:18px;
-                                                                                                                    font-weight:700}
-                                                                                                                    .coffeepos-history-dialog>footer,.coffeepos-history-dialog form>footer{
-                                                                                                                        display:flex;
-                                                                                                                        justify-content:flex-end;
-                                                                                                                        gap:10px;
-                                                                                                                        padding:16px 22px;
-                                                                                                                        border-top:1px solid #e8e1d6}
-                                                                                                                        .coffeepos-history-dialog footer button{
-                                                                                                                            padding:10px 14px;
-                                                                                                                            border:1px solid #cfc5b5;
-                                                                                                                            border-radius:9px;
-                                                                                                                            background:#fff;
-                                                                                                                            font-weight:700}
-                                                                                                                            .coffeepos-history-dialog footer .coffeepos-button--danger{
-                                                                                                                                border-color:#b63b32;
-                                                                                                                                background:#b63b32;
-                                                                                                                                color:#fff}
-                                                                                                                                .coffeepos-refund-dialog form>p,.coffeepos-refund-dialog form>label,.coffeepos-refund-dialog form>small{
-                                                                                                                                    display:grid;
-                                                                                                                                    gap:6px;
-                                                                                                                                    margin:14px 22px}
-                                                                                                                                    .coffeepos-refund-dialog textarea{
-                                                                                                                                        min-height:90px}
-                                                                                                                                        @media(max-width:900px){
-                                                                                                                                            .coffeepos-history-filters{
-                                                                                                                                                grid-template-columns:1fr 1fr}
-                                                                                                                                                .coffeepos-history-search{
-                                                                                                                                                    grid-column:1/-1}
-                                                                                                                                                    .coffeepos-history-order-main{
-                                                                                                                                                        grid-template-columns:1fr 1fr}
-                                                                                                                                                        .coffeepos-history-order-main>span:last-child{
-                                                                                                                                                            grid-column:1/-1;
-                                                                                                                                                            text-align:left}
-                                                                                                                                                        }
-                                                                                                                                                        @media(max-width:600px){
-                                                                                                                                                            .coffeepos-history{
-                                                                                                                                                                padding:14px}
-                                                                                                                                                                .coffeepos-history-filters{
-                                                                                                                                                                    grid-template-columns:1fr}
-                                                                                                                                                                    .coffeepos-history-search{
-                                                                                                                                                                        grid-column:auto}
-                                                                                                                                                                        .coffeepos-history-order-main{
-                                                                                                                                                                            grid-template-columns:1fr}
-                                                                                                                                                                            .coffeepos-history-order-main>span:last-child{
-                                                                                                                                                                                grid-column:auto}
-                                                                                                                                                                                .coffeepos-history-detail-meta{
-                                                                                                                                                                                    grid-template-columns:1fr}
-                                                                                                                                                                                    .coffeepos-history-dialog>footer{
-                                                                                                                                                                                        flex-wrap:wrap;
-                                                                                                                                                                                        justify-content:stretch}
-                                                                                                                                                                                        .coffeepos-history-dialog>footer button{
-                                                                                                                                                                                            flex:1 1 45%}
-                                                                                                                                                                                        }
+.coffeepos-history {
+    min-height: 100vh;
+    background: #f4f1ea;
+    padding: 24px;
+    color: #201d18
+}
+
+.coffeepos-history > .coffeepos-operations-header, .coffeepos-history-filters, .coffeepos-history-list, .coffeepos-history-summary, .coffeepos-history-pagination, .coffeepos-history-empty {
+    max-width: 1240px;
+    margin-left: auto;
+    margin-right: auto
+}
+
+.coffeepos-history-filters {
+    display: grid;
+    grid-template-columns:repeat(4, minmax(130px, 1fr)) minmax(220px, 2fr) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 18px;
+    padding: 16px;
+    border: 1px solid #ded7ca;
+    border-radius: 14px;
+    background: #fff
+}
+
+.coffeepos-history-filters label {
+    display: grid;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700
+}
+
+.coffeepos-history-filters input, .coffeepos-history-filters select, .coffeepos-history-dialog input, .coffeepos-history-dialog textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 11px;
+    border: 1px solid #cfc5b5;
+    border-radius: 9px;
+    background: #fff;
+    font: inherit
+}
+
+.coffeepos-history-summary {
+    margin-bottom: 10px;
+    color: #6c6255
+}
+
+.coffeepos-history-list {
+    display: grid;
+    gap: 10px
+}
+
+.coffeepos-history-order-card {
+    border: 1px solid #ded7ca;
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 5px 18px rgba(44, 35, 22, .05);
+    overflow: hidden
+}
+
+.coffeepos-history-order-main {
+    display: grid;
+    grid-template-columns:1.1fr 1.4fr 1fr;
+    gap: 18px;
+    align-items: center;
+    width: 100%;
+    padding: 16px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer
+}
+
+.coffeepos-history-order-main > span {
+    display: grid;
+    gap: 4px
+}
+
+.coffeepos-history-order-main > span:last-child {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-content: flex-end;
+    align-items: flex-end;
+}
+
+.coffeepos-history-order-main small {
+    color: #776e62
+}
+
+.coffeepos-history-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 18px
+}
+
+.coffeepos-history-pagination button {
+    padding: 9px 16px;
+    border: 1px solid #cfc5b5;
+    border-radius: 9px;
+    background: #fff
+}
+
+.coffeepos-history-dialog {
+    width: min(760px, calc(100vw - 28px));
+    max-height: 90vh;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    background: #fff;
+    color: #201d18;
+    box-shadow: 0 20px 70px rgba(20, 16, 10, .3)
+}
+
+.coffeepos-history-dialog::backdrop {
+    background: rgba(25, 20, 14, .58)
+}
+
+.coffeepos-history-dialog > header, .coffeepos-history-dialog form > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 22px;
+    border-bottom: 1px solid #e8e1d6
+}
+
+.coffeepos-history-dialog header h2, .coffeepos-history-dialog header p {
+    margin: 0
+}
+
+.coffeepos-history-dialog header button {
+    border: 0;
+    background: transparent;
+    font-size: 28px
+}
+
+.coffeepos-history-detail-meta {
+    display: grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap: 10px;
+    padding: 18px 22px
+}
+
+.coffeepos-history-detail-meta p {
+    display: grid;
+    gap: 3px;
+    margin: 0
+}
+
+.coffeepos-history-detail-meta span {
+    font-size: 12px;
+    color: #776e62
+}
+
+.coffeepos-history-detail-items {
+    display: grid;
+    gap: 8px;
+    padding: 0 22px
+}
+
+.coffeepos-history-detail-item {
+    display: grid;
+    grid-template-columns:1fr auto auto;
+    gap: 14px;
+    align-items: center;
+    padding: 11px;
+    border-radius: 10px;
+    background: #f7f4ee
+}
+
+.coffeepos-history-detail-item > div {
+    display: grid
+}
+
+.coffeepos-history-detail-item small {
+    color: #776e62
+}
+
+.coffeepos-history-totals {
+    display: grid;
+    gap: 7px;
+    margin: 18px 22px
+}
+
+.coffeepos-history-totals div {
+    display: flex;
+    justify-content: space-between
+}
+
+.coffeepos-history-totals .is-total {
+    padding-top: 9px;
+    border-top: 1px solid #ddd2c2;
+    font-size: 18px;
+    font-weight: 700
+}
+
+.coffeepos-history-dialog > footer, .coffeepos-history-dialog form > footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 22px;
+    border-top: 1px solid #e8e1d6
+}
+
+.coffeepos-history-dialog footer button {
+    padding: 10px 14px;
+    border: 1px solid #cfc5b5;
+    border-radius: 9px;
+    background: #fff;
+    font-weight: 700
+}
+
+.coffeepos-history-dialog footer .coffeepos-button--danger {
+    border-color: #b63b32;
+    background: #b63b32;
+    color: #fff
+}
+
+.coffeepos-refund-dialog form > p, .coffeepos-refund-dialog form > label, .coffeepos-refund-dialog form > small {
+    display: grid;
+    gap: 6px;
+    margin: 14px 22px
+}
+
+.coffeepos-refund-dialog textarea {
+    min-height: 90px
+}
+
+@media (max-width: 900px) {
+    .coffeepos-history-filters {
+        grid-template-columns:1fr 1fr
+    }
+
+    .coffeepos-history-search {
+        grid-column: 1/-1
+    }
+
+    .coffeepos-history-order-main {
+        grid-template-columns:1fr 1fr
+    }
+
+    .coffeepos-history-order-main > span:last-child {
+        grid-column: 1/-1;
+        text-align: left
+    }
+}
+
+@media (max-width: 600px) {
+    .coffeepos-history {
+        padding: 14px
+    }
+
+    .coffeepos-history-filters {
+        grid-template-columns:1fr
+    }
+
+    .coffeepos-history-search {
+        grid-column: auto
+    }
+
+    .coffeepos-history-order-main {
+        grid-template-columns:1fr
+    }
+
+    .coffeepos-history-order-main > span:last-child {
+        grid-column: auto
+    }
+
+    .coffeepos-history-detail-meta {
+        grid-template-columns:1fr
+    }
+
+    .coffeepos-history-dialog > footer {
+        flex-wrap: wrap;
+        justify-content: stretch
+    }
+
+    .coffeepos-history-dialog > footer button {
+        flex: 1 1 45%
+    }
+}

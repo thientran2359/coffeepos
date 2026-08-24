@@ -10,6 +10,13 @@
         const empty = root.querySelector('[data-component="quick-note-empty"]');
         const template = document.getElementById('coffeepos-quick-note-row-template');
         const optionName = 'coffeepos_quick_notes';
+        const logo = root.querySelector('[data-component="settings-logo"]');
+        const logoId = logo ? logo.querySelector('[data-component="settings-logo-id"]') : null;
+        const logoPreview = logo ? logo.querySelector('[data-component="settings-logo-preview"]') : null;
+        const removeLogoButton = logo ? logo.querySelector('[data-action="remove-settings-logo"]') : null;
+        const slugInput = form ? form.querySelector('[name="coffeepos_pos_base_slug"]') : null;
+        const slugPreview = form ? form.querySelector('[data-component="pos-slug-preview"]') : null;
+        let mediaFrame = null;
         let nextIndex = rows ? rows.querySelectorAll('[data-component="quick-note-row"]').length : 0;
 
         function updateEmptyState() {
@@ -50,6 +57,9 @@
         }
 
         function validateUniqueIds(event) {
+            if (event.submitter && ['export', 'import'].includes(event.submitter.value)) {
+                return;
+            }
             const seen = new Map();
             let firstInvalid = null;
 
@@ -74,6 +84,27 @@
             }
         }
 
+        function selectLogo() {
+            if (!window.wp || !window.wp.media || !logoId || !logoPreview) {
+                return;
+            }
+            mediaFrame = mediaFrame || window.wp.media({ title: 'Select CoffeePOS logo', button: { text: 'Use this logo' }, multiple: false, library: { type: 'image' } });
+            mediaFrame.off('select').on('select', function () {
+                const attachment = mediaFrame.state().get('selection').first().toJSON();
+                logoId.value = String(attachment.id || '');
+                logoPreview.src = String(attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url || '');
+                logoPreview.hidden = logoPreview.src === '';
+                if (removeLogoButton) { removeLogoButton.hidden = logoPreview.hidden; }
+            });
+            mediaFrame.open();
+        }
+
+        function removeLogo() {
+            if (logoId) { logoId.value = '0'; }
+            if (logoPreview) { logoPreview.removeAttribute('src'); logoPreview.hidden = true; }
+            if (removeLogoButton) { removeLogoButton.hidden = true; }
+        }
+
         function onClick(event) {
             const trigger = event.target.closest('[data-action]');
 
@@ -88,6 +119,14 @@
             if (trigger.getAttribute('data-action') === 'remove-quick-note') {
                 removeQuickNote(trigger);
             }
+
+            if (trigger.getAttribute('data-action') === 'select-settings-logo') {
+                selectLogo();
+            }
+
+            if (trigger.getAttribute('data-action') === 'remove-settings-logo') {
+                removeLogo();
+            }
         }
 
         function init() {
@@ -97,6 +136,9 @@
 
             root.addEventListener('click', onClick);
             form.addEventListener('submit', validateUniqueIds);
+            if (slugInput && slugPreview) {
+                slugInput.addEventListener('input', function () { slugPreview.textContent = String(slugInput.value || 'pos'); });
+            }
             updateEmptyState();
         }
 

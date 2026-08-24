@@ -118,6 +118,83 @@ final class Settings
         return self::boundedPollInterval(self::get(self::OPTION_ORDER_QUEUE_POLL_INTERVAL));
     }
 
+    public static function update(string $optionName, $value): void
+    {
+        $definitions = self::definitions();
+
+        if (! isset($definitions[$optionName]) || ! current_user_can(Capabilities::MANAGE_SETTINGS)) {
+            return;
+        }
+
+        update_option($optionName, self::sanitizeOption($optionName, $value));
+    }
+
+    public static function serviceTablesToText(): string
+    {
+        $tables = array_values(array_filter((array) self::get(self::OPTION_SERVICE_TABLES), static function ($table): bool {
+            return is_array($table) && trim((string) ($table['label'] ?? '')) !== '';
+        }));
+
+        usort($tables, static function (array $left, array $right): int {
+            $order = ((int) ($left['sort_order'] ?? 0)) <=> ((int) ($right['sort_order'] ?? 0));
+            return $order !== 0 ? $order : (((int) ($left['id'] ?? 0)) <=> ((int) ($right['id'] ?? 0)));
+        });
+
+        return implode("\n", array_map(static function (array $table): string {
+            return sanitize_text_field((string) ($table['label'] ?? ''));
+        }, $tables));
+    }
+
+    public static function serviceTablesFromText(string $value): array
+    {
+        $existing = (array) self::get(self::OPTION_SERVICE_TABLES);
+        $idsByLabel = [];
+        $nextId = 1;
+
+        foreach ($existing as $table) {
+            if (! is_array($table)) {
+                continue;
+            }
+
+            $id = absint($table['id'] ?? 0);
+            $label = sanitize_text_field((string) ($table['label'] ?? ''));
+            $key = self::normalizedLabel($label);
+
+            if ($id > 0) {
+                $nextId = max($nextId, $id + 1);
+            }
+
+            if ($id > 0 && $key !== '' && ! isset($idsByLabel[$key])) {
+                $idsByLabel[$key] = $id;
+            }
+        }
+
+        $lines = preg_split('/\R/u', $value) ?: [];
+        $tables = [];
+        $seenLabels = [];
+
+        foreach (array_slice($lines, 0, 200) as $line) {
+            $label = sanitize_text_field((string) $line);
+            $label = function_exists('mb_substr') ? mb_substr($label, 0, 100) : substr($label, 0, 100);
+            $key = self::normalizedLabel($label);
+
+            if ($label === '' || $key === '' || isset($seenLabels[$key])) {
+                continue;
+            }
+
+            $seenLabels[$key] = true;
+            $id = $idsByLabel[$key] ?? $nextId++;
+            $tables[] = [
+                'id' => $id,
+                'label' => $label,
+                'enabled' => true,
+                'sort_order' => count($tables) * 10 + 10,
+            ];
+        }
+
+        return $tables;
+    }
+
     private static function definitions(): array
     {
         return [
@@ -256,6 +333,11 @@ final class Settings
     private static function boundedPollInterval($value): int
     {
         return max(3000, min(60000, (int) $value));
+    }
+
+    private static function normalizedLabel(string $label): string
+    {
+        return function_exists('mb_strtolower') ? mb_strtolower(trim($label)) : strtolower(trim($label));
     }
 
     private static function sanitizeModifierGroups(array $groups): array

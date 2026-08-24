@@ -73,6 +73,7 @@ final class Capabilities
         'shifts' => self::MANAGE_OWN_SHIFT,
         'order-history' => self::VIEW_ORDER_HISTORY,
         'reports' => self::VIEW_REPORTS,
+        'settings' => self::MANAGE_SETTINGS,
     ];
 
     public static function register(): void

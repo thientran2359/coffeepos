@@ -353,6 +353,7 @@ Baseline routes:
 /pos/order-history
 /pos/shifts
 /pos/reports
+/pos/settings
 ```
 
 Routing implementation must follow architecture/API documentation.
@@ -479,6 +480,7 @@ templates/
 ├── order-history/
 ├── shifts/
 ├── reports/
+├── settings/
 └── components/
 ```
 

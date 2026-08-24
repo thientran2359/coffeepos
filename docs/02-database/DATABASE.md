@@ -736,6 +736,13 @@ Each entry contains a stable positive integer `id`, display `label`, `enabled`
 state, and `sort_order`. This is selection configuration only; it is not table
 occupancy, reservation, or floor-plan persistence.
 
+The frontend `/pos/settings/` textarea serializes each non-empty line into one
+enabled entry. Unchanged labels preserve their existing IDs, new labels receive
+IDs above the current configured maximum, and line order is stored in increments
+of 10.
+The textarea is presentation only; the option remains the canonical structured
+array consumed by `SettingsTableProvider`.
+
 Examples:
 
 ```text

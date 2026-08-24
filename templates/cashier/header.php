@@ -25,14 +25,5 @@ $cashier = (string) ($cashierView['cashier'] ?? __('Cashier', 'coffeepos'));
         <button type="button" class="coffeepos-icon-button" data-action="open-customer-display" disabled title="<?php esc_attr_e('Customer display', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Customer display', 'coffeepos'); ?>">
             <span aria-hidden="true">D</span>
         </button>
-        <a class="coffeepos-icon-button" href="<?php echo esc_url(home_url('/' . trim(\CoffeePOS\Infrastructure\Settings\Settings::getPosBaseSlug(), '/') . '/shifts/')); ?>" data-action="open-shift" title="<?php esc_attr_e('Shift', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Shift', 'coffeepos'); ?>">
-            <span aria-hidden="true">S</span>
-        </a>
-        <?php if (current_user_can(\CoffeePOS\Support\Capabilities::VIEW_REPORTS)) : ?>
-            <a class="coffeepos-icon-button" href="<?php echo esc_url(home_url('/' . trim(\CoffeePOS\Infrastructure\Settings\Settings::getPosBaseSlug(), '/') . '/reports/')); ?>" data-action="open-reports" title="<?php esc_attr_e('Reports', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Reports', 'coffeepos'); ?>">
-                <span aria-hidden="true">R</span>
-            </a>
-        <?php endif; ?>
-        <?php if (current_user_can(\CoffeePOS\Support\Capabilities::MANAGE_SETTINGS)) : ?><a class="coffeepos-icon-button" href="<?php echo esc_url(admin_url('admin.php?page=coffeepos')); ?>" data-action="open-settings" title="<?php esc_attr_e('Settings', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Settings', 'coffeepos'); ?>"><span aria-hidden="true">&#9881;</span></a><?php endif; ?>
     </nav>
 </header>

@@ -13,6 +13,8 @@ final class Router
 {
     public const QUERY_VAR_SCREEN = 'coffeepos_screen';
 
+    public const REWRITE_SCHEMA_VERSION = '2';
+
     private const SCREENS = [
         'entry',
         'cashier',
@@ -22,13 +24,17 @@ final class Router
         'order-history',
         'shifts',
         'reports',
+        'settings',
     ];
 
     private TemplateLoader $templateLoader;
 
-    public function __construct(?TemplateLoader $templateLoader = null)
+    private SettingsScreen $settingsScreen;
+
+    public function __construct(?TemplateLoader $templateLoader = null, ?SettingsScreen $settingsScreen = null)
     {
         $this->templateLoader = $templateLoader ?? new TemplateLoader();
+        $this->settingsScreen = $settingsScreen ?? new SettingsScreen();
     }
 
     public function register(): void
@@ -72,12 +78,17 @@ final class Router
 
     public static function maybeFlushRewriteRules(): void
     {
-        if ((string) get_option('coffeepos_rewrite_version', '') === COFFEEPOS_VERSION) {
+        if ((string) get_option('coffeepos_rewrite_version', '') === self::rewriteVersion()) {
             return;
         }
 
         flush_rewrite_rules(false);
-        update_option('coffeepos_rewrite_version', COFFEEPOS_VERSION);
+        update_option('coffeepos_rewrite_version', self::rewriteVersion());
+    }
+
+    public static function rewriteVersion(): string
+    {
+        return COFFEEPOS_VERSION . ':' . self::REWRITE_SCHEMA_VERSION;
     }
 
     public function addQueryVars(array $vars): array
@@ -113,11 +124,13 @@ final class Router
             );
         }
 
+        $settingsNotice = $screen === 'settings' ? $this->settingsScreen->handleRequest() : [];
         $resolvedTemplate = $this->templateLoader->prepare($screen, [
             'screen' => $screen,
             'route' => self::routeUrl($screen),
             'rest_namespace' => RouteRegistrar::NAMESPACE,
             'navigation' => self::navigationItems(),
+            'settings_notice' => $settingsNotice,
         ]);
 
         if ($resolvedTemplate === null) {
@@ -185,7 +198,7 @@ final class Router
             $items[] = [
                 'screen' => 'settings',
                 'label' => __('Settings', 'coffeepos'),
-                'url' => admin_url('admin.php?page=coffeepos'),
+                'url' => self::routeUrl('settings'),
             ];
         }
 
@@ -245,7 +258,7 @@ final class Router
 
     private function firstPermittedRoute(): string
     {
-        foreach (['cashier', 'kds', 'order-queue', 'shifts', 'order-history', 'reports'] as $screen) {
+        foreach (['cashier', 'kds', 'order-queue', 'shifts', 'order-history', 'reports', 'settings'] as $screen) {
             if (Capabilities::currentUserCanAccessScreen($screen)) {
                 return self::routeUrl($screen);
             }

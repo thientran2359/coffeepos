@@ -4,7 +4,9 @@
 
 ## 1. Purpose
 
-Admin UI configures CoffeePOS behavior without mixing administrative settings into cashier workflow.
+The capability-protected frontend screen at `/pos/settings/` configures
+CoffeePOS behavior without mixing administrative settings into the Cashier
+workflow or requiring access to the WordPress/WooCommerce admin menu.
 
 ---
 
@@ -56,6 +58,20 @@ Do not expose dangerous or unreasonable values without validation.
 
 ---
 
+# 5.1 Dine-in Tables
+
+The Settings screen provides one textarea backed by
+`coffeepos_service_tables`. Each non-empty line is one enabled table label and
+its line order becomes `sort_order`. Duplicate labels and empty lines are
+ignored. Existing unchanged labels retain their stable positive integer IDs;
+new labels receive new IDs. The input is bounded to 200 lines and 100 characters
+per label.
+
+This controls selection only. It does not define occupancy, reservations, table
+orders, or a floor plan.
+
+---
+
 # 6. Modifiers and Quick Notes
 
 Admin may manage modifier groups/options and configured quick notes.
@@ -95,7 +111,9 @@ Admin screens must use WordPress capabilities.
 
 Do not rely on menu visibility alone.
 
-CoffeePOS settings require `coffeepos_manage_settings`. WordPress user/account
+The `/pos/settings/` route and every save require
+`coffeepos_manage_settings`. Saves use a WordPress nonce, an explicit option
+allowlist, and the central Settings sanitizers. WordPress user/account
 management remains in the native WordPress Users interface and requires native
 WordPress user-management capabilities. Phase 12 does not add a PIN field,
 password field, employee-account store, or CoffeePOS account editor.
@@ -124,7 +142,8 @@ All settings must be:
 
 # 10. Acceptance Criteria
 
-1. Administrative settings are separate from cashier UI.
+1. `/pos/settings/` is separate from Cashier and replaces the former
+   WooCommerce-admin submenu.
 2. Settings are protected by capabilities.
 3. Values are validated and sanitized.
 4. Saving invalid settings fails safely.

@@ -37,7 +37,7 @@ final class Lifecycle
 
         Router::registerRewriteRules(Settings::getPosBaseSlug());
         flush_rewrite_rules();
-        update_option('coffeepos_rewrite_version', COFFEEPOS_VERSION);
+        update_option('coffeepos_rewrite_version', Router::rewriteVersion());
 
         update_option('coffeepos_installed_version', COFFEEPOS_VERSION);
 

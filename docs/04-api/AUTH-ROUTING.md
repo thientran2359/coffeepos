@@ -19,6 +19,7 @@ cookies, authentication hooks, and account lifecycle are authoritative.
 | `/pos/shifts/` | protected staff | `coffeepos_manage_own_shift` |
 | `/pos/order-history/` | protected staff | `coffeepos_view_order_history` |
 | `/pos/reports/` | protected staff | `coffeepos_view_reports` |
+| `/pos/settings/` | protected staff settings | `coffeepos_manage_settings` |
 | `/pos/customer/` | paired public projection | documented Customer Display session contract |
 
 Trailing-slash variants resolve canonically without changing authorization.
@@ -30,7 +31,7 @@ For an authenticated request, it resolves the first authorized landing route in
 this order:
 
 ```text
-cashier → kds → order queue → shifts → order history → reports
+cashier → kds → order queue → shifts → order history → reports → settings
 ```
 
 An authenticated user with no CoffeePOS screen capability receives a safe

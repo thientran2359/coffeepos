@@ -149,7 +149,7 @@ silently grant broader access.
 
 - anonymous `/pos/` renders the PHP-owned login screen;
 - authenticated `/pos/` redirects to the first permitted route in this order:
-  Cashier, KDS, Order Queue, Shifts, Order History, Reports;
+  Cashier, KDS, Order Queue, Shifts, Order History, Reports, Settings;
 - anonymous protected routes redirect to `/pos/` with an allowlisted same-site
   CoffeePOS return target;
 - authenticated users without the route capability receive a controlled 403;
@@ -184,8 +184,8 @@ credentials. Password managers and keyboard-only use must work.
 Cashier, KDS, Order Queue, Shifts, Order History, and Reports use one PHP-owned
 Staff Navigation component. It shows only permitted routes, identifies the
 current route, displays the staff display name, may show current shift state,
-and includes WordPress logout. A Settings destination may point to the native
-CoffeePOS admin settings page only for `coffeepos_manage_settings` users.
+and includes WordPress logout. The Settings destination points to the protected
+frontend `/pos/settings/` screen only for `coffeepos_manage_settings` users.
 
 The component is a persistent left sidebar that starts as a compact icon rail
 on every page load and may be expanded by staff for the current page. Desktop

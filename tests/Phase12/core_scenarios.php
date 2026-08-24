@@ -11,6 +11,10 @@ require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 if (! function_exists('__')) { function __($value) { return (string) $value; } }
 if (! function_exists('sanitize_key')) { function sanitize_key($value) { return strtolower((string) preg_replace('/[^a-zA-Z0-9_\-]/', '', (string) $value)); } }
+if (! function_exists('sanitize_text_field')) { function sanitize_text_field($value) { return trim(strip_tags((string) $value)); } }
+if (! function_exists('absint')) { function absint($value) { return abs((int) $value); } }
+$phase12Options = [];
+if (! function_exists('get_option')) { function get_option($name, $default = false) { global $phase12Options; return array_key_exists($name, $phase12Options) ? $phase12Options[$name] : $default; } }
 
 final class Phase12Role
 {
@@ -33,6 +37,7 @@ $assert(isset($phase12Roles['coffeepos_kitchen']->caps[Capabilities::ACCESS_KDS]
 $assert(isset($phase12Roles['coffeepos_supervisor']->caps[Capabilities::CANCEL_ORDERS]) && ! isset($phase12Roles['coffeepos_supervisor']->caps[Capabilities::REFUND_ORDERS]), 'TC-04 supervisor capability bundle is incorrect.');
 $assert(count(array_intersect(Capabilities::all(), array_keys($phase12Roles['coffeepos_manager']->caps))) === count(Capabilities::all()), 'TC-05 manager lacks CoffeePOS capabilities.');
 $assert(count(array_intersect(Capabilities::all(), array_keys($phase12Roles['administrator']->caps))) === count(Capabilities::all()), 'TC-06 administrator migration is incomplete.');
+$assert(Capabilities::forScreen('settings') === Capabilities::MANAGE_SETTINGS, 'TC-06 frontend Settings route capability is missing.');
 
 $cart = Cart::createSession('VND', 'phase12-session-abcdef', '2026-08-23T12:00:00Z');
 $cart->setOrderNote('Deliver all drinks together');
@@ -63,7 +68,17 @@ foreach ([Capabilities::ACCESS_KDS, Capabilities::ACCESS_ORDER_QUEUE, Capabiliti
 $settings = $source('includes/Infrastructure/Settings/Settings.php');
 $assert(strpos($settings, "'less_sugar', 'label' => 'Ít đường'") !== false && strpos($settings, 'OPTION_RECEIPT_PRINT_ORDER_NOTE') !== false, 'TC-15 Phase-12 quick-note/receipt defaults are missing.');
 $assert(strpos($settings, 'if ($ids === [] || $ids ===') !== false, 'TC-15 Phase-12 upgrade must seed quick notes when the legacy option is empty.');
-$assert(strpos($source('includes/Admin/AdminBootstrap.php'), '[product_ids]') !== false && strpos($settings, 'sanitizeIdList') !== false, 'TC-15 quick-note applicability must be administrator-editable and normalized.');
+$settingsUi = $source('templates/settings/content.php') . $source('includes/POS/SettingsScreen.php');
+$assert(strpos($settingsUi, '[product_ids]') !== false && strpos($settings, 'sanitizeIdList') !== false, 'TC-15 quick-note applicability must be settings-editable and normalized.');
+$assert(strpos($settingsUi, 'service_tables_text') !== false && strpos($settingsUi, 'coffeepos_save_settings') !== false && strpos($settings, 'serviceTablesFromText') !== false, 'TC-15 Dine-in table textarea/settings save contract is incomplete.');
+$phase12Options[\CoffeePOS\Infrastructure\Settings\Settings::OPTION_SERVICE_TABLES] = [
+    ['id' => 2, 'label' => 'Table 02', 'enabled' => true, 'sort_order' => 20],
+    ['id' => 5, 'label' => 'Garden', 'enabled' => true, 'sort_order' => 50],
+];
+$parsedTables = \CoffeePOS\Infrastructure\Settings\Settings::serviceTablesFromText("Table 02\nPatio\nPatio\n");
+$assert(count($parsedTables) === 2 && $parsedTables[0]['id'] === 2 && $parsedTables[1]['id'] === 6 && $parsedTables[1]['sort_order'] === 20, 'TC-15 table textarea parsing did not preserve stable IDs, deduplicate labels, or order new tables.');
+$adminBootstrap = $source('includes/Admin/AdminBootstrap.php');
+$assert(strpos($router, "'settings'") !== false && strpos($router, "routeUrl('settings')") !== false && strpos($adminBootstrap, 'add_submenu_page') === false && strpos($adminBootstrap, 'admin_menu') === false, 'TC-15 frontend Settings routing or legacy-admin removal is incomplete.');
 $cartApi = $source('includes/REST/CartController.php') . $source('assets/js/api/client.js');
 $assert(strpos($cartApi, '/cart/order-note') !== false && strpos($cartApi, 'setOrderNote') !== false && strpos($cartApi, 'clearOrderNote') !== false, 'TC-16 order-note REST/client wiring is incomplete.');
 $cartUi = $source('templates/cashier/cart-panel.php') . $source('templates/cashier/overlay-root.php') . $source('templates/components/order-note-dialog.php') . $source('assets/js/components/cart-panel.js');

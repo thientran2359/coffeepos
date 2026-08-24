@@ -1,1 +1,9 @@
 /vendor/
+
+# Internal AI/project planning material. Keep these files locally, but do not
+# publish them in the source repository.
+/docs/
+/AGENTS.md
+/AGENTS.override.md
+/**/AGENTS.md
+/**/AGENTS.override.md

@@ -191,10 +191,18 @@
 }
 
 .coffeepos-settings__import-export {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: end;
+    display: flex;
     gap: 12px;
+    flex-direction: column;
+    align-items: baseline;
+}
+
+.coffeepos-settings__import-export .coffeepos-settings__field {
+    width: 100%;
+}
+
+.coffeepos-settings__import-export textarea {
+    width: 100%;
 }
 
 .coffeepos-settings__diagnostics dl {

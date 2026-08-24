@@ -105,6 +105,7 @@ $cartApi = $source('includes/REST/CartController.php') . $source('assets/js/api/
 $assert(strpos($cartApi, '/cart/order-note') !== false && strpos($cartApi, 'setOrderNote') !== false && strpos($cartApi, 'clearOrderNote') !== false, 'TC-16 order-note REST/client wiring is incomplete.');
 $cartUi = $source('templates/cashier/cart-panel.php') . $source('templates/cashier/overlay-root.php') . $source('templates/components/order-note-dialog.php') . $source('assets/js/components/cart-panel.js');
 $assert(strpos($cartUi, 'data-component="cart-context-row"') !== false && strpos($cartUi, 'data-component="order-note-trigger"') !== false && strpos($cartUi, 'data-component="order-note-dialog"') !== false && strpos($cartUi, 'openOrderNote') !== false, 'TC-16 compact cart context/order-note dialog wiring is incomplete.');
+$assert(strpos($cartUi, 'coffeepos-table-badge') !== false && strpos($cartUi, 'data-action="open-table"') !== false && strpos($cartUi, 'data-component="selected-table-label"') !== false, 'TC-16 selected table badge must preserve the table-selection hooks.');
 $productModal = $source('templates/components/product-modal.php') . $source('assets/js/components/product-modal.js');
 $assert(strpos($productModal, 'toggle-quick-note') !== false && strpos($productModal, 'syncQuickNoteText') !== false && strpos($productModal, 'Selected labels are added to the item note') !== false, 'TC-16 quick-note chips do not mirror selected labels into the item note.');
 $orderGateway = $source('includes/Integration/WooCommerce/WooCommerceOrderGateway.php');

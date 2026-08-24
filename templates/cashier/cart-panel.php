@@ -29,7 +29,8 @@ $membershipEnabled = (bool) \CoffeePOS\Infrastructure\Settings\Settings::get(\Co
         </button>
     </div>
     <div class="coffeepos-table-placeholder" data-component="table-placeholder" data-state="hidden" hidden>
-        <button type="button" class="coffeepos-btn coffeepos-btn-light" data-action="open-table">
+        <button type="button" class="coffeepos-table-badge" data-action="open-table" title="<?php esc_attr_e('Select or change table', 'coffeepos'); ?>">
+            <span class="coffeepos-table-badge__dot" aria-hidden="true"></span>
             <span data-component="selected-table-label"><?php esc_html_e('Select table', 'coffeepos'); ?></span>
         </button>
     </div>

@@ -2,10 +2,10 @@
 declare(strict_types=1);
 if (! defined('ABSPATH')) { exit; }
 ?>
-<section class="coffeepos-shifts" data-component="shifts-screen" data-state="loading">
-    <header class="coffeepos-operations-header">
-        <div><p class="coffeepos-eyebrow"><?php esc_html_e('CoffeePOS operations', 'coffeepos'); ?></p><h1><?php esc_html_e('Shift Management', 'coffeepos'); ?></h1></div>
-        <a class="coffeepos-button coffeepos-button--secondary" href="<?php echo esc_url(home_url('/' . trim(\CoffeePOS\Infrastructure\Settings\Settings::getPosBaseSlug(), '/') . '/cashier/')); ?>"><?php esc_html_e('Back to Cashier', 'coffeepos'); ?></a>
+<section class="coffeepos-operations coffeepos-shifts" data-component="shifts-screen" data-state="loading">
+    <header class="coffeepos-operations__header">
+        <div><span class="coffeepos-eyebrow"><?php esc_html_e('Operations', 'coffeepos'); ?></span><h1><?php esc_html_e('Shift Management', 'coffeepos'); ?></h1></div>
+        <div class="coffeepos-operations__tools"><a class="coffeepos-btn" href="<?php echo esc_url(home_url('/' . trim(\CoffeePOS\Infrastructure\Settings\Settings::getPosBaseSlug(), '/') . '/cashier/')); ?>"><?php esc_html_e('Back to Cashier', 'coffeepos'); ?></a></div>
     </header>
     <p class="coffeepos-inline-error" data-component="shift-error" hidden></p>
 
@@ -15,7 +15,7 @@ if (! defined('ABSPATH')) { exit; }
         <form data-component="open-shift-form">
             <label><?php esc_html_e('Opening cash', 'coffeepos'); ?><input name="opening_cash" inputmode="decimal" required value="0"></label>
             <label><?php esc_html_e('Opening note', 'coffeepos'); ?><textarea name="opening_note" maxlength="2000"></textarea></label>
-            <button class="coffeepos-button coffeepos-button--primary" type="submit"><?php esc_html_e('Open shift', 'coffeepos'); ?></button>
+            <button class="coffeepos-btn coffeepos-btn-primary" type="submit"><?php esc_html_e('Open shift', 'coffeepos'); ?></button>
         </form>
     </section>
 
@@ -33,7 +33,7 @@ if (! defined('ABSPATH')) { exit; }
         <form data-component="close-shift-form">
             <label><?php esc_html_e('Actual cash', 'coffeepos'); ?><input name="actual_cash" inputmode="decimal" required></label>
             <label><?php esc_html_e('Closing note', 'coffeepos'); ?><textarea name="closing_note" maxlength="2000"></textarea></label>
-            <button class="coffeepos-button coffeepos-button--danger" type="submit"><?php esc_html_e('Close and reconcile shift', 'coffeepos'); ?></button>
+            <button class="coffeepos-btn coffeepos-btn-danger" type="submit"><?php esc_html_e('Close and reconcile shift', 'coffeepos'); ?></button>
         </form>
     </section>
 

@@ -13,14 +13,13 @@ $context = TemplateLoader::context();
 $notice = is_array($context['settings_notice'] ?? null) ? $context['settings_notice'] : [];
 $quickNotes = (array) Settings::get(Settings::OPTION_QUICK_NOTES);
 ?>
-<section class="coffeepos-settings" data-component="settings-screen">
-    <header class="coffeepos-settings__header">
+<section class="coffeepos-operations coffeepos-settings" data-component="settings-screen">
+    <header class="coffeepos-operations__header">
         <div>
-            <p class="coffeepos-eyebrow"><?php esc_html_e('CoffeePOS management', 'coffeepos'); ?></p>
+            <span class="coffeepos-eyebrow"><?php esc_html_e('Management', 'coffeepos'); ?></span>
             <h1><?php esc_html_e('Settings', 'coffeepos'); ?></h1>
-            <p><?php esc_html_e('Configure tables, checkout, operational screens, item notes, and receipts.', 'coffeepos'); ?></p>
         </div>
-        <a class="coffeepos-button coffeepos-button--secondary" href="<?php echo esc_url(\CoffeePOS\POS\Router::routeUrl('cashier')); ?>"><?php esc_html_e('Back to Cashier', 'coffeepos'); ?></a>
+        <div class="coffeepos-operations__tools"><a class="coffeepos-btn" href="<?php echo esc_url(\CoffeePOS\POS\Router::routeUrl('cashier')); ?>"><?php esc_html_e('Back to Cashier', 'coffeepos'); ?></a></div>
     </header>
 
     <?php if ($notice !== []) : ?>
@@ -85,6 +84,6 @@ $quickNotes = (array) Settings::get(Settings::OPTION_QUICK_NOTES);
             <label class="coffeepos-settings__check"><input type="checkbox" name="<?php echo esc_attr(Settings::OPTION_RECEIPT_PRINT_ORDER_NOTE); ?>" value="1" <?php checked(Settings::shouldPrintOrderNote()); ?>><span><?php esc_html_e('Print the private order note on receipts', 'coffeepos'); ?></span></label>
         </section>
 
-        <div class="coffeepos-settings__actions"><button class="coffeepos-button coffeepos-button--primary" type="submit"><?php esc_html_e('Save settings', 'coffeepos'); ?></button></div>
+        <div class="coffeepos-settings__actions"><button class="coffeepos-btn coffeepos-btn-primary" type="submit"><?php esc_html_e('Save settings', 'coffeepos'); ?></button></div>
     </form>
 </section>

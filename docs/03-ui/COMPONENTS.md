@@ -650,6 +650,17 @@ retry action where possible
 ```
 
 Do not expose stack traces or raw server exceptions.
+
+## Shared Operations Header
+
+Order Queue defines the visual contract for staff management screens. Shifts,
+Order History, Reports, and Settings reuse `coffeepos-operations`,
+`coffeepos-operations__header`, `coffeepos-operations__tools`, and the shared
+button variants. The contract includes the dark green header, gold lower border,
+light eyebrow text, white title, right-aligned tools, pale operations background,
+and consistent normal/primary/danger buttons. Screen-specific data and actions
+remain owned by each screen.
+
 ## Phase 10 Order History Components
 
 The History filter bar owns date/status/type/search input. Order cards and

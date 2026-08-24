@@ -8,14 +8,13 @@ if (! defined('ABSPATH')) {
 
 $cashierUrl = home_url('/' . trim(\CoffeePOS\Infrastructure\Settings\Settings::getPosBaseSlug(), '/') . '/cashier/');
 ?>
-<section class="coffeepos-reports" data-component="reports-screen" data-state="loading">
-    <header class="coffeepos-reports-header">
+<section class="coffeepos-operations coffeepos-reports" data-component="reports-screen" data-state="loading">
+    <header class="coffeepos-operations__header">
         <div>
-            <p class="coffeepos-eyebrow"><?php esc_html_e('CoffeePOS management', 'coffeepos'); ?></p>
+            <span class="coffeepos-eyebrow"><?php esc_html_e('Operations', 'coffeepos'); ?></span>
             <h1><?php esc_html_e('Reports & Analytics', 'coffeepos'); ?></h1>
-            <p data-field="report-range-label"><?php esc_html_e('Loading report range…', 'coffeepos'); ?></p>
         </div>
-        <a class="coffeepos-button coffeepos-button--secondary" href="<?php echo esc_url($cashierUrl); ?>"><?php esc_html_e('Back to Cashier', 'coffeepos'); ?></a>
+        <div class="coffeepos-operations__tools"><span data-field="report-range-label" role="status"><?php esc_html_e('Loading report range…', 'coffeepos'); ?></span><a class="coffeepos-btn" href="<?php echo esc_url($cashierUrl); ?>"><?php esc_html_e('Back to Cashier', 'coffeepos'); ?></a></div>
     </header>
 
     <form class="coffeepos-report-filters" data-component="report-filters">
@@ -46,10 +45,10 @@ $cashierUrl = home_url('/' . trim(\CoffeePOS\Infrastructure\Settings\Settings::g
                 <option value="100">100</option>
             </select>
         </label>
-        <button class="coffeepos-button coffeepos-button--primary" type="submit"><?php esc_html_e('Apply', 'coffeepos'); ?></button>
+        <button class="coffeepos-btn coffeepos-btn-primary" type="submit"><?php esc_html_e('Apply', 'coffeepos'); ?></button>
         <div class="coffeepos-report-export-actions">
-            <button type="button" data-action="export-report" data-format="csv"><?php esc_html_e('Export CSV', 'coffeepos'); ?></button>
-            <button type="button" data-action="export-report" data-format="xlsx"><?php esc_html_e('Export Excel', 'coffeepos'); ?></button>
+            <button class="coffeepos-btn" type="button" data-action="export-report" data-format="csv"><?php esc_html_e('Export CSV', 'coffeepos'); ?></button>
+            <button class="coffeepos-btn" type="button" data-action="export-report" data-format="xlsx"><?php esc_html_e('Export Excel', 'coffeepos'); ?></button>
         </div>
     </form>
 

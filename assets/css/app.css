@@ -455,7 +455,6 @@ textarea:focus-visible,
 
 .coffeepos-product-card {
     min-width: 0;
-    min-height: 112px;
     background: var(--coffeepos-surface);
     border: 1px solid var(--coffeepos-border);
     border-radius: var(--coffeepos-radius);
@@ -961,7 +960,12 @@ body.coffeepos:not(.coffeepos-screen-login):not(.coffeepos-screen-customer) #cof
 }
 
 .coffeepos-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px 14px;
+    font: inherit;
+    text-decoration: none;
 }
 
 .coffeepos-icon-button {
@@ -1580,6 +1584,63 @@ body.coffeepos-screen-settings #coffeepos-app {
     .coffeepos-settings { padding: 14px; }
     .coffeepos-settings__header { align-items: stretch; flex-direction: column; }
     .coffeepos-settings__grid { grid-template-columns: 1fr; }
+}
+
+/* Shared management-screen presentation follows the Order Queue shell. */
+.coffeepos-shifts,
+.coffeepos-history,
+.coffeepos-reports,
+.coffeepos-settings {
+    min-height: 100vh;
+    padding: 20px;
+    color: var(--coffeepos-text);
+    background: #e9eee9;
+}
+.coffeepos-shifts .coffeepos-operations__header,
+.coffeepos-history .coffeepos-operations__header,
+.coffeepos-reports .coffeepos-operations__header,
+.coffeepos-settings .coffeepos-operations__header {
+    margin: -20px -20px 18px;
+    max-width: none;
+}
+.coffeepos-operations__header .coffeepos-eyebrow {
+    display: block;
+    margin: 0 0 3px;
+    color: #cbd8d1;
+}
+.coffeepos-shift-card,
+.coffeepos-history-filters,
+.coffeepos-history-order-card,
+.coffeepos-report-filters,
+.coffeepos-report-currency,
+.coffeepos-settings__card {
+    border-color: #cfd8d2;
+    box-shadow: 0 8px 22px rgba(27,48,38,.08);
+}
+.coffeepos-history-pagination .coffeepos-btn,
+.coffeepos-history-dialog footer .coffeepos-btn,
+.coffeepos-report-export-actions .coffeepos-btn {
+    min-height: 44px;
+    color: var(--coffeepos-text);
+    background: #fff;
+    border: 1px solid var(--coffeepos-border-strong);
+    border-radius: var(--coffeepos-radius);
+}
+.coffeepos-history-dialog footer .coffeepos-btn-danger {
+    color: var(--coffeepos-danger);
+    background: #fff5f4;
+    border-color: #e7b9b4;
+}
+.coffeepos-settings__header { width: auto; margin-right: -20px; margin-left: -20px; }
+@media (max-width: 720px) {
+    .coffeepos-shifts,
+    .coffeepos-history,
+    .coffeepos-reports,
+    .coffeepos-settings { padding: 14px; }
+    .coffeepos-shifts .coffeepos-operations__header,
+    .coffeepos-history .coffeepos-operations__header,
+    .coffeepos-reports .coffeepos-operations__header,
+    .coffeepos-settings .coffeepos-operations__header { margin: -14px -14px 16px; }
 }
 .coffeepos-order-note-dialog .coffeepos-modal-dialog { width: min(520px, 100%); }
 .coffeepos-order-note-dialog .coffeepos-field { margin-top: 16px; }

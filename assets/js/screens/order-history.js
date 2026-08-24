@@ -75,7 +75,7 @@
             try {
                 const data = await api.reorderOrder(selected.id, {client_operation_id: operation('history-reorder')});
                 window.sessionStorage.setItem('coffeepos.pos_session_id', String(data.cart.pos_session_id));
-                const back = root.querySelector('.coffeepos-operations-header a'); window.location.assign(back.href);
+                const back = root.querySelector('.coffeepos-operations__header a'); window.location.assign(back.href);
             } catch (error) { showError(detailDialog.querySelector('[data-component="detail-error"]'), error); pending = false; }
         }
         async function submitRefund(event) {

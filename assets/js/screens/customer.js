@@ -18,6 +18,7 @@
         const syncState = root.querySelector('[data-component="customer-sync-state"]');
         const syncMessage = root.querySelector('[data-field="customer-sync-message"]');
         let transport = null;
+        let pairing = null;
         let recoveryPending = false;
         let rolloverPending = false;
         let rolloverTimer = 0;
@@ -119,6 +120,12 @@
             }
         }
         function connect(sessionId) {
+            if (!protocol.validSessionId(sessionId)) { return; }
+            if (transport) { transport.close(); transport = null; }
+            window.clearTimeout(rolloverTimer);
+            window.clearTimeout(handshakeTimer);
+            recoveryPending = false;
+            rolloverPending = false;
             store.pair(sessionId);
             try {
                 transport = CoffeePOS.sync.createChannel({ source: 'customer', target: 'cashier', onMessage: onMessage, onError: function () { setConnection('reconnecting', __('Display connection was interrupted.', 'coffeepos'), true); } });
@@ -130,6 +137,26 @@
                 setConnection('unsupported', __('This display must use the same browser profile and requires BroadcastChannel support.', 'coffeepos'), true);
             }
             recoverCart(sessionId);
+        }
+        function startPairing() {
+            try {
+                pairing = CoffeePOS.sync.createDisplayPairing({
+                    scope: String(config.displayPairingScope || ''),
+                    source: 'customer',
+                    onMessage: function (message) {
+                        const sessionId = String(message.payload.pos_session_id || '');
+                        if (message.type !== 'display.control.pair' || !protocol.validSessionId(sessionId)) { return; }
+                        if (transport && store.getState().posSessionId === sessionId) { requestSnapshot(); return; }
+                        connect(sessionId);
+                    },
+                    onError: function () {
+                        setConnection('reconnecting', __('Customer Display pairing is unavailable.', 'coffeepos'), true);
+                    }
+                });
+                pairing.post('display.control.ready', {}, 'cashier');
+            } catch (error) {
+                setConnection('reconnecting', __('Customer Display pairing is unavailable.', 'coffeepos'), true);
+            }
         }
         async function loadCatalog() {
             catalog.setStatus('loading', __('Loading menu…', 'coffeepos'));
@@ -143,14 +170,20 @@
             if (action === 'retry-display-sync' && protocol.validSessionId(store.getState().posSessionId)) { recoverCart(store.getState().posSessionId); requestSnapshot(); }
         }
         function init() {
-            root.addEventListener('click', onClick); loadCatalog();
+            window.name = 'coffeepos-customer-display';
+            root.addEventListener('click', onClick); loadCatalog(); startPairing();
             if (config.pairingState !== 'paired' || !protocol.validSessionId(config.posSessionId)) {
-                setConnection('unpaired', config.pairingState === 'invalid' ? __('The pairing link is invalid. Open Customer Display from Cashier.', 'coffeepos') : __('Open Customer Display from the Cashier screen to pair it.', 'coffeepos'), false);
+                setConnection('unpaired', config.pairingState === 'invalid' ? __('The pairing link is invalid. Open Customer Display from Cashier.', 'coffeepos') : __('Waiting for Cashier pairing…', 'coffeepos'), false);
                 render(); return;
+            }
+            if (window.history && typeof window.history.replaceState === 'function') {
+                const cleanUrl = new window.URL(window.location.href);
+                cleanUrl.searchParams.delete('pos_session_id');
+                window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
             }
             connect(config.posSessionId);
         }
-        return { init: init, getState: store.getState, destroy: function () { if (transport) { transport.close(); } window.clearTimeout(rolloverTimer); window.clearTimeout(handshakeTimer); } };
+        return { init: init, getState: store.getState, destroy: function () { if (transport) { transport.close(); } if (pairing) { pairing.close(); } window.clearTimeout(rolloverTimer); window.clearTimeout(handshakeTimer); } };
     };
     window.CoffeePOS = CoffeePOS;
 }(window));

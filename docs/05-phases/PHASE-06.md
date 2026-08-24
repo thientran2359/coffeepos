@@ -10,6 +10,12 @@
 > order and sends `display.reset`. There is no automatic thank-you timeout. This
 > supersedes conflicting timer/provider-pending language below.
 
+> **Approved automatic-pairing refinement (2026-08-24):** The user-facing route
+> is `/pos/customer/` without `pos_session_id`. An opaque authenticated-user
+> control channel pairs the named Customer Display tab with Cashier's current
+> internal `pos_session_id`. The ID remains required for server cart authority
+> and the session-scoped data channel, but staff never copy or manipulate it.
+
 ## 1. Objective
 
 Provide a separate customer-facing screen that renders the shared WooCommerce
@@ -23,7 +29,9 @@ Cashier Cart Session
     ↓
 Open / Pair Customer Display
     ↓
-/pos/customer?pos_session_id={opaque-id}
+/pos/customer/
+    ↓
+display.control.ready / display.control.pair
     ↓
 Shared CatalogView + Independent Customer Templates
     ↓
@@ -110,7 +118,7 @@ projection only for Customer Display.
 Customer Display route
 Customer Display shell
 Explicit Cashier/display pairing
-Opaque pos_session_id URL correlation
+Automatic same-browser pairing with opaque internal pos_session_id
 Read-only shared CatalogView menu
 Customer-specific PHP catalog templates
 Landscape menu/cart layout
@@ -221,15 +229,17 @@ Use the existing major-screen route:
 /pos/customer
 ```
 
-Pairing uses the opaque logical cart ID:
+Normal pairing uses the clean Customer Display route:
 
 ```text
-/pos/customer?pos_session_id={id}
+/pos/customer/
 ```
 
 Rules:
 
-- `pos_session_id` may appear in the Customer Display URL
+- Cashier sends `pos_session_id` through the same-browser pairing handshake
+- the normal URL does not contain `pos_session_id`
+- a legacy `pos_session_id` URL may be accepted and cleaned after startup
 - it must match the same strict format accepted by the Cart API
 - it is a correlation identifier, not an authentication credential
 - it must never contain the WooCommerce session token, auth cookie, or REST nonce
@@ -238,9 +248,10 @@ Rules:
 - the route must not create a new cart merely because pairing input is absent
 - URL output is escaped and no sensitive data is written into the page markup
 
-The Cashier should expose an explicit action to open the Customer Display URL for
-the current cart in a new window/tab. Do not require staff to copy internal IDs
-manually.
+The Cashier exposes an explicit action targeting the named
+`coffeepos-customer-display` browsing context. It opens the tab when absent and
+navigates/reloads the existing tab when present. Do not require staff to copy
+internal IDs or interact with the customer-facing monitor.
 
 ---
 
@@ -265,6 +276,11 @@ limitation.
 Each screen instance owns a locally generated `source_instance_id` so a sender
 can ignore its own messages and diagnostics can distinguish windows.
 
+Pairing discovery uses only
+`coffeepos:display-control:<opaque-user-scope>`. It may carry the current
+`pos_session_id`, target instance ID, and pairing metadata, but never cart,
+customer, payment, or order projections.
+
 ---
 
 # 7. Channel Contract
@@ -277,7 +293,7 @@ coffeepos:<pos_session_id>
 
 Rules:
 
-- never use a global unscoped `coffeepos` channel
+- never use a global unscoped `coffeepos` data channel
 - open a channel only after validating `pos_session_id`
 - close the previous channel before switching sessions or destroying the screen
 - ignore messages whose `pos_session_id` does not match the active channel
@@ -1383,7 +1399,7 @@ Phase 06 is complete when:
 ```text
 TC-01 authorized /pos/customer shell
 TC-02 unauthorized route rejected
-TC-03 valid pos_session_id pairing
+TC-03 valid automatic pairing supplies the current pos_session_id internally
 TC-04 missing pairing ID
 TC-05 malformed pairing ID
 TC-06 unknown/expired paired cart

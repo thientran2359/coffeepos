@@ -16,6 +16,10 @@ $cashier = (string) ($cashierView['cashier'] ?? __('Cashier', 'coffeepos'));
         <strong><?php echo esc_html($brand); ?></strong>
         <span data-component="shift-status"><?php echo esc_html($shift); ?></span>
         <span data-component="cashier-identity"><?php echo esc_html($cashier); ?></span>
+        <span class="coffeepos-display-status" data-component="customer-display-status" data-state="disconnected" role="status" aria-live="polite">
+            <span class="coffeepos-display-status-dot" aria-hidden="true"></span>
+            <span data-field="customer-display-status-label"><?php esc_html_e('Customer display: Not connected', 'coffeepos'); ?></span>
+        </span>
     </div>
 
     <nav class="coffeepos-cashier-utilities" aria-label="<?php esc_attr_e('Cashier utility actions', 'coffeepos'); ?>">

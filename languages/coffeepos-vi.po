@@ -63,7 +63,7 @@ msgstr "Thêm mã giảm giá"
 msgid "Adding member to cart…"
 msgstr "Đang thêm hội viên vào giỏ hàng…"
 
-#: includes/Infrastructure/Assets/AssetLoader.php:123 templates/components/product-modal.php:14 assets/js/components/product-modal.js:98
+#: includes/Infrastructure/Assets/AssetLoader.php:125 templates/components/product-modal.php:14 assets/js/components/product-modal.js:98
 msgid "Add item"
 msgstr "Thêm món"
 
@@ -79,7 +79,7 @@ msgstr "Thêm ghi chú nhanh"
 msgid "Address"
 msgstr "Địa chỉ"
 
-#: includes/Infrastructure/Assets/AssetLoader.php:125 templates/components/product-modal.php:74 assets/js/components/product-modal.js:263
+#: includes/Infrastructure/Assets/AssetLoader.php:127 templates/components/product-modal.php:74 assets/js/components/product-modal.js:263
 msgid "Add to cart"
 msgstr "Thêm vào giỏ hàng"
 
@@ -231,7 +231,7 @@ msgstr "Giỏ hàng"
 msgid "Cart item count"
 msgstr "Số lượng mặt hàng trong giỏ hàng"
 
-#: assets/js/screens/customer.js:115
+#: assets/js/screens/customer.js:116
 msgid "Cart recovered; waiting for Cashier state…"
 msgstr "Xe đã được phục hồi; đang chờ trạng thái thu ngân…"
 
@@ -243,7 +243,7 @@ msgstr "Tiền mặt"
 msgid "Cashier"
 msgstr "Thu ngân"
 
-#: templates/cashier/header.php:21
+#: templates/cashier/header.php:25
 msgid "Cashier utility actions"
 msgstr "Hành động tiện ích thu ngân"
 
@@ -459,11 +459,11 @@ msgstr "Xác nhận hành động"
 msgid "Confirm received & complete"
 msgstr "Xác nhận đã nhận tiền và hoàn tất"
 
-#: templates/customer/menu.php:11 assets/js/screens/customer.js:126
+#: templates/customer/menu.php:11 assets/js/screens/customer.js:133
 msgid "Connecting display…"
 msgstr "Đang kết nối màn hình…"
 
-#: assets/js/screens/customer.js:96
+#: assets/js/screens/customer.js:97
 msgid "Connecting next order…"
 msgstr "Đang kết nối đơn hàng tiếp theo…"
 
@@ -491,7 +491,7 @@ msgstr "Không thể hoàn tất quá trình xuất Excel."
 msgid "Could not open the Excel export package."
 msgstr "Không thể mở gói xuất Excel."
 
-#: assets/js/screens/customer.js:99
+#: assets/js/screens/customer.js:100
 msgid "Could not pair the next order. Reconnect this display."
 msgstr "Không thể ghép đơn hàng tiếp theo. Kết nối lại màn hình này."
 
@@ -579,7 +579,7 @@ msgstr "Khách hàng & Hội viên"
 msgid "Customer creation is already in progress."
 msgstr "Việc tạo khách hàng đang được tiến hành."
 
-#: templates/cashier/header.php:25
+#: templates/cashier/header.php:29
 msgid "Customer display"
 msgstr "Màn hình khách hàng"
 
@@ -587,9 +587,29 @@ msgstr "Màn hình khách hàng"
 msgid "Customer Display"
 msgstr "Màn hình khách hàng"
 
-#: assets/js/components/cashier-sync.js:25 assets/js/components/cashier-sync.js:68
+#: assets/js/components/cashier-sync.js:27
+msgid "Customer display: Connected"
+msgstr "Màn hình khách: Đã kết nối"
+
+#: assets/js/components/cashier-sync.js:28
+msgid "Customer display: Connecting…"
+msgstr "Màn hình khách: Đang kết nối…"
+
+#: templates/cashier/header.php:21 assets/js/components/cashier-sync.js:28
+msgid "Customer display: Not connected"
+msgstr "Màn hình khách: Chưa kết nối"
+
+#: assets/js/components/cashier-sync.js:52 assets/js/components/cashier-sync.js:56 assets/js/screens/customer.js:153 assets/js/screens/customer.js:158
+msgid "Customer Display pairing is unavailable."
+msgstr "Không thể ghép nối với Màn hình khách hàng."
+
+#: assets/js/components/cashier-sync.js:68 assets/js/components/cashier-sync.js:112
 msgid "Customer Display synchronization is unavailable."
 msgstr "Không thể đồng bộ với Màn hình khách hàng."
+
+#: assets/js/components/cashier-sync.js:157
+msgid "Customer Display was blocked by the browser. Allow pop-ups and try again."
+msgstr "Trình duyệt đã chặn Màn hình khách hàng. Hãy cho phép cửa sổ bật lên rồi thử lại."
 
 #: templates/settings/content.php:73
 msgid "Customize CoffeePOS screens without changing the WordPress theme or storefront."
@@ -663,15 +683,15 @@ msgstr "Giảm giá"
 msgid "Dismiss notification"
 msgstr "Loại bỏ thông báo"
 
-#: assets/js/screens/customer.js:59
+#: assets/js/screens/customer.js:60
 msgid "Display connected"
 msgstr "Đã kết nối màn hình"
 
-#: assets/js/screens/customer.js:124
+#: assets/js/screens/customer.js:131
 msgid "Display connection was interrupted."
 msgstr "Kết nối hiển thị bị gián đoạn."
 
-#: assets/js/screens/customer.js:118
+#: assets/js/screens/customer.js:119
 msgid "Display sync is unavailable. Reconnect to try again."
 msgstr "Đồng bộ hóa hiển thị không khả dụng. Hãy kết nối lại để thử lại."
 
@@ -679,7 +699,7 @@ msgstr "Đồng bộ hóa hiển thị không khả dụng. Hãy kết nối l�
 msgid "Each quick note must be a valid settings row."
 msgstr "Mỗi ghi chú nhanh phải là một hàng cài đặt hợp lệ."
 
-#: includes/Infrastructure/Assets/AssetLoader.php:124 templates/cashier/cart-panel.php:108 templates/components/cart-item.php:27 assets/js/components/product-modal.js:97
+#: includes/Infrastructure/Assets/AssetLoader.php:126 templates/cashier/cart-panel.php:108 templates/components/cart-item.php:27 assets/js/components/product-modal.js:97
 msgid "Edit item"
 msgstr "Sửa món"
 
@@ -807,7 +827,7 @@ msgstr "Khách lẻ"
 msgid "Guest customer"
 msgstr "Khách lẻ"
 
-#: templates/cashier/header.php:22
+#: templates/cashier/header.php:26
 msgid "Held carts"
 msgstr "Đơn tạm giữ"
 
@@ -831,7 +851,7 @@ msgstr "Nhập cài đặt JSON"
 msgid "Increase quantity"
 msgstr "Tăng số lượng"
 
-#: includes/Infrastructure/Assets/AssetLoader.php:128 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
+#: includes/Infrastructure/Assets/AssetLoader.php:130 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
 msgid "In stock"
 msgstr "Còn hàng"
 
@@ -923,7 +943,7 @@ msgstr "Đang tải danh mục..."
 msgid "Loading coupons..."
 msgstr "Đang tải mã giảm giá..."
 
-#: templates/customer/menu.php:15 assets/js/screens/customer.js:135
+#: templates/customer/menu.php:15 assets/js/screens/customer.js:162
 msgid "Loading menu…"
 msgstr "Đang tải trình đơn…"
 
@@ -1115,10 +1135,6 @@ msgstr "Mở ca trước khi thanh toán."
 msgid "Open a shift before completing checkout."
 msgstr "Mở ca trước khi hoàn tất thanh toán."
 
-#: assets/js/screens/customer.js:148
-msgid "Open Customer Display from the Cashier screen to pair it."
-msgstr "Mở Màn hình khách hàng từ màn hình Thu ngân để ghép nối."
-
 #: templates/shifts/content.php:16 templates/shifts/content.php:26
 msgid "Opening cash"
 msgstr "Tiền đầu ca"
@@ -1143,7 +1159,7 @@ msgstr "Vận hành"
 msgid "Options"
 msgstr "Tùy chọn"
 
-#: includes/Infrastructure/Assets/AssetLoader.php:130 templates/components/product-card.php:49 assets/js/components/catalog-renderer.js:39
+#: includes/Infrastructure/Assets/AssetLoader.php:132 templates/components/product-card.php:49 assets/js/components/catalog-renderer.js:39
 msgid "Options available"
 msgstr "Tùy chọn có sẵn"
 
@@ -1223,7 +1239,7 @@ msgstr "Loại đơn hàng"
 msgid "Order updated."
 msgstr "Đã cập nhật đơn hàng."
 
-#: includes/Infrastructure/Assets/AssetLoader.php:129 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
+#: includes/Infrastructure/Assets/AssetLoader.php:131 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
 msgid "Out of stock"
 msgstr "Hết hàng"
 
@@ -1383,7 +1399,7 @@ msgstr "Danh mục sản phẩm"
 msgid "Product configuration unavailable"
 msgstr "Không thể tải cấu hình sản phẩm"
 
-#: includes/Infrastructure/Assets/AssetLoader.php:131 assets/js/components/product-modal.js:109
+#: includes/Infrastructure/Assets/AssetLoader.php:133 assets/js/components/product-modal.js:109
 msgid "Product could not be loaded."
 msgstr "Không thể tải sản phẩm."
 
@@ -1471,7 +1487,7 @@ msgstr "Số tiền nhận được dưới tổng số tiền."
 msgid "Reconnect display"
 msgstr "Kết nối lại màn hình"
 
-#: assets/js/screens/customer.js:38
+#: assets/js/screens/customer.js:39
 msgid "Recovering display state…"
 msgstr "Đang khôi phục trạng thái hiển thị…"
 
@@ -1607,7 +1623,7 @@ msgstr "Lưu ghi chú"
 msgid "Save settings"
 msgstr "Lưu cài đặt"
 
-#: includes/Infrastructure/Assets/AssetLoader.php:127 assets/js/components/product-modal.js:262
+#: includes/Infrastructure/Assets/AssetLoader.php:129 assets/js/components/product-modal.js:262
 msgid "Saving..."
 msgstr "Đang lưu..."
 
@@ -1815,7 +1831,7 @@ msgstr "Giỏ hàng đã thay đổi theo yêu cầu khác. Xem lại giỏ hàn
 msgid "The cart could not be loaded."
 msgstr "Không thể tải giỏ hàng."
 
-#: includes/Infrastructure/Assets/AssetLoader.php:133 templates/cashier/cart-panel.php:88 assets/js/components/product-modal.js:421 assets/js/screens/cashier.js:165
+#: includes/Infrastructure/Assets/AssetLoader.php:135 templates/cashier/cart-panel.php:88 assets/js/components/product-modal.js:421 assets/js/screens/cashier.js:165
 msgid "The cart could not be updated."
 msgstr "Không thể cập nhật giỏ hàng."
 
@@ -1879,7 +1895,7 @@ msgstr "Quá trình nhập không chứa cài đặt CoffeePOS được hỗ tr�
 msgid "The imported settings disable every payment method."
 msgstr "Cài đặt đã nhập sẽ vô hiệu hóa mọi phương thức thanh toán."
 
-#: assets/js/screens/customer.js:137
+#: assets/js/screens/customer.js:164
 msgid "The menu could not be loaded."
 msgstr "Không thể tải menu."
 
@@ -1911,7 +1927,7 @@ msgstr "Đơn hàng vẫn đang chờ xử lý cho đến khi nhà cung cấp đ
 msgid "The order was not found."
 msgstr "Đơn hàng không được tìm thấy."
 
-#: assets/js/screens/customer.js:148
+#: assets/js/screens/customer.js:176
 msgid "The pairing link is invalid. Open Customer Display from Cashier."
 msgstr "Liên kết ghép nối không hợp lệ. Mở Màn hình hiển thị khách hàng từ nhân viên thu ngân."
 
@@ -2067,7 +2083,7 @@ msgstr "Nhân viên thu ngân này đã có ca mở."
 msgid "This customer request was already used with different information."
 msgstr "Yêu cầu của khách hàng này đã được sử dụng với thông tin khác."
 
-#: assets/js/screens/customer.js:130
+#: assets/js/screens/customer.js:137
 msgid "This display must use the same browser profile and requires BroadcastChannel support."
 msgstr "Màn hình này phải sử dụng cùng một cấu hình trình duyệt và yêu cầu hỗ trợ BroadcastChannel."
 
@@ -2075,7 +2091,7 @@ msgstr "Màn hình này phải sử dụng cùng một cấu hình trình duyệ
 msgid "This operation was already used with different information."
 msgstr "Hoạt động này đã được sử dụng với các thông tin khác nhau."
 
-#: assets/js/screens/customer.js:118
+#: assets/js/screens/customer.js:119
 msgid "This paired cart has expired. Open the display again from Cashier."
 msgstr "Giỏ hàng được ghép nối này đã hết hạn. Mở lại màn hình từ Thu ngân."
 
@@ -2087,7 +2103,7 @@ msgstr "Điện thoại này đã thuộc về một hội viên. Xác nhận đ
 msgid "This report export format is unavailable on the server."
 msgstr "Máy chủ không hỗ trợ định dạng xuất báo cáo này."
 
-#: includes/Infrastructure/Assets/AssetLoader.php:132 assets/js/components/product-modal.js:306
+#: includes/Infrastructure/Assets/AssetLoader.php:134 assets/js/components/product-modal.js:306
 msgid "This variation is unavailable."
 msgstr "Biến thể này không khả dụng."
 
@@ -2155,7 +2171,7 @@ msgstr "Định dạng xuất báo cáo không được hỗ trợ."
 msgid "Updated now"
 msgstr "Vừa cập nhật"
 
-#: includes/Infrastructure/Assets/AssetLoader.php:126 assets/js/components/product-modal.js:263
+#: includes/Infrastructure/Assets/AssetLoader.php:128 assets/js/components/product-modal.js:263
 msgid "Update item"
 msgstr "Cập nhật món"
 
@@ -2214,6 +2230,10 @@ msgstr "Mã thanh toán VietQR"
 #: templates/settings/content.php:132
 msgid "VietQR template"
 msgstr "Mẫu VietQR"
+
+#: assets/js/screens/customer.js:176
+msgid "Waiting for Cashier pairing…"
+msgstr "Đang chờ ghép nối từ Thu ngân…"
 
 #: assets/js/components/cart-context.js:157
 msgid "Waiting to search…"

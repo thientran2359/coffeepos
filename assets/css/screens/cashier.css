@@ -46,6 +46,44 @@
     white-space: nowrap;
 }
 
+.coffeepos-display-status {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: 6px;
+    padding: 4px 9px;
+    overflow: hidden;
+    color: #d9e4df;
+    border: 1px solid #53635c;
+    border-radius: 999px;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.coffeepos-display-status-dot {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    background: #89958f;
+    border-radius: 50%;
+}
+
+.coffeepos-display-status[data-state="connecting"] .coffeepos-display-status-dot {
+    background: var(--coffeepos-accent);
+}
+
+.coffeepos-display-status[data-state="connected"] {
+    color: #e9fff5;
+    border-color: #4e9c79;
+    background: rgba(24, 126, 87, 0.22);
+}
+
+.coffeepos-display-status[data-state="connected"] .coffeepos-display-status-dot {
+    background: #70e0ac;
+    box-shadow: 0 0 0 3px rgba(112, 224, 172, 0.16);
+}
+
 .coffeepos-cashier-utilities {
     display: flex;
     align-items: center;
@@ -762,6 +800,10 @@
 
     .coffeepos-cashier-brand [data-component="cashier-identity"] {
         display: none;
+    }
+
+    .coffeepos-display-status {
+        max-width: 210px;
     }
 
     .coffeepos-cashier-layout {

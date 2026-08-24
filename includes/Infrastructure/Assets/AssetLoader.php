@@ -43,6 +43,7 @@ final class AssetLoader
 
         wp_register_script('coffeepos-sync-protocol', COFFEEPOS_URL . 'assets/js/sync/protocol.js', ['coffeepos-core-app'], $version, true);
         wp_register_script('coffeepos-sync-channel', COFFEEPOS_URL . 'assets/js/sync/channel.js', ['coffeepos-sync-protocol'], $version, true);
+        wp_register_script('coffeepos-sync-display-pairing', COFFEEPOS_URL . 'assets/js/sync/display-pairing.js', ['coffeepos-sync-protocol'], $version, true);
 
         if ($screen === 'cashier') {
             $this->registerCashierScripts($version);
@@ -101,6 +102,7 @@ final class AssetLoader
             'restNonce' => wp_create_nonce('wp_rest'),
             'currencyDecimals' => function_exists('wc_get_price_decimals') ? wc_get_price_decimals() : 2,
             'customerDisplayUrl' => esc_url_raw(home_url('/' . trim(Settings::getPosBaseSlug(), '/') . '/customer/')),
+            'displayPairingScope' => substr(hash_hmac('sha256', (string) get_current_user_id(), wp_salt('auth')), 0, 32),
             'posSessionId' => $screen === 'customer' && $pairingValid ? $pairingInput : '',
             'pairingState' => $screen === 'customer' ? ($pairingValid ? 'paired' : ($pairingInput === '' ? 'missing' : 'invalid')) : '',
             'pollIntervalMs' => $screen === 'kds' ? Settings::getKdsPollInterval() : ($screen === 'order-queue' ? Settings::getOrderQueuePollInterval() : 0),
@@ -286,7 +288,7 @@ final class AssetLoader
         wp_register_script('coffeepos-component-coupon-selector', COFFEEPOS_URL . 'assets/js/components/coupon-selector.js', ['coffeepos-api-client', 'coffeepos-ui-template-renderer'], $version, true);
         $this->registerReceiptPrinter($version, 'coffeepos-ui-template-renderer');
         wp_register_script('coffeepos-component-checkout', COFFEEPOS_URL . 'assets/js/components/checkout.js', ['coffeepos-api-client', 'coffeepos-ui-template-renderer', 'coffeepos-component-receipt-printer'], $version, true);
-        wp_register_script('coffeepos-component-cashier-sync', COFFEEPOS_URL . 'assets/js/components/cashier-sync.js', ['coffeepos-sync-channel'], $version, true);
+        wp_register_script('coffeepos-component-cashier-sync', COFFEEPOS_URL . 'assets/js/components/cashier-sync.js', ['coffeepos-sync-channel', 'coffeepos-sync-display-pairing'], $version, true);
 
         wp_register_script(
             'coffeepos-component-order-type',
@@ -334,6 +336,7 @@ final class AssetLoader
             'coffeepos-customer-template-renderer',
             'coffeepos-state-customer',
             'coffeepos-sync-channel',
+            'coffeepos-sync-display-pairing',
             'coffeepos-component-customer-catalog',
             'coffeepos-component-customer-cart',
             'coffeepos-component-customer-payment',

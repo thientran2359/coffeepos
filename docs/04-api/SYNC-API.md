@@ -2,6 +2,21 @@
 
 # CoffeePOS Synchronization Contract
 
+## Approved automatic same-browser pairing (2026-08-24)
+
+Cashier and Customer Display still use the server-issued `pos_session_id` as
+the internal cart identity, but staff no longer pass it in the Customer Display
+URL. Both authenticated tabs join an opaque, user-scoped display-control
+channel. Customer Display announces `display.control.ready`; Cashier replies
+with `display.control.pair` containing the current `pos_session_id`, then both
+screens bind the existing session-scoped cart channel.
+
+The control channel carries pairing only. It MUST NOT carry cart contents,
+prices, totals, customer data, payment state, or order state. The Cashier's
+open-display action targets the named `coffeepos-customer-display` browsing
+context, so an already-open tab on the second monitor is navigated/reloaded
+instead of requiring staff interaction on that monitor.
+
 ## Approved manual-bank checkout projection (2026-08-23)
 
 `checkout.started` may be emitted again when Cashier changes the selected
@@ -49,12 +64,25 @@ Required channel name:
 coffeepos:<pos_session_id>
 ```
 
-`pos_session_id` is the opaque logical cart ID returned by the Cart API. It may
-be passed to the Customer Display URL, but it must never contain or expose the
-WooCommerce session token, authentication cookie, or REST nonce.
+`pos_session_id` is the opaque logical cart ID returned by the Cart API. It is
+sent internally by the authenticated same-browser pairing handshake and is not
+required in the normal Customer Display URL. A legacy URL value may be accepted
+for backward compatibility and then removed from the visible URL. It must never
+contain or expose the WooCommerce session token, authentication cookie, or REST
+nonce.
 
 Cashier and Customer Display must join the same session-scoped channel. A
 receiver must never subscribe to a global unscoped `coffeepos` channel.
+
+The separate control channel is:
+
+```text
+coffeepos:display-control:<opaque-user-scope>
+```
+
+Its scope is derived server-side for the authenticated WordPress user. It is
+not authorization; both routes and REST recovery continue to require the
+normal WordPress authentication, capability, and nonce checks.
 
 This contract supports tabs/windows in the same browser storage partition and
 origin, including a second monitor attached to the cashier device.

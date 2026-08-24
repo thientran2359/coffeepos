@@ -7,6 +7,8 @@
     CoffeePOS.components.createCashierSyncBridge = function (root, toast) {
         const protocol = CoffeePOS.sync.protocol;
         const displayButton = root.querySelector('[data-action="open-customer-display"]');
+        const displayStatus = root.querySelector('[data-component="customer-display-status"]');
+        const displayStatusLabel = displayStatus ? displayStatus.querySelector('[data-field="customer-display-status-label"]') : null;
         const config = window.CoffeePOSConfig || {};
         let cart = null;
         let payment = null;
@@ -14,14 +16,55 @@
         let screenState = 'idle';
         let workflowSequence = 0;
         let syncAvailable = true;
+        let pairing = null;
+        let displayHeartbeatTimer = 0;
+
+        function setDisplayConnection(state) {
+            window.clearTimeout(displayHeartbeatTimer);
+            if (displayStatus) { displayStatus.setAttribute('data-state', state); }
+            if (displayStatusLabel) {
+                displayStatusLabel.textContent = state === 'connected'
+                    ? __('Customer display: Connected', 'coffeepos')
+                    : (state === 'connecting' ? __('Customer display: Connecting…', 'coffeepos') : __('Customer display: Not connected', 'coffeepos'));
+            }
+            if (state === 'connected') {
+                displayHeartbeatTimer = window.setTimeout(function () { setDisplayConnection('disconnected'); }, 12000);
+            }
+        }
+
+        function pairDisplay(targetInstanceId) {
+            if (!pairing || !cart || !protocol.validSessionId(cart.pos_session_id)) { return false; }
+            return pairing.post('display.control.pair', { pos_session_id: cart.pos_session_id }, 'customer', targetInstanceId || '');
+        }
+
+        try {
+            pairing = CoffeePOS.sync.createDisplayPairing({
+                scope: String(config.displayPairingScope || ''),
+                source: 'cashier',
+                onMessage: function (message) {
+                    if (message.type === 'display.control.ready') {
+                        setDisplayConnection('connecting');
+                        pairDisplay(message.source_instance_id);
+                    }
+                },
+                onError: function () {
+                    setDisplayConnection('disconnected');
+                    if (toast) { toast.show(__('Customer Display pairing is unavailable.', 'coffeepos'), 'warning'); }
+                }
+            });
+        } catch (error) {
+            if (toast) { toast.show(__('Customer Display pairing is unavailable.', 'coffeepos'), 'warning'); }
+        }
 
         const transport = CoffeePOS.sync.createChannel({
             source: 'cashier', target: 'customer',
             onMessage: function (message) {
                 if (message.source !== 'customer' || ['display.ready', 'state.requested'].indexOf(message.type) === -1) { return; }
+                setDisplayConnection('connected');
                 snapshot();
             },
             onError: function () {
+                setDisplayConnection('disconnected');
                 if (toast) { toast.show(__('Customer Display synchronization is unavailable.', 'coffeepos'), 'warning'); }
             }
         });
@@ -60,6 +103,7 @@
             const changed = transport.getSessionId() !== nextCart.pos_session_id;
             cart = nextCart;
             if (changed) {
+                setDisplayConnection('disconnected');
                 try {
                     transport.bind(cart.pos_session_id);
                     syncAvailable = true;
@@ -108,11 +152,23 @@
             const base = String(config.customerDisplayUrl || '');
             if (!base) { return; }
             const url = new window.URL(base, window.location.origin);
-            url.searchParams.set('pos_session_id', cart.pos_session_id);
-            window.open(url.href, 'coffeepos-customer-display');
+            const displayWindow = window.open(url.href, 'coffeepos-customer-display');
+            if (!displayWindow && toast) {
+                toast.show(__('Customer Display was blocked by the browser. Allow pop-ups and try again.', 'coffeepos'), 'warning');
+            }
         }
         if (displayButton) { displayButton.addEventListener('click', openDisplay); }
-        return { publishCart: publishCart, publishWorkflow: publishWorkflow, returnToCart: returnToCart, snapshot: snapshot, destroy: transport.close };
+        return {
+            publishCart: publishCart,
+            publishWorkflow: publishWorkflow,
+            returnToCart: returnToCart,
+            snapshot: snapshot,
+            destroy: function () {
+                window.clearTimeout(displayHeartbeatTimer);
+                transport.close();
+                if (pairing) { pairing.close(); }
+            }
+        };
     };
     window.CoffeePOS = CoffeePOS;
 }(window));

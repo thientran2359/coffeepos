@@ -23,7 +23,10 @@ foreach ($poEntries[1] as $index => $source) {
         $translations[stripcslashes($source)] = stripcslashes($poEntries[2][$index]);
     }
 }
-$assert(count($translations) === 574, 'Vietnamese catalog must translate all 574 source messages.');
+$sourceMessages = array_values(array_filter(array_map('stripcslashes', $potIds[1]), static function (string $message): bool {
+    return $message !== '';
+}));
+$assert(count($translations) === count($sourceMessages), 'Vietnamese catalog must translate every POT source message.');
 
 foreach ($translations as $source => $translation) {
     $assert(trim($translation) !== '', 'Empty Vietnamese translation: ' . $source);

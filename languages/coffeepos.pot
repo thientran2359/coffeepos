@@ -61,7 +61,7 @@ msgstr ""
 msgid "Adding member to cart…"
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:123 templates/components/product-modal.php:14 assets/js/components/product-modal.js:98
+#: includes/Infrastructure/Assets/AssetLoader.php:125 templates/components/product-modal.php:14 assets/js/components/product-modal.js:98
 msgid "Add item"
 msgstr ""
 
@@ -77,7 +77,7 @@ msgstr ""
 msgid "Address"
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:125 templates/components/product-modal.php:74 assets/js/components/product-modal.js:263
+#: includes/Infrastructure/Assets/AssetLoader.php:127 templates/components/product-modal.php:74 assets/js/components/product-modal.js:263
 msgid "Add to cart"
 msgstr ""
 
@@ -229,7 +229,7 @@ msgstr ""
 msgid "Cart item count"
 msgstr ""
 
-#: assets/js/screens/customer.js:115
+#: assets/js/screens/customer.js:116
 msgid "Cart recovered; waiting for Cashier state…"
 msgstr ""
 
@@ -241,7 +241,7 @@ msgstr ""
 msgid "Cashier"
 msgstr ""
 
-#: templates/cashier/header.php:21
+#: templates/cashier/header.php:25
 msgid "Cashier utility actions"
 msgstr ""
 
@@ -457,11 +457,11 @@ msgstr ""
 msgid "Confirm received & complete"
 msgstr ""
 
-#: templates/customer/menu.php:11 assets/js/screens/customer.js:126
+#: templates/customer/menu.php:11 assets/js/screens/customer.js:133
 msgid "Connecting display…"
 msgstr ""
 
-#: assets/js/screens/customer.js:96
+#: assets/js/screens/customer.js:97
 msgid "Connecting next order…"
 msgstr ""
 
@@ -489,7 +489,7 @@ msgstr ""
 msgid "Could not open the Excel export package."
 msgstr ""
 
-#: assets/js/screens/customer.js:99
+#: assets/js/screens/customer.js:100
 msgid "Could not pair the next order. Reconnect this display."
 msgstr ""
 
@@ -577,7 +577,7 @@ msgstr ""
 msgid "Customer creation is already in progress."
 msgstr ""
 
-#: templates/cashier/header.php:25
+#: templates/cashier/header.php:29
 msgid "Customer display"
 msgstr ""
 
@@ -585,8 +585,28 @@ msgstr ""
 msgid "Customer Display"
 msgstr ""
 
-#: assets/js/components/cashier-sync.js:25 assets/js/components/cashier-sync.js:68
+#: assets/js/components/cashier-sync.js:27
+msgid "Customer display: Connected"
+msgstr ""
+
+#: assets/js/components/cashier-sync.js:28
+msgid "Customer display: Connecting…"
+msgstr ""
+
+#: templates/cashier/header.php:21 assets/js/components/cashier-sync.js:28
+msgid "Customer display: Not connected"
+msgstr ""
+
+#: assets/js/components/cashier-sync.js:52 assets/js/components/cashier-sync.js:56 assets/js/screens/customer.js:153 assets/js/screens/customer.js:158
+msgid "Customer Display pairing is unavailable."
+msgstr ""
+
+#: assets/js/components/cashier-sync.js:68 assets/js/components/cashier-sync.js:112
 msgid "Customer Display synchronization is unavailable."
+msgstr ""
+
+#: assets/js/components/cashier-sync.js:157
+msgid "Customer Display was blocked by the browser. Allow pop-ups and try again."
 msgstr ""
 
 #: templates/settings/content.php:73
@@ -661,15 +681,15 @@ msgstr ""
 msgid "Dismiss notification"
 msgstr ""
 
-#: assets/js/screens/customer.js:59
+#: assets/js/screens/customer.js:60
 msgid "Display connected"
 msgstr ""
 
-#: assets/js/screens/customer.js:124
+#: assets/js/screens/customer.js:131
 msgid "Display connection was interrupted."
 msgstr ""
 
-#: assets/js/screens/customer.js:118
+#: assets/js/screens/customer.js:119
 msgid "Display sync is unavailable. Reconnect to try again."
 msgstr ""
 
@@ -677,7 +697,7 @@ msgstr ""
 msgid "Each quick note must be a valid settings row."
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:124 templates/cashier/cart-panel.php:108 templates/components/cart-item.php:27 assets/js/components/product-modal.js:97
+#: includes/Infrastructure/Assets/AssetLoader.php:126 templates/cashier/cart-panel.php:108 templates/components/cart-item.php:27 assets/js/components/product-modal.js:97
 msgid "Edit item"
 msgstr ""
 
@@ -805,7 +825,7 @@ msgstr ""
 msgid "Guest customer"
 msgstr ""
 
-#: templates/cashier/header.php:22
+#: templates/cashier/header.php:26
 msgid "Held carts"
 msgstr ""
 
@@ -829,7 +849,7 @@ msgstr ""
 msgid "Increase quantity"
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:128 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
+#: includes/Infrastructure/Assets/AssetLoader.php:130 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
 msgid "In stock"
 msgstr ""
 
@@ -921,7 +941,7 @@ msgstr ""
 msgid "Loading coupons..."
 msgstr ""
 
-#: templates/customer/menu.php:15 assets/js/screens/customer.js:135
+#: templates/customer/menu.php:15 assets/js/screens/customer.js:162
 msgid "Loading menu…"
 msgstr ""
 
@@ -1113,10 +1133,6 @@ msgstr ""
 msgid "Open a shift before completing checkout."
 msgstr ""
 
-#: assets/js/screens/customer.js:148
-msgid "Open Customer Display from the Cashier screen to pair it."
-msgstr ""
-
 #: templates/shifts/content.php:16 templates/shifts/content.php:26
 msgid "Opening cash"
 msgstr ""
@@ -1141,7 +1157,7 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:130 templates/components/product-card.php:49 assets/js/components/catalog-renderer.js:39
+#: includes/Infrastructure/Assets/AssetLoader.php:132 templates/components/product-card.php:49 assets/js/components/catalog-renderer.js:39
 msgid "Options available"
 msgstr ""
 
@@ -1221,7 +1237,7 @@ msgstr ""
 msgid "Order updated."
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:129 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
+#: includes/Infrastructure/Assets/AssetLoader.php:131 templates/components/product-card.php:46 assets/js/components/catalog-renderer.js:35
 msgid "Out of stock"
 msgstr ""
 
@@ -1381,7 +1397,7 @@ msgstr ""
 msgid "Product configuration unavailable"
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:131 assets/js/components/product-modal.js:109
+#: includes/Infrastructure/Assets/AssetLoader.php:133 assets/js/components/product-modal.js:109
 msgid "Product could not be loaded."
 msgstr ""
 
@@ -1469,7 +1485,7 @@ msgstr ""
 msgid "Reconnect display"
 msgstr ""
 
-#: assets/js/screens/customer.js:38
+#: assets/js/screens/customer.js:39
 msgid "Recovering display state…"
 msgstr ""
 
@@ -1605,7 +1621,7 @@ msgstr ""
 msgid "Save settings"
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:127 assets/js/components/product-modal.js:262
+#: includes/Infrastructure/Assets/AssetLoader.php:129 assets/js/components/product-modal.js:262
 msgid "Saving..."
 msgstr ""
 
@@ -1813,7 +1829,7 @@ msgstr ""
 msgid "The cart could not be loaded."
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:133 templates/cashier/cart-panel.php:88 assets/js/components/product-modal.js:421 assets/js/screens/cashier.js:165
+#: includes/Infrastructure/Assets/AssetLoader.php:135 templates/cashier/cart-panel.php:88 assets/js/components/product-modal.js:421 assets/js/screens/cashier.js:165
 msgid "The cart could not be updated."
 msgstr ""
 
@@ -1877,7 +1893,7 @@ msgstr ""
 msgid "The imported settings disable every payment method."
 msgstr ""
 
-#: assets/js/screens/customer.js:137
+#: assets/js/screens/customer.js:164
 msgid "The menu could not be loaded."
 msgstr ""
 
@@ -1909,7 +1925,7 @@ msgstr ""
 msgid "The order was not found."
 msgstr ""
 
-#: assets/js/screens/customer.js:148
+#: assets/js/screens/customer.js:176
 msgid "The pairing link is invalid. Open Customer Display from Cashier."
 msgstr ""
 
@@ -2065,7 +2081,7 @@ msgstr ""
 msgid "This customer request was already used with different information."
 msgstr ""
 
-#: assets/js/screens/customer.js:130
+#: assets/js/screens/customer.js:137
 msgid "This display must use the same browser profile and requires BroadcastChannel support."
 msgstr ""
 
@@ -2073,7 +2089,7 @@ msgstr ""
 msgid "This operation was already used with different information."
 msgstr ""
 
-#: assets/js/screens/customer.js:118
+#: assets/js/screens/customer.js:119
 msgid "This paired cart has expired. Open the display again from Cashier."
 msgstr ""
 
@@ -2085,7 +2101,7 @@ msgstr ""
 msgid "This report export format is unavailable on the server."
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:132 assets/js/components/product-modal.js:306
+#: includes/Infrastructure/Assets/AssetLoader.php:134 assets/js/components/product-modal.js:306
 msgid "This variation is unavailable."
 msgstr ""
 
@@ -2153,7 +2169,7 @@ msgstr ""
 msgid "Updated now"
 msgstr ""
 
-#: includes/Infrastructure/Assets/AssetLoader.php:126 assets/js/components/product-modal.js:263
+#: includes/Infrastructure/Assets/AssetLoader.php:128 assets/js/components/product-modal.js:263
 msgid "Update item"
 msgstr ""
 
@@ -2211,6 +2227,10 @@ msgstr ""
 
 #: templates/settings/content.php:132
 msgid "VietQR template"
+msgstr ""
+
+#: assets/js/screens/customer.js:176
+msgid "Waiting for Cashier pairing…"
 msgstr ""
 
 #: assets/js/components/cart-context.js:157

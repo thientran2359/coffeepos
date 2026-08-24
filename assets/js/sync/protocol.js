@@ -94,7 +94,7 @@
     CoffeePOS.sync = CoffeePOS.sync || {};
     CoffeePOS.sync.protocol = {
         types: TYPES.slice(), plainObject: plainObject, validSessionId: validSessionId,
-        channelName: channelName, instanceId: instanceId, createEnvelope: createEnvelope,
+        channelName: channelName, id: id, instanceId: instanceId, createEnvelope: createEnvelope,
         validateEnvelope: validateEnvelope, safeQrUrl: safeQrUrl,
         safeCustomer: safeCustomer, safeCustomerCart: safeCustomerCart
     };

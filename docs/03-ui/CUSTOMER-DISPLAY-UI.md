@@ -2,6 +2,21 @@
 
 # CoffeePOS Customer Display UI Specification
 
+## Approved automatic tab pairing (2026-08-24)
+
+The normal display URL is `/pos/customer/` without `pos_session_id`. On first
+load the page names its browsing context `coffeepos-customer-display` and waits
+on the authenticated user's display-control channel. Cashier supplies the
+current internal cart ID through the pairing handshake. Clicking the Cashier
+display action later navigates/reloads that named tab and pairs it again, so the
+operator does not touch the customer-facing monitor.
+
+Cashier header exposes a compact Customer Display connection badge. It becomes
+connected only after Cashier receives a valid session-channel readiness or
+snapshot request from Customer Display. The regular display heartbeat refreshes
+the badge; missing heartbeats return it to not connected so an old tab does not
+leave a false connected state.
+
 ## Approved checkout overlay revision (2026-08-23)
 
 Opening Cashier checkout opens a centered Customer Display overlay above the
@@ -22,9 +37,10 @@ Customer Display is a separate customer-facing application surface.
 
 The feature baseline requires real-time synchronization with the cashier through `BroadcastChannel`.
 
-Cashier and Customer Display must be paired by the same opaque
-`pos_session_id`. The display renders the latest server-confirmed cart
-projection; it does not maintain an independent cart.
+Cashier and Customer Display must internally bind the same opaque
+`pos_session_id`, obtained automatically through the same-browser pairing
+handshake. The display renders the latest server-confirmed cart projection; it
+does not maintain an independent cart.
 
 It also renders a read-only product menu grouped by WooCommerce category from
 the shared `CatalogView`. The menu and realtime cart are separate presentation
@@ -294,6 +310,11 @@ Cashier responds with a full `state.snapshot`; the display therefore does not
 need to wait for the next cart change. Revision gaps trigger
 `state.requested`. Messages for another session or an older revision are
 ignored.
+
+Before opening the cart channel, an unpaired display sends
+`display.control.ready` on its opaque user-scoped control channel. Cashier
+answers with a targeted `display.control.pair`. No cart or payment projection is
+allowed on this control channel.
 
 Customer Display may send only readiness, snapshot requests, and
 acknowledgements. It cannot mutate cart, payment, or order state.

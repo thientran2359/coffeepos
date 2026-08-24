@@ -8,6 +8,7 @@ const vm = require('vm');
 const root = path.resolve(__dirname, '..', '..');
 const protocolSource = fs.readFileSync(path.join(root, 'assets/js/sync/protocol.js'), 'utf8');
 const channelSource = fs.readFileSync(path.join(root, 'assets/js/sync/channel.js'), 'utf8');
+const pairingSource = fs.readFileSync(path.join(root, 'assets/js/sync/display-pairing.js'), 'utf8');
 
 const channels = [];
 class FakeBroadcastChannel {
@@ -38,11 +39,14 @@ window.window = window;
 
 vm.runInNewContext(protocolSource, { window, URL, Date, Math, Number, Object, Array, String, RegExp });
 vm.runInNewContext(channelSource, { window, Date, Math, Number, Object, Array, String, RegExp, Set, Map });
+vm.runInNewContext(pairingSource, { window, Date, Math, Number, Object, Array, String, RegExp });
 
 const protocol = window.CoffeePOS.sync.protocol;
 const createChannel = window.CoffeePOS.sync.createChannel;
+const createDisplayPairing = window.CoffeePOS.sync.createDisplayPairing;
 assert(protocol, 'SyncProtocol must be registered on the shared CoffeePOS namespace.');
 assert(createChannel, 'SyncChannel factory must be registered on the shared CoffeePOS namespace.');
+assert(createDisplayPairing, 'Display pairing factory must be registered on the shared CoffeePOS namespace.');
 
 const sessionId = '1234567890abcdef';
 assert.strictEqual(protocol.channelName(sessionId), 'coffeepos:' + sessionId);
@@ -80,5 +84,32 @@ assert.strictEqual(channels[0].closed, true, 'Rebinding must close the previous 
 assert.strictEqual(channels[1].name, 'coffeepos:fedcba0987654321');
 transport.close();
 assert.strictEqual(channels[1].closed, true);
+
+const pairingMessages = [];
+const pairing = createDisplayPairing({
+	scope: '0123456789abcdef0123456789abcdef',
+	source: 'customer',
+	onMessage: (message) => pairingMessages.push(message),
+});
+const pairingChannel = channels[2];
+assert.strictEqual(pairingChannel.name, 'coffeepos:display-control:0123456789abcdef0123456789abcdef');
+assert.strictEqual(pairing.post('display.control.ready', {}, 'cashier'), true);
+assert.strictEqual(pairingChannel.messages[0].type, 'display.control.ready');
+assert.strictEqual(Object.prototype.hasOwnProperty.call(pairingChannel.messages[0].payload, 'pos_session_id'), false);
+
+pairingChannel.onmessage({ data: {
+	version: 1,
+	type: 'display.control.pair',
+	message_id: 'display-control-message-0001',
+	source_instance_id: 'cashier-display-control-instance',
+	source: 'cashier',
+	target: 'customer',
+	target_instance_id: pairing.getSourceInstanceId(),
+	payload: { pos_session_id: sessionId },
+} });
+assert.strictEqual(pairingMessages.length, 1, 'Targeted pairing message must reach the Customer Display instance.');
+assert.strictEqual(pairingMessages[0].payload.pos_session_id, sessionId);
+pairing.close();
+assert.strictEqual(pairingChannel.closed, true);
 
 console.log('Phase 06 protocol scenarios passed.');

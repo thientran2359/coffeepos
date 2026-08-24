@@ -63,7 +63,10 @@ function disabled(bool $disabled): void
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CoffeePOS Phase 02 Browser Fixture</title>
-    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="/assets/css/core.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/screens/cashier.css">
+    <link rel="stylesheet" href="/assets/css/print.css">
 </head>
 <body class="coffeepos coffeepos-screen-cashier">
 <main id="coffeepos-app" data-screen="cashier" data-coffeepos-screen="cashier">

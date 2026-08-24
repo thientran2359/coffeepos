@@ -138,7 +138,6 @@
         function onClick(event) {
             const trigger = event.target.closest('[data-action]'); if (!trigger) { return; }
             const action = trigger.getAttribute('data-action');
-            if (action === 'scroll-category') { catalog.scroll(trigger.getAttribute('data-category-id')); }
             if (action === 'retry-customer-catalog') { loadCatalog(); }
             if (action === 'retry-display-sync' && protocol.validSessionId(store.getState().posSessionId)) { recoverCart(store.getState().posSessionId); requestSnapshot(); }
         }

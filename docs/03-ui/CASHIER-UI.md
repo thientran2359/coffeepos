@@ -342,8 +342,9 @@ Nhiều đường
 Selection should be visibly toggled.
 
 The UI allows multiple selections. Quick-note IDs remain structured state and
-must not be appended into the custom-note textarea. Editing a cart item restores
-both controls independently.
+each selected label is mirrored into the custom-note textarea on a separate
+line. Deselecting a chip removes that exact generated line without deleting
+other staff instructions.
 
 ---
 

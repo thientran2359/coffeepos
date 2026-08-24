@@ -1,0 +1,80 @@
+/* CoffeePOS foundations: design tokens, document defaults, accessibility, and shared text treatments. */
+:root {
+    --coffeepos-bg: #eef1ed;
+    --coffeepos-surface: #ffffff;
+    --coffeepos-surface-soft: #f7f8f5;
+    --coffeepos-border: #d9ded7;
+    --coffeepos-border-strong: #bdc7c0;
+    --coffeepos-text: #202623;
+    --coffeepos-text-muted: #64706a;
+    --coffeepos-primary: #12715b;
+    --coffeepos-primary-dark: #0a5140;
+    --coffeepos-accent: #e9b949;
+    --coffeepos-danger: #ba3a3a;
+    --coffeepos-warning: #9a6400;
+    --coffeepos-success: #19734d;
+    --coffeepos-focus: #2c6ecb;
+    --coffeepos-header: #1f2b27;
+    --coffeepos-radius: 6px;
+    --coffeepos-shadow: 0 12px 32px rgba(28, 38, 33, 0.18);
+}
+[hidden] {
+    display: none !important;
+}
+html,
+body.coffeepos {
+    margin: 0;
+    min-height: 100%;
+}
+body.coffeepos {
+    overflow: hidden;
+    background: var(--coffeepos-bg);
+    color: var(--coffeepos-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    line-height: 1.4;
+}
+body.coffeepos-overlay-open {
+    overflow: hidden;
+}
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid var(--coffeepos-focus);
+    outline-offset: 2px;
+}
+.screen-reader-text {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+#coffeepos-app {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 620px;
+    display: flex;
+    flex-direction: column;
+}
+.coffeepos-eyebrow {
+    display: block;
+    color: var(--coffeepos-text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}

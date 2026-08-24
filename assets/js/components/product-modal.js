@@ -348,15 +348,44 @@
 
         function toggleQuickNote(button) {
             const noteId = button.getAttribute('data-quick-note-id');
+            const noteLabel = String(button.textContent || '').trim();
             const index = state.selectedQuickNotes.indexOf(noteId);
+            const selected = index === -1;
 
-            if (index === -1) {
+            if (selected) {
                 state.selectedQuickNotes.push(noteId);
             } else {
                 state.selectedQuickNotes.splice(index, 1);
             }
 
+            syncQuickNoteText(noteLabel, selected);
             applySelectionState();
+        }
+
+        function syncQuickNoteText(label, selected) {
+            if (label === '') {
+                return;
+            }
+
+            const lines = String(customNote.value || '').split(/\r?\n/);
+            const existing = lines.some(function (line) { return line.trim() === label; });
+
+            if (selected && !existing) {
+                const current = String(customNote.value || '').replace(/\s+$/, '');
+                const next = current === '' ? label : current + '\n' + label;
+                const maximum = Number(customNote.getAttribute('maxlength') || 0);
+
+                if (maximum === 0 || next.length <= maximum) {
+                    customNote.value = next;
+                }
+                return;
+            }
+
+            if (!selected && existing) {
+                customNote.value = lines.filter(function (line) {
+                    return line.trim() !== label;
+                }).join('\n').replace(/^\n+|\n+$/g, '');
+            }
         }
 
         function changeQuantity(delta) {

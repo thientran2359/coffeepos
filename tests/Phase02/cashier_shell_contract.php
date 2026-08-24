@@ -32,7 +32,9 @@ $paths = [
     'productJs' => 'assets/js/components/product-card.js',
     'orderTypeJs' => 'assets/js/components/order-type.js',
     'cashierJs' => 'assets/js/screens/cashier.js',
-    'css' => 'assets/css/app.css',
+    'coreCss' => 'assets/css/core.css',
+    'componentsCss' => 'assets/css/components.css',
+    'cashierCss' => 'assets/css/screens/cashier.css',
 ];
 
 $read = static function (string $relativePath) use ($pluginRoot): string {
@@ -107,6 +109,12 @@ $jsBundle = implode("\n", [
     $files['productJs'],
     $files['orderTypeJs'],
     $files['cashierJs'],
+]);
+
+$cssBundle = implode("\n", [
+    $files['coreCss'],
+    $files['componentsCss'],
+    $files['cashierCss'],
 ]);
 
 $run('TC-01/02 route scope remains POS-only', static function () use ($assertContains, $files): void {
@@ -243,7 +251,7 @@ $run('JavaScript is modular and app.js remains a bootstrap', static function () 
     $assertContains('if ($screen === \'cashier\')', $files['assetLoader'], 'Cashier assets are not screen scoped');
 });
 
-$run('TC-16-18 responsive and touch contracts', static function () use ($assertContains, $files): void {
+$run('TC-16-18 responsive and touch contracts', static function () use ($assertContains, $cssBundle): void {
     foreach ([
         'min-height: 44px',
         '@media (max-width: 1180px)',
@@ -251,13 +259,13 @@ $run('TC-16-18 responsive and touch contracts', static function () use ($assertC
         '@media (max-width: 720px)',
         'grid-template-columns: minmax(0, 1fr) 330px',
     ] as $rule) {
-        $assertContains($rule, $files['css'], 'Missing responsive/touch CSS rule');
+        $assertContains($rule, $cssBundle, 'Missing responsive/touch CSS rule');
     }
 });
 
-$run('TC-19-21 keyboard and semantic control contracts', static function () use ($assertContains, $templateBundle, $files): void {
+$run('TC-19-21 keyboard and semantic control contracts', static function () use ($assertContains, $templateBundle, $cssBundle): void {
     foreach (['<button', '<label', 'aria-label=', 'aria-live=', ':focus-visible'] as $contract) {
-        $assertContains($contract, $templateBundle . $files['css'], 'Missing accessibility contract');
+        $assertContains($contract, $templateBundle . $cssBundle, 'Missing accessibility contract');
     }
 });
 

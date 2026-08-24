@@ -1,0 +1,128 @@
+/* CoffeePOS operations shell shared by KDS, Order Queue, and management screens. */
+/* Phase 07 KDS and Order Queue */
+body.coffeepos-screen-kds,
+body.coffeepos-screen-order-queue {
+    overflow: auto;
+    background: #e9eee9;
+}
+.coffeepos-operations {
+    min-height: 0;
+    flex: 1;
+    padding: 20px;
+}
+.coffeepos-operations__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin: -20px -20px 18px;
+    padding: 16px 22px;
+    color: #fff;
+    background: var(--coffeepos-header);
+    border-bottom: 3px solid var(--coffeepos-accent);
+}
+.coffeepos-operations__header h1 {
+    margin: 2px 0 0;
+    font-size: clamp(26px, 3vw, 40px);
+}
+.coffeepos-operations__tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.coffeepos-operations__tools [role="status"] {
+    color: #cbd8d1;
+    font-size: 13px;
+}
+.coffeepos-operations__filters {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 12px;
+}
+.coffeepos-operations__filters button {
+    min-height: 44px;
+    padding: 8px 16px;
+    color: var(--coffeepos-text);
+    background: transparent;
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 999px;
+    cursor: pointer;
+}
+.coffeepos-operations__filters button[aria-pressed="true"] {
+    color: #fff;
+    background: var(--coffeepos-primary);
+    border-color: var(--coffeepos-primary);
+}
+.coffeepos-operations__filters label {
+    display: grid;
+    gap: 4px;
+    color: var(--coffeepos-text-muted);
+    font-size: 13px;
+}
+.coffeepos-operations__filters select {
+    min-width: 170px;
+    min-height: 42px;
+    padding: 7px 10px;
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 8px;
+    background: #fff;
+}
+.coffeepos-operations__notice {
+    margin: 14px 0;
+    padding: 16px;
+    border: 1px solid #d9dfda;
+    border-radius: 10px;
+    background: #fff;
+    text-align: center;
+}
+.coffeepos-kds-card > header,
+.coffeepos-queue-card > header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    color: #fff;
+    background: #29463b;
+}
+.coffeepos-kds-card > header strong,
+.coffeepos-queue-card > header strong {
+    font-size: 22px;
+}
+.coffeepos-kds-card__state,
+.coffeepos-queue-card__state {
+    align-self: center;
+    padding: 4px 9px;
+    color: #20352e;
+    background: #f1cb69;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.coffeepos-kds-card__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 16px;
+    color: #52625a;
+    background: #f4f7f5;
+    border-bottom: 1px solid #dde5e0;
+}
+@media (max-width: 720px) {
+    .coffeepos-operations__header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .coffeepos-operations__tools, .coffeepos-operations__filters {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .coffeepos-kds-grid, .coffeepos-order-queue-list {
+        grid-template-columns: 1fr;
+    }
+}

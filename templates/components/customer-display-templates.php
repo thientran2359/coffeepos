@@ -2,9 +2,6 @@
 declare(strict_types=1);
 if (! defined('ABSPATH')) { exit; }
 ?>
-<template id="coffeepos-customer-category-button-template">
-    <button type="button" class="coffeepos-category-button" data-action="scroll-category" data-attr="data-category-id:id"><span data-field="name"></span></button>
-</template>
 <template id="coffeepos-customer-category-template">
     <section class="coffeepos-customer-category" data-component="catalog-category-section" data-key="id" data-attr="data-category-id:id">
         <h2 data-field="name"></h2>

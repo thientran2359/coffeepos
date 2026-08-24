@@ -29,13 +29,7 @@ final class AssetLoader
             : '';
         $pairingValid = preg_match('/^[a-zA-Z0-9\-]{16,64}$/', $pairingInput) === 1;
 
-        wp_register_style(
-            'coffeepos-app',
-            COFFEEPOS_URL . 'assets/css/app.css',
-            [],
-            $version
-        );
-        wp_enqueue_style('coffeepos-app');
+        $this->enqueuePosStyles($screen, $version);
 
         wp_register_script(
             'coffeepos-core-app',
@@ -85,6 +79,11 @@ final class AssetLoader
             $appDependencies[] = 'coffeepos-screen-reports';
         }
 
+        if ($screen === 'settings') {
+            $this->registerSettingsScripts($version);
+            $appDependencies[] = 'coffeepos-screen-settings';
+        }
+
         wp_register_script(
             'coffeepos-app',
             COFFEEPOS_URL . 'assets/js/app.js',
@@ -122,6 +121,77 @@ final class AssetLoader
         ]);
 
         wp_enqueue_script('coffeepos-app');
+    }
+
+    private function enqueuePosStyles(?string $screen, string $version): void
+    {
+        $this->registerStyle('coffeepos-core', 'core.css', [], $version);
+
+        if ($screen === 'customer') {
+            $this->registerStyle(
+                'coffeepos-screen-customer',
+                'screens/customer-display.css',
+                ['coffeepos-core'],
+                $version
+            );
+            wp_enqueue_style('coffeepos-screen-customer');
+
+            return;
+        }
+
+        $this->registerStyle('coffeepos-components', 'components.css', ['coffeepos-core'], $version);
+
+        $screenFiles = [
+            'entry' => 'screens/login.css',
+            'cashier' => 'screens/cashier.css',
+            'kds' => 'screens/kds.css',
+            'order-queue' => 'screens/order-queue.css',
+            'shifts' => 'screens/shifts.css',
+            'order-history' => 'screens/order-history.css',
+            'reports' => 'screens/reports.css',
+            'settings' => 'screens/settings.css',
+        ];
+
+        if ($screen === null || ! isset($screenFiles[$screen])) {
+            wp_enqueue_style('coffeepos-components');
+
+            return;
+        }
+
+        $dependencies = ['coffeepos-components'];
+        $operationsScreens = ['kds', 'order-queue', 'shifts', 'order-history', 'reports', 'settings'];
+        if (in_array($screen, $operationsScreens, true)) {
+            $this->registerStyle('coffeepos-operations', 'operations.css', $dependencies, $version);
+            $dependencies = ['coffeepos-operations'];
+        }
+
+        $screenHandle = 'coffeepos-screen-' . $screen;
+        $this->registerStyle($screenHandle, $screenFiles[$screen], $dependencies, $version);
+        $lastHandle = $screenHandle;
+
+        $managementScreens = ['shifts', 'order-history', 'reports', 'settings'];
+        if (in_array($screen, $managementScreens, true)) {
+            $this->registerStyle('coffeepos-management', 'management.css', [$screenHandle], $version);
+            $lastHandle = 'coffeepos-management';
+        }
+
+        if (in_array($screen, ['cashier', 'order-queue', 'order-history'], true)) {
+            $this->registerStyle('coffeepos-print', 'print.css', [$lastHandle], $version, 'all');
+            $lastHandle = 'coffeepos-print';
+        }
+
+        wp_enqueue_style($lastHandle);
+    }
+
+    private function registerStyle(string $handle, string $path, array $dependencies, string $version, string $media = 'all'): void
+    {
+        wp_register_style(
+            $handle,
+            COFFEEPOS_URL . 'assets/css/' . ltrim($path, '/'),
+            $dependencies,
+            $version,
+            $media
+        );
     }
 
     private function registerCashierScripts(string $version): void
@@ -285,6 +355,11 @@ final class AssetLoader
         wp_register_script('coffeepos-reports-api-client', COFFEEPOS_URL . 'assets/js/api/client.js', ['coffeepos-core-app'], $version, true);
         wp_register_script('coffeepos-reports-template-renderer', COFFEEPOS_URL . 'assets/js/ui/template-renderer.js', ['coffeepos-core-app'], $version, true);
         wp_register_script('coffeepos-screen-reports', COFFEEPOS_URL . 'assets/js/screens/reports.js', ['coffeepos-reports-api-client', 'coffeepos-reports-template-renderer'], $version, true);
+    }
+
+    private function registerSettingsScripts(string $version): void
+    {
+        wp_register_script('coffeepos-screen-settings', COFFEEPOS_URL . 'assets/js/screens/settings.js', ['coffeepos-core-app'], $version, true);
     }
 
     private function registerReceiptPrinter(string $version, string $rendererHandle): void

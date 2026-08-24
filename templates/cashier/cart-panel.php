@@ -19,7 +19,6 @@ if (! defined('ABSPATH')) {
 </header>
 
 <section class="coffeepos-order-type" data-component="order-type" data-state="normal">
-    <h3><?php esc_html_e('Service', 'coffeepos'); ?></h3>
     <div class="coffeepos-order-type-options">
         <button type="button" class="coffeepos-segment" data-action="select-order-type" data-order-type="dine_in" aria-pressed="false">
             <?php esc_html_e('Dine-in', 'coffeepos'); ?>

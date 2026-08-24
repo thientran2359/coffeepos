@@ -11,7 +11,9 @@ use CoffeePOS\Infrastructure\Templates\TemplateLoader;
 
 $context = TemplateLoader::context();
 $notice = is_array($context['settings_notice'] ?? null) ? $context['settings_notice'] : [];
-$quickNotes = (array) Settings::get(Settings::OPTION_QUICK_NOTES);
+$quickNotes = isset($notice['quick_notes']) && is_array($notice['quick_notes'])
+    ? $notice['quick_notes']
+    : (array) Settings::get(Settings::OPTION_QUICK_NOTES);
 ?>
 <section class="coffeepos-operations coffeepos-settings" data-component="settings-screen">
     <header class="coffeepos-operations__header">
@@ -61,22 +63,38 @@ $quickNotes = (array) Settings::get(Settings::OPTION_QUICK_NOTES);
         </section>
 
         <section class="coffeepos-settings__card" aria-labelledby="coffeepos-settings-notes-title">
-            <div class="coffeepos-settings__card-heading"><div><h2 id="coffeepos-settings-notes-title"><?php esc_html_e('Item quick notes', 'coffeepos'); ?></h2><p><?php esc_html_e('Keep IDs stable. Product and category IDs are comma-separated.', 'coffeepos'); ?></p></div></div>
+            <div class="coffeepos-settings__card-heading">
+                <div><h2 id="coffeepos-settings-notes-title"><?php esc_html_e('Item quick notes', 'coffeepos'); ?></h2><p><?php esc_html_e('Keep saved IDs stable. Product and category IDs are comma-separated.', 'coffeepos'); ?></p></div>
+                <button type="button" class="coffeepos-btn" data-action="add-quick-note"><?php esc_html_e('Add quick note', 'coffeepos'); ?></button>
+            </div>
             <div class="coffeepos-settings__table-wrap"><table class="coffeepos-settings__table">
-                <thead><tr><th><?php esc_html_e('ID', 'coffeepos'); ?></th><th><?php esc_html_e('Label', 'coffeepos'); ?></th><th><?php esc_html_e('Product IDs', 'coffeepos'); ?></th><th><?php esc_html_e('Category IDs', 'coffeepos'); ?></th><th><?php esc_html_e('Order', 'coffeepos'); ?></th><th><?php esc_html_e('Enabled', 'coffeepos'); ?></th></tr></thead>
-                <tbody>
+                <thead><tr><th><?php esc_html_e('ID', 'coffeepos'); ?></th><th><?php esc_html_e('Label', 'coffeepos'); ?></th><th><?php esc_html_e('Product IDs', 'coffeepos'); ?></th><th><?php esc_html_e('Category IDs', 'coffeepos'); ?></th><th><?php esc_html_e('Order', 'coffeepos'); ?></th><th><?php esc_html_e('Enabled', 'coffeepos'); ?></th><th><?php esc_html_e('Actions', 'coffeepos'); ?></th></tr></thead>
+                <tbody data-component="quick-note-rows">
                 <?php foreach ($quickNotes as $index => $note) : if (! is_array($note)) { continue; } $prefix = Settings::OPTION_QUICK_NOTES . '[' . (int) $index . ']'; ?>
-                    <tr>
+                    <tr data-component="quick-note-row" data-existing="true">
                         <td><input type="text" readonly name="<?php echo esc_attr($prefix . '[id]'); ?>" value="<?php echo esc_attr((string) ($note['id'] ?? '')); ?>"></td>
                         <td><input type="text" required name="<?php echo esc_attr($prefix . '[label]'); ?>" value="<?php echo esc_attr((string) ($note['label'] ?? '')); ?>"></td>
                         <td><input type="text" name="<?php echo esc_attr($prefix . '[product_ids]'); ?>" value="<?php echo esc_attr(implode(', ', array_map('absint', (array) ($note['product_ids'] ?? [])))); ?>"></td>
                         <td><input type="text" name="<?php echo esc_attr($prefix . '[category_ids]'); ?>" value="<?php echo esc_attr(implode(', ', array_map('absint', (array) ($note['category_ids'] ?? [])))); ?>"></td>
                         <td><input class="is-order" type="number" name="<?php echo esc_attr($prefix . '[sort_order]'); ?>" value="<?php echo esc_attr((string) ($note['sort_order'] ?? 0)); ?>"></td>
                         <td><input type="hidden" name="<?php echo esc_attr($prefix . '[enabled]'); ?>" value="0"><input type="checkbox" name="<?php echo esc_attr($prefix . '[enabled]'); ?>" value="1" <?php checked(! empty($note['enabled'])); ?>></td>
+                        <td><button type="button" class="coffeepos-btn coffeepos-settings__remove-row" data-action="remove-quick-note"><?php esc_html_e('Remove', 'coffeepos'); ?></button></td>
                     </tr>
                 <?php endforeach; ?>
+                    <tr data-component="quick-note-empty" <?php echo $quickNotes !== [] ? 'hidden' : ''; ?>><td colspan="7"><?php esc_html_e('No quick notes configured.', 'coffeepos'); ?></td></tr>
                 </tbody>
             </table></div>
+            <template id="coffeepos-quick-note-row-template">
+                <tr data-component="quick-note-row" data-existing="false">
+                    <td><input type="text" required pattern="[a-z0-9_-]+" maxlength="64" data-setting-field="id" placeholder="less_hot"></td>
+                    <td><input type="text" required maxlength="120" data-setting-field="label" placeholder="<?php esc_attr_e('Less hot', 'coffeepos'); ?>"></td>
+                    <td><input type="text" data-setting-field="product_ids" placeholder="12, 34"></td>
+                    <td><input type="text" data-setting-field="category_ids" placeholder="5, 8"></td>
+                    <td><input class="is-order" type="number" data-setting-field="sort_order" value="50"></td>
+                    <td><input type="hidden" data-setting-field="enabled" value="0"><input type="checkbox" data-setting-field="enabled" value="1" checked></td>
+                    <td><button type="button" class="coffeepos-btn coffeepos-settings__remove-row" data-action="remove-quick-note"><?php esc_html_e('Remove', 'coffeepos'); ?></button></td>
+                </tr>
+            </template>
         </section>
 
         <section class="coffeepos-settings__card" aria-labelledby="coffeepos-settings-receipt-title">

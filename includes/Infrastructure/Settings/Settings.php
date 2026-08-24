@@ -407,6 +407,7 @@ final class Settings
     private static function sanitizeQuickNotes(array $notes): array
     {
         $sanitized = [];
+        $seen = [];
 
         foreach ($notes as $note) {
             if (! is_array($note)) {
@@ -416,9 +417,11 @@ final class Settings
             $id = sanitize_key((string) ($note['id'] ?? ''));
             $label = sanitize_text_field((string) ($note['label'] ?? ''));
 
-            if ($id === '' || $label === '') {
+            if ($id === '' || $label === '' || isset($seen[$id])) {
                 continue;
             }
+
+            $seen[$id] = true;
 
             $sanitized[] = [
                 'id' => $id,

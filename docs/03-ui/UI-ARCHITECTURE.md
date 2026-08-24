@@ -465,6 +465,46 @@ Screen-level layout owns:
 
 Do not let individual components rely on unrelated screen selectors.
 
+CoffeePOS stylesheets are organized by ownership:
+
+```text
+assets/css/
+├── core.css
+├── components.css
+├── operations.css
+├── management.css
+├── print.css
+└── screens/
+    ├── login.css
+    ├── cashier.css
+    ├── customer-display.css
+    ├── kds.css
+    ├── order-queue.css
+    ├── shifts.css
+    ├── order-history.css
+    ├── reports.css
+    └── settings.css
+```
+
+`core.css` owns design tokens and document foundations. `components.css` owns
+shared controls, navigation, overlays, notifications, and component states.
+`operations.css` owns the common KDS and operations shell, while
+`management.css` owns presentation shared by Shifts, Order History, Reports,
+and Settings. A file under `screens/` owns only its screen-specific layout and
+visual rules. Receipt presentation and print-only behavior belong in
+`print.css`.
+
+The asset loader MUST enqueue styles through declared WordPress dependencies in
+this order where applicable:
+
+```text
+core -> components -> operations -> screen -> management -> print
+```
+
+Only files required by the current route are enqueued. Do not use CSS
+`@import`, restore a monolithic application stylesheet, or organize production
+styles by implementation phase number.
+
 ---
 
 # 18. Template Ownership
@@ -603,7 +643,10 @@ The login shell defines idle, submitting, generic-error, and no-access states.
 It uses semantic labels, password-manager-friendly fields, visible focus, and no
 client-built credential transport.
 
-Item quick-note chips and the item free-text textarea are separate controls.
+Item quick-note chips remain structured selections, and selecting a chip also
+mirrors its current label into the item free-text textarea on a separate line.
+Deselecting it removes that exact generated line. Staff may add other free text
+in the same textarea.
 The order-note textarea belongs to the cart/order summary and is not shown in
 the item configuration modal. Customer Display excludes the order note.
 

@@ -946,17 +946,11 @@ Rules:
 
 ---
 
-# 29. Category Navigation
+# 29. Category Presentation
 
-Customer Display may provide compact category jump navigation.
-
-Category navigation:
-
-- scrolls to an existing Customer Display category section
-- does not filter or rebuild the menu
-- does not issue another product/catalog request
-- preserves product rows and cart state
-- uses stable category IDs from `CatalogView`
+Customer Display renders the category sections directly and does not expose a
+category jump navigation. Category headings and stable category IDs remain in
+the read-only menu projection.
 
 Customer Display does not need Cashier product search or product configuration.
 
@@ -1070,7 +1064,6 @@ Expected hooks:
 ```text
 data-component="customer-display"
 data-component="customer-menu"
-data-component="customer-category-nav"
 data-component="catalog-scroll"
 data-component="catalog-category-section"
 data-component="catalog-category-products"
@@ -1083,7 +1076,6 @@ data-component="customer-connection"
 data-category-id
 data-product-id
 data-occurrence-key
-data-action="scroll-category"
 data-action="retry-display-sync"
 ```
 

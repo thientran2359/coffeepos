@@ -29,6 +29,12 @@ Component controllers may manage state and nested rendering, but they must not
 duplicate these structures in JavaScript strings. The JSON fields consumed by a
 template are part of that component's projection contract.
 
+Settings uses `coffeepos-quick-note-row-template` to add administrator-defined
+quick-note rows. `data-action="add-quick-note"` clones the template and assigns
+the option field names; `data-action="remove-quick-note"` removes a row from the
+pending form. Saved quick-note IDs are read-only, while new IDs remain editable
+until the first successful save.
+
 ---
 
 # 2. Product Card
@@ -252,8 +258,9 @@ Labels may be localized.
 
 Multiple enabled/applicable chips may be selected. A selected chip has visible
 and accessible pressed state. The selected stable IDs are structured item
-configuration; the UI MUST NOT concatenate chip labels into the free-text
-textarea. Edit mode restores both selections and free text independently.
+configuration. Selecting a chip also adds its current label to the free-text
+textarea as an exact separate line; deselecting it removes that generated line
+without removing other staff-entered lines.
 
 ---
 
@@ -266,6 +273,8 @@ Rules:
 - sanitize server-side
 - display safely in cart/KDS/receipt where appropriate
 - keep it attached to the order item
+- accept quick-note labels mirrored by the product modal plus additional staff
+  instructions
 
 ---
 

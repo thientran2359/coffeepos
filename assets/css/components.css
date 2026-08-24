@@ -1,0 +1,510 @@
+/* CoffeePOS shared components: staff navigation, controls, states, overlays, notifications, and order notes. */
+.coffeepos-staff-nav {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    height: 100dvh;
+    max-height: 100dvh;
+    padding: 14px 12px;
+    overflow: visible;
+    color: #fff;
+    background: #29221d;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+.coffeepos-staff-nav a {
+    color: inherit;
+    text-decoration: none;
+}
+.coffeepos-staff-nav__toggle {
+    position: absolute;
+    top: 24px;
+    right: -14px;
+    z-index: 2;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    color: #29221d;
+    background: var(--coffeepos-accent);
+    border: 2px solid var(--coffeepos-bg);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,.24);
+    font: inherit;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+.coffeepos-staff-nav__toggle:hover {
+    filter: brightness(.96);
+}
+.coffeepos-staff-nav__toggle:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+.coffeepos-staff-nav__brand,
+.coffeepos-staff-nav__links a,
+.coffeepos-staff-nav__user,
+.coffeepos-staff-nav__logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.coffeepos-staff-nav__brand {
+    min-height: 48px;
+    padding: 4px 7px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.16);
+    font-weight: 800;
+}
+.coffeepos-staff-nav__brand-mark,
+.coffeepos-staff-nav__icon,
+.coffeepos-staff-nav__avatar {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    flex: none;
+    place-items: center;
+    border-radius: 9px;
+    background: rgba(255,255,255,.1);
+    font-size: 13px;
+    font-weight: 800;
+}
+.coffeepos-staff-nav__brand-mark {
+    color: #29221d;
+    background: var(--coffeepos-accent);
+}
+.coffeepos-staff-nav__links {
+    display: grid;
+    align-content: start;
+    flex: 1;
+    gap: 5px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.coffeepos-staff-nav__links a {
+    min-height: 46px;
+    padding: 5px 7px;
+    border-radius: 9px;
+    white-space: nowrap;
+}
+.coffeepos-staff-nav__links a:hover,
+.coffeepos-staff-nav__links a:focus-visible,
+.coffeepos-staff-nav__links a.is-active {
+    background: rgba(255,255,255,.16);
+}
+.coffeepos-staff-nav__links a.is-active .coffeepos-staff-nav__icon {
+    color: #29221d;
+    background: var(--coffeepos-accent);
+}
+.coffeepos-staff-nav__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.coffeepos-staff-nav__account {
+    display: grid;
+    gap: 6px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.16);
+}
+.coffeepos-staff-nav__user,
+.coffeepos-staff-nav__logout {
+    min-height: 42px;
+    padding: 3px 7px;
+}
+.coffeepos-staff-nav__logout {
+    border-radius: 9px;
+}
+.coffeepos-staff-nav__logout:hover,
+.coffeepos-staff-nav__logout:focus-visible {
+    background: rgba(255,255,255,.16);
+}
+@media (max-width: 900px) {
+    .coffeepos-staff-nav__toggle {
+        display: none;
+    }
+    .coffeepos-staff-nav {
+        padding-inline: 10px;
+    }
+    .coffeepos-staff-nav__brand,
+    .coffeepos-staff-nav__links a,
+    .coffeepos-staff-nav__user,
+    .coffeepos-staff-nav__logout {
+        justify-content: center;
+        padding-inline: 0;
+    }
+    .coffeepos-staff-nav__label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+}
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+body.coffeepos:not(.coffeepos-screen-login):not(.coffeepos-screen-customer) #coffeepos-app {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+}
+body.coffeepos:not(.coffeepos-screen-login):not(.coffeepos-screen-customer) #coffeepos-app > .coffeepos-staff-nav {
+    grid-column: 1;
+    grid-row: 1;
+}
+body.coffeepos:not(.coffeepos-screen-login):not(.coffeepos-screen-customer) #coffeepos-app > :not(.coffeepos-staff-nav) {
+    min-width: 0;
+    min-height: 0;
+    grid-column: 2;
+    grid-row: 1;
+}
+body.coffeepos:not(.coffeepos-screen-login):not(.coffeepos-screen-customer) #coffeepos-app.is-staff-nav-collapsed {
+    grid-template-columns: 72px minmax(0, 1fr);
+}
+#coffeepos-app.is-staff-nav-collapsed .coffeepos-staff-nav {
+    padding-inline: 10px;
+}
+#coffeepos-app.is-staff-nav-collapsed .coffeepos-staff-nav__brand,
+#coffeepos-app.is-staff-nav-collapsed .coffeepos-staff-nav__links a,
+#coffeepos-app.is-staff-nav-collapsed .coffeepos-staff-nav__user,
+#coffeepos-app.is-staff-nav-collapsed .coffeepos-staff-nav__logout {
+    justify-content: center;
+    padding-inline: 0;
+}
+#coffeepos-app.is-staff-nav-collapsed .coffeepos-staff-nav__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+@media (max-width: 1180px) {
+    body.coffeepos:not(.coffeepos-screen-login):not(.coffeepos-screen-customer) #coffeepos-app {
+        grid-template-columns: 184px minmax(0, 1fr);
+    }
+}
+@media (max-width: 900px) {
+    body.coffeepos:not(.coffeepos-screen-login):not(.coffeepos-screen-customer) #coffeepos-app {
+        grid-template-columns: 72px minmax(0, 1fr);
+    }
+}
+.coffeepos-empty-state,
+.coffeepos-error-state {
+    min-height: 112px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    color: var(--coffeepos-text-muted);
+    text-align: center;
+}
+.coffeepos-empty-state__visual,
+.coffeepos-confirm-dialog__visual {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 8px;
+    color: var(--coffeepos-primary);
+    background: #dceee8;
+    border-radius: 50%;
+    font-size: 22px;
+    font-weight: 800;
+}
+.coffeepos-empty-state strong,
+.coffeepos-error-state strong {
+    color: var(--coffeepos-text);
+}
+.coffeepos-empty-state p,
+.coffeepos-error-state p {
+    margin: 4px 0 0;
+}
+.coffeepos-error-state {
+    color: var(--coffeepos-danger);
+}
+.coffeepos-cart-summary {
+    display: grid;
+    gap: 5px;
+}
+.coffeepos-cart-summary > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 13px;
+}
+.coffeepos-cart-summary .is-total {
+    margin-top: 3px;
+    padding-top: 7px;
+    color: var(--coffeepos-primary-dark);
+    border-top: 1px dashed var(--coffeepos-border-strong);
+    font-size: 17px;
+}
+.coffeepos-checkout {
+    padding-top: 10px;
+}
+.coffeepos-checkout .coffeepos-btn {
+    width: 100%;
+    min-height: 52px;
+    font-size: 16px;
+    font-weight: 800;
+}
+.coffeepos-btn,
+.coffeepos-icon-button,
+.coffeepos-link-button {
+    min-height: 44px;
+    color: var(--coffeepos-text);
+    background: #ffffff;
+    border: 1px solid var(--coffeepos-border-strong);
+    border-radius: var(--coffeepos-radius);
+    cursor: pointer;
+}
+.coffeepos-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    font: inherit;
+    text-decoration: none;
+}
+.coffeepos-icon-button {
+    width: 44px;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    padding: 0;
+    border: 0;
+    font-weight: 800;
+}
+.coffeepos-link-button {
+    min-height: 30px;
+    padding: 2px 6px;
+    color: var(--coffeepos-primary-dark);
+    background: transparent;
+    border: 0;
+    text-decoration: underline;
+}
+.coffeepos-btn:hover:not(:disabled),
+.coffeepos-icon-button:hover:not(:disabled) {
+    border-color: var(--coffeepos-primary);
+}
+.coffeepos-btn:disabled,
+.coffeepos-icon-button:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+}
+.coffeepos-btn-light {
+    background: var(--coffeepos-surface-soft);
+}
+.coffeepos-btn-primary {
+    color: #ffffff;
+    background: var(--coffeepos-primary);
+    border-color: var(--coffeepos-primary);
+}
+.coffeepos-btn-primary:hover:not(:disabled) {
+    background: var(--coffeepos-primary-dark);
+}
+.coffeepos-btn-danger {
+    color: var(--coffeepos-danger);
+    background: #fff5f4;
+    border-color: #e7b9b4;
+}
+.coffeepos-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    color: var(--coffeepos-text-muted);
+}
+.coffeepos-loading--inline {
+    justify-content: flex-start;
+}
+.coffeepos-loading--component,
+.coffeepos-loading--panel {
+    min-height: 112px;
+}
+.coffeepos-loading--screen {
+    min-height: 100vh;
+}
+.coffeepos-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--coffeepos-border-strong);
+    border-top-color: var(--coffeepos-primary);
+    border-radius: 50%;
+    animation: coffeepos-spin 700ms linear infinite;
+}
+@keyframes coffeepos-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+.coffeepos-overlay-root {
+    position: relative;
+    z-index: 20;
+}
+.coffeepos-modal,
+.coffeepos-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+}
+.coffeepos-modal {
+    display: grid;
+    place-items: center;
+    padding: 18px;
+}
+.coffeepos-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(21, 28, 25, 0.58);
+}
+.coffeepos-modal-dialog {
+    position: relative;
+    z-index: 1;
+    width: min(440px, 100%);
+    max-height: calc(100vh - 36px);
+    overflow-y: auto;
+    padding: 18px;
+    background: var(--coffeepos-surface);
+    border: 1px solid var(--coffeepos-border-strong);
+    border-radius: 8px;
+    box-shadow: var(--coffeepos-shadow);
+}
+.coffeepos-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.coffeepos-modal-header h3,
+.coffeepos-confirm-dialog h3 {
+    margin: 0;
+    font-size: 18px;
+}
+.coffeepos-modal-body {
+    min-height: 74px;
+    padding: 14px 0;
+}
+.coffeepos-modal-body p {
+    margin: 0;
+    color: var(--coffeepos-text-muted);
+}
+.coffeepos-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+.coffeepos-confirm-dialog__panel {
+    text-align: center;
+}
+.coffeepos-confirm-dialog__visual {
+    margin-right: auto;
+    margin-left: auto;
+    color: var(--coffeepos-warning);
+    background: #f8e8b7;
+}
+.coffeepos-confirm-dialog__panel p {
+    color: var(--coffeepos-text-muted);
+}
+.coffeepos-drawer__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    width: min(420px, 92vw);
+    height: 100%;
+    padding: 18px;
+    background: var(--coffeepos-surface);
+    box-shadow: var(--coffeepos-shadow);
+}
+.coffeepos-toast-region {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 60;
+    width: min(360px, calc(100vw - 36px));
+    display: grid;
+    gap: 8px;
+}
+.coffeepos-toast {
+    min-height: 50px;
+    display: grid;
+    grid-template-columns: 10px minmax(0, 1fr) 36px;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 7px 7px 12px;
+    color: #ffffff;
+    background: #294d61;
+    border-radius: var(--coffeepos-radius);
+    box-shadow: var(--coffeepos-shadow);
+}
+.coffeepos-toast[data-state="success"] {
+    background: var(--coffeepos-success);
+}
+.coffeepos-toast[data-state="warning"] {
+    background: var(--coffeepos-warning);
+}
+.coffeepos-toast[data-state="error"] {
+    background: var(--coffeepos-danger);
+}
+.coffeepos-toast__mark {
+    width: 8px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 50%;
+}
+.coffeepos-toast .coffeepos-icon-button {
+    width: 34px;
+    min-height: 34px;
+    color: #ffffff;
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+.coffeepos-order-note-dialog .coffeepos-modal-dialog {
+    width: min(520px, 100%);
+}
+.coffeepos-order-note-dialog .coffeepos-field {
+    margin-top: 16px;
+}
+.coffeepos-order-note-dialog textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 150px;
+    resize: vertical;
+}
+.coffeepos-order-note-dialog [data-component="order-note-status"] {
+    display: block;
+    min-height: 20px;
+    margin-top: 8px;
+    color: var(--coffeepos-text-muted);
+}
+.coffeepos-order-note-dialog .coffeepos-modal-actions .coffeepos-link-button {
+    margin-right: auto;
+}
+.coffeepos-order-note {
+    margin: 10px 16px;
+    padding: 10px;
+    border-left: 4px solid #d08a29;
+    background: #fff4da;
+    white-space: pre-wrap;
+}

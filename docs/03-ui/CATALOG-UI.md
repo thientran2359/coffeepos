@@ -215,6 +215,8 @@ data-action="locate-product"
 # 7. Customer Display Menu
 
 Customer Display renders a read-only visual menu from the same `CatalogView`.
+It renders category sections directly without the Cashier category navigation
+or category jump controls.
 
 Desktop/landscape composition:
 

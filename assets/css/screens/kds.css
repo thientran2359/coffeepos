@@ -1,0 +1,55 @@
+/* CoffeePOS Kitchen Display screen. */
+.coffeepos-kds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+.coffeepos-kds-card {
+    overflow: hidden;
+    background: #fff;
+    border: 2px solid #b9c7bf;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(27,48,38,.1);
+}
+.coffeepos-kds-card[data-severity="warning"] {
+    border-color: #e0a21b;
+    box-shadow: 0 0 0 3px rgba(224,162,27,.16);
+}
+.coffeepos-kds-card[data-severity="critical"] {
+    border-color: #c83e3e;
+    box-shadow: 0 0 0 3px rgba(200,62,62,.18);
+}
+.coffeepos-kds-card[data-severity="warning"] [data-component="kds-timer"] {
+    color: #9a6400;
+}
+.coffeepos-kds-card[data-severity="critical"] [data-component="kds-timer"] {
+    color: #b22828;
+}
+.coffeepos-kds-card__items {
+    padding: 0 16px;
+}
+.coffeepos-kds-item {
+    padding: 13px 0;
+    border-bottom: 1px dashed #d5ddd8;
+}
+.coffeepos-kds-item small {
+    display: block;
+    margin-top: 3px;
+    color: #66756d;
+}
+.coffeepos-kds-item__notes {
+    display: grid;
+    gap: 3px;
+    margin: 7px 0 0;
+    color: #9a5100;
+    font-weight: 700;
+}
+.coffeepos-kds-item__notes span:empty {
+    display: none;
+}
+.coffeepos-kds-card__action {
+    width: calc(100% - 32px);
+    margin: 14px 16px 16px;
+    min-height: 48px;
+}

@@ -7,7 +7,6 @@ if (! defined('ABSPATH')) { exit; }
         <div><span class="coffeepos-eyebrow"><?php esc_html_e('Welcome to', 'coffeepos'); ?></span><h1><?php bloginfo('name'); ?></h1></div>
         <div data-component="customer-connection" data-state="connecting"><?php esc_html_e('Connecting display…', 'coffeepos'); ?></div>
     </header>
-    <nav data-component="customer-category-nav" aria-label="<?php esc_attr_e('Menu categories', 'coffeepos'); ?>"></nav>
     <div class="coffeepos-customer-catalog" data-component="catalog-scroll" tabindex="0">
         <div data-component="customer-catalog-sections"></div>
         <div data-component="customer-catalog-status" role="status"><?php esc_html_e('Loading menu…', 'coffeepos'); ?></div>

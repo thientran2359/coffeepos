@@ -68,9 +68,17 @@ foreach ([Capabilities::ACCESS_KDS, Capabilities::ACCESS_ORDER_QUEUE, Capabiliti
 $settings = $source('includes/Infrastructure/Settings/Settings.php');
 $assert(strpos($settings, "'less_sugar', 'label' => 'Ít đường'") !== false && strpos($settings, 'OPTION_RECEIPT_PRINT_ORDER_NOTE') !== false, 'TC-15 Phase-12 quick-note/receipt defaults are missing.');
 $assert(strpos($settings, 'if ($ids === [] || $ids ===') !== false, 'TC-15 Phase-12 upgrade must seed quick notes when the legacy option is empty.');
-$settingsUi = $source('templates/settings/content.php') . $source('includes/POS/SettingsScreen.php');
+$settingsUi = $source('templates/settings/content.php') . $source('includes/POS/SettingsScreen.php') . $source('assets/js/screens/settings.js') . $source('includes/Infrastructure/Assets/AssetLoader.php') . $source('assets/js/app.js');
 $assert(strpos($settingsUi, '[product_ids]') !== false && strpos($settings, 'sanitizeIdList') !== false, 'TC-15 quick-note applicability must be settings-editable and normalized.');
 $assert(strpos($settingsUi, 'service_tables_text') !== false && strpos($settingsUi, 'coffeepos_save_settings') !== false && strpos($settings, 'serviceTablesFromText') !== false, 'TC-15 Dine-in table textarea/settings save contract is incomplete.');
+$assert(strpos($settingsUi, 'coffeepos-quick-note-row-template') !== false && strpos($settingsUi, 'add-quick-note') !== false && strpos($settingsUi, 'remove-quick-note') !== false && strpos($settingsUi, 'createSettingsController') !== false && strpos($settingsUi, 'validateQuickNotes') !== false && strpos($settingsUi, 'coffeepos-screen-settings') !== false, 'TC-15 dynamic quick-note settings management is incomplete.');
+$quickNoteValidator = new ReflectionMethod(\CoffeePOS\POS\SettingsScreen::class, 'validateQuickNotes');
+$quickNoteValidator->setAccessible(true);
+$settingsScreen = new \CoffeePOS\POS\SettingsScreen();
+$assert($quickNoteValidator->invoke($settingsScreen, [['id' => 'less_hot', 'label' => 'Less hot']]) === '', 'TC-15 a valid new quick-note definition was rejected.');
+$assert($quickNoteValidator->invoke($settingsScreen, []) !== '', 'TC-15 an empty quick-note definition set was accepted.');
+$assert($quickNoteValidator->invoke($settingsScreen, [['id' => 'same', 'label' => 'One'], ['id' => 'same', 'label' => 'Two']]) !== '', 'TC-15 duplicate quick-note IDs were accepted.');
+$assert($quickNoteValidator->invoke($settingsScreen, [['id' => 'Not Valid', 'label' => 'Invalid']]) !== '', 'TC-15 an invalid quick-note ID was accepted.');
 $phase12Options[\CoffeePOS\Infrastructure\Settings\Settings::OPTION_SERVICE_TABLES] = [
     ['id' => 2, 'label' => 'Table 02', 'enabled' => true, 'sort_order' => 20],
     ['id' => 5, 'label' => 'Garden', 'enabled' => true, 'sort_order' => 50],
@@ -83,14 +91,18 @@ $cartApi = $source('includes/REST/CartController.php') . $source('assets/js/api/
 $assert(strpos($cartApi, '/cart/order-note') !== false && strpos($cartApi, 'setOrderNote') !== false && strpos($cartApi, 'clearOrderNote') !== false, 'TC-16 order-note REST/client wiring is incomplete.');
 $cartUi = $source('templates/cashier/cart-panel.php') . $source('templates/cashier/overlay-root.php') . $source('templates/components/order-note-dialog.php') . $source('assets/js/components/cart-panel.js');
 $assert(strpos($cartUi, 'data-component="cart-context-row"') !== false && strpos($cartUi, 'data-component="order-note-trigger"') !== false && strpos($cartUi, 'data-component="order-note-dialog"') !== false && strpos($cartUi, 'openOrderNote') !== false, 'TC-16 compact cart context/order-note dialog wiring is incomplete.');
+$productModal = $source('templates/components/product-modal.php') . $source('assets/js/components/product-modal.js');
+$assert(strpos($productModal, 'toggle-quick-note') !== false && strpos($productModal, 'syncQuickNoteText') !== false && strpos($productModal, 'Selected labels are added to the item note') !== false, 'TC-16 quick-note chips do not mirror selected labels into the item note.');
 $orderGateway = $source('includes/Integration/WooCommerce/WooCommerceOrderGateway.php');
 $assert(strpos($orderGateway, "'_coffeepos_order_note'") !== false && strpos($orderGateway, 'quickNoteMetadata') !== false, 'TC-17 note order persistence is incomplete.');
 $receipt = $source('templates/receipt/receipt.php') . $source('assets/js/components/receipt-printer.js');
 $assert(strpos($receipt, 'coffeepos-receipt-item-template') !== false && strpos($receipt, 'Receipt data is incomplete') !== false && strpos($receipt, 'innerHTML') === false, 'TC-18 authoritative PHP-owned receipt rendering is incomplete.');
-$navigation = $source('templates/components/staff-navigation.php') . $source('templates/components/screen-shell.php') . $source('assets/css/app.css') . $source('assets/js/app.js');
+$navigation = $source('templates/components/staff-navigation.php') . $source('templates/components/screen-shell.php') . $source('assets/css/components.css') . $source('assets/js/app.js');
 $assert(strpos($navigation, 'staff-navigation') !== false && strpos($navigation, "['login', 'customer']") !== false && strpos($navigation, 'coffeepos-staff-nav__icon') !== false && strpos($navigation, 'grid-template-columns: 220px') !== false && strpos($navigation, 'toggle-staff-navigation') !== false && strpos($navigation, 'update(true)') !== false && strpos($navigation, "class=\"<?php echo \$isStaffScreen ? 'is-staff-nav-collapsed' : ''; ?>\"") !== false, 'TC-19 shared default-collapsed left-sidebar navigation boundary is incomplete.');
 $managementHeaders = $source('templates/shifts/content.php') . $source('templates/order-history/content.php') . $source('templates/reports/content.php') . $source('templates/settings/content.php');
 $assert(substr_count($managementHeaders, 'coffeepos-operations__header') === 4 && substr_count($managementHeaders, 'coffeepos-operations__tools') === 4 && strpos($managementHeaders, 'coffeepos-operations-header') === false && strpos($managementHeaders, 'coffeepos-reports-header') === false && strpos($managementHeaders, 'coffeepos-settings__header') === false, 'TC-20 management screens do not share the Order Queue header contract.');
+$assetLoader = $source('includes/Infrastructure/Assets/AssetLoader.php');
+$assert(strpos($assetLoader, "'core.css'") !== false && strpos($assetLoader, "'components.css'") !== false && strpos($assetLoader, "'screens/cashier.css'") !== false && strpos($assetLoader, "'management.css'") !== false && strpos($assetLoader, "'print.css'") !== false && strpos($assetLoader, 'assets/css/app.css') === false, 'TC-21 route-scoped stylesheet ownership contract is incomplete.');
 
 if ($failures !== []) {
     foreach ($failures as $failure) { echo '[FAIL] ' . $failure . PHP_EOL; }

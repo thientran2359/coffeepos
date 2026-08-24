@@ -81,6 +81,11 @@
             screenController.init();
         }
 
+        if (screen === 'settings' && window.CoffeePOS.screens.createSettingsController) {
+            screenController = window.CoffeePOS.screens.createSettingsController(root);
+            screenController.init();
+        }
+
         window.CoffeePOS.activeScreen = screenController;
 
         window.dispatchEvent(new CustomEvent('coffeepos:ready', {

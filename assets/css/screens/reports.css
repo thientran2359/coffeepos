@@ -1,0 +1,198 @@
+/* CoffeePOS Reports and Analytics screen. */
+/* Phase 11: Reports and Analytics */
+.coffeepos-reports{
+    min-height:100vh;
+    padding:24px;
+    color:#201d18;
+    background:#f4f1ea}
+    .coffeepos-reports-header,.coffeepos-report-filters,.coffeepos-report-status,.coffeepos-reports>.coffeepos-inline-error,.coffeepos-report-warnings,.coffeepos-report-groups,.coffeepos-report-empty{
+        max-width:1320px;
+        margin-left:auto;
+        margin-right:auto}
+        .coffeepos-reports-header{
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:20px;
+            margin-bottom:18px}
+            .coffeepos-reports-header h1{
+                margin:0;
+                font-size:clamp(30px,4vw,48px)}
+                .coffeepos-reports-header>div>p:last-child{
+                    margin:5px 0 0;
+                    color:#70675b}
+                    .coffeepos-report-filters{
+                        display:flex;
+                        align-items:end;
+                        gap:12px;
+                        flex-wrap:wrap;
+                        margin-bottom:16px;
+                        padding:16px;
+                        border:1px solid #ded7ca;
+                        border-radius:14px;
+                        background:#fff}
+                        .coffeepos-report-filters label{
+                            display:grid;
+                            gap:6px;
+                            min-width:145px;
+                            font-size:13px;
+                            font-weight:700}
+                            .coffeepos-report-filters input,.coffeepos-report-filters select{
+                                min-height:42px;
+                                padding:8px 10px;
+                                border:1px solid #cfc5b5;
+                                border-radius:9px;
+                                background:#fff}
+                                .coffeepos-report-export-actions{
+                                    display:flex;
+                                    gap:8px;
+                                    margin-left:auto}
+                                    .coffeepos-report-export-actions button{
+                                        min-height:42px;
+                                        padding:8px 12px;
+                                        border:1px solid #b6aa98;
+                                        border-radius:9px;
+                                        background:#f8f5ef;
+                                        font-weight:700}
+                                        .coffeepos-report-status,.coffeepos-report-empty{
+                                            padding:40px 20px;
+                                            text-align:center;
+                                            color:#6b6257}
+                                            .coffeepos-report-warnings{
+                                                margin-bottom:16px;
+                                                padding:16px 20px;
+                                                border:1px solid #e3bd62;
+                                                border-radius:12px;
+                                                background:#fff8dc}
+                                                .coffeepos-report-warnings h2{
+                                                    margin:0 0 8px;
+                                                    font-size:16px}
+                                                    .coffeepos-report-warnings ul{
+                                                        margin:0;
+                                                        padding-left:20px}
+                                                        .coffeepos-report-groups{
+                                                            display:grid;
+                                                            gap:22px}
+                                                            .coffeepos-report-currency{
+                                                                padding:20px;
+                                                                border:1px solid #ded7ca;
+                                                                border-radius:18px;
+                                                                background:#fff;
+                                                                box-shadow:0 10px 28px rgba(44,35,22,.07)}
+                                                                .coffeepos-report-currency>header{
+                                                                    display:flex;
+                                                                    align-items:center;
+                                                                    justify-content:space-between;
+                                                                    gap:16px;
+                                                                    margin-bottom:16px}
+                                                                    .coffeepos-report-currency>header p,.coffeepos-report-currency>header h2{
+                                                                        margin:0}
+                                                                        .coffeepos-report-currency>header h2{
+                                                                            font-size:24px}
+                                                                            .coffeepos-report-kpis{
+                                                                                display:grid;
+                                                                                grid-template-columns:repeat(5,minmax(0,1fr));
+                                                                                gap:10px;
+                                                                                margin-bottom:18px}
+                                                                                .coffeepos-report-kpis section{
+                                                                                    display:grid;
+                                                                                    gap:5px;
+                                                                                    min-width:0;
+                                                                                    padding:15px;
+                                                                                    border-radius:12px;
+                                                                                    background:#f7f4ee}
+                                                                                    .coffeepos-report-kpis span,.coffeepos-report-kpis small{
+                                                                                        color:#71685d}
+                                                                                        .coffeepos-report-kpis strong{
+                                                                                            overflow-wrap:anywhere;
+                                                                                            font-size:clamp(18px,2vw,25px)}
+                                                                                            .coffeepos-report-section-grid{
+                                                                                                display:grid;
+                                                                                                grid-template-columns:1fr 1fr;
+                                                                                                gap:16px}
+                                                                                                .coffeepos-report-panel{
+                                                                                                    min-width:0;
+                                                                                                    padding:16px;
+                                                                                                    border:1px solid #e5ded3;
+                                                                                                    border-radius:13px}
+                                                                                                    .coffeepos-report-panel h3{
+                                                                                                        margin:0 0 12px}
+                                                                                                        .coffeepos-report-payment-list,.coffeepos-report-product-list{
+                                                                                                            display:grid;
+                                                                                                            gap:8px}
+                                                                                                            .coffeepos-report-payment{
+                                                                                                                display:flex;
+                                                                                                                justify-content:space-between;
+                                                                                                                gap:14px;
+                                                                                                                padding:11px;
+                                                                                                                border-radius:9px;
+                                                                                                                background:#f7f4ee}
+                                                                                                                .coffeepos-report-payment>div{
+                                                                                                                    display:grid;
+                                                                                                                    gap:3px}
+                                                                                                                    .coffeepos-report-payment>div:last-child{
+                                                                                                                        text-align:right}
+                                                                                                                        .coffeepos-report-payment small{
+                                                                                                                            color:#756c61}
+                                                                                                                            .coffeepos-report-product{
+                                                                                                                                display:grid;
+                                                                                                                                grid-template-columns:minmax(0,1fr) auto auto;
+                                                                                                                                gap:14px;
+                                                                                                                                align-items:center;
+                                                                                                                                padding:10px;
+                                                                                                                                border-bottom:1px solid #eee8df}
+                                                                                                                                .coffeepos-report-product:last-child{
+                                                                                                                                    border-bottom:0}
+                                                                                                                                    .coffeepos-report-product>span:last-child{
+                                                                                                                                        text-align:right;
+                                                                                                                                        font-weight:700}
+                                                                                                                                        .coffeepos-report-hours{
+                                                                                                                                            display:grid;
+                                                                                                                                            grid-template-columns:repeat(4,minmax(0,1fr));
+                                                                                                                                            gap:7px;
+                                                                                                                                            max-height:330px;
+                                                                                                                                            overflow:auto}
+                                                                                                                                            .coffeepos-report-hour{
+                                                                                                                                                display:grid;
+                                                                                                                                                gap:2px;
+                                                                                                                                                padding:9px;
+                                                                                                                                                border-radius:8px;
+                                                                                                                                                background:#f7f4ee}
+                                                                                                                                                .coffeepos-report-hour span,.coffeepos-report-hour small{
+                                                                                                                                                    font-size:12px;
+                                                                                                                                                    color:#70675c}
+                                                                                                                                                    @media(max-width:1050px){
+                                                                                                                                                        .coffeepos-report-kpis{
+                                                                                                                                                            grid-template-columns:repeat(3,1fr)}
+                                                                                                                                                            .coffeepos-report-hours{
+                                                                                                                                                                grid-template-columns:repeat(3,1fr)}
+                                                                                                                                                            }
+                                                                                                                                                            @media(max-width:780px){
+                                                                                                                                                                .coffeepos-reports{
+                                                                                                                                                                    padding:14px}
+                                                                                                                                                                    .coffeepos-reports-header{
+                                                                                                                                                                        align-items:stretch;
+                                                                                                                                                                        flex-direction:column}
+                                                                                                                                                                        .coffeepos-report-export-actions{
+                                                                                                                                                                            width:100%;
+                                                                                                                                                                            margin-left:0}
+                                                                                                                                                                            .coffeepos-report-export-actions button{
+                                                                                                                                                                                flex:1}
+                                                                                                                                                                                .coffeepos-report-kpis{
+                                                                                                                                                                                    grid-template-columns:1fr 1fr}
+                                                                                                                                                                                    .coffeepos-report-section-grid{
+                                                                                                                                                                                        grid-template-columns:1fr}
+                                                                                                                                                                                    }
+                                                                                                                                                                                    @media(max-width:480px){
+                                                                                                                                                                                        .coffeepos-report-kpis{
+                                                                                                                                                                                            grid-template-columns:1fr}
+                                                                                                                                                                                            .coffeepos-report-filters label{
+                                                                                                                                                                                                width:100%}
+                                                                                                                                                                                                .coffeepos-report-hours{
+                                                                                                                                                                                                    grid-template-columns:repeat(2,1fr)}
+                                                                                                                                                                                                    .coffeepos-report-product{
+                                                                                                                                                                                                        grid-template-columns:1fr auto}
+                                                                                                                                                                                                        .coffeepos-report-product>span:last-child{
+                                                                                                                                                                                                            grid-column:1/-1;
+                                                                                                                                                                                                            text-align:left}
+                                                                                                                                                                                                        }

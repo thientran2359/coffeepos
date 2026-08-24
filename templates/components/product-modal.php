@@ -49,11 +49,13 @@ if (! defined('ABSPATH')) {
 
             <section class="coffeepos-product-config-section" data-component="quick-notes-section" hidden>
                 <h4><?php esc_html_e('Quick notes', 'coffeepos'); ?></h4>
+                <p class="coffeepos-product-config-section__hint"><?php esc_html_e('Select one or more. Selected labels are added to the item note.', 'coffeepos'); ?></p>
                 <div class="coffeepos-option-list" data-component="quick-notes"></div>
             </section>
 
             <label class="coffeepos-field">
                 <span><?php esc_html_e('Item note', 'coffeepos'); ?></span>
+                <small><?php esc_html_e('Quick-note labels appear on separate lines. Add any other preparation instructions here.', 'coffeepos'); ?></small>
                 <textarea data-component="product-custom-note" rows="3" maxlength="500"></textarea>
             </label>
 

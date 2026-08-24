@@ -210,14 +210,28 @@ a parallel note system. Default definitions are:
 | `less_milk` | Ít sữa |
 | `less_ice` | Ít đá |
 
-An administrator with `coffeepos_manage_settings` may edit label, enabled state,
-sort order, and optional product/category applicability. Stable IDs are not
-silently changed when labels change. Quick notes never change price.
+An administrator with `coffeepos_manage_settings` may create or remove
+definitions and edit label, enabled state, sort order, and optional
+product/category applicability. A new definition requires a unique lowercase
+ID containing only letters, numbers, underscores, or hyphens. After the first
+save, its ID becomes read-only while its label remains editable. Removing a row
+does not rewrite captured historical order metadata. Quick notes never change
+price.
+
+The Settings screen owns the PHP template
+`coffeepos-quick-note-row-template` and the stable actions
+`add-quick-note`/`remove-quick-note`. JavaScript may assign form-field names to
+cloned rows but must not build row markup with HTML strings. The server repeats
+required-ID, allowed-character, required-label, and uniqueness validation before
+updating any setting.
+At least one definition remains configured; administrators who want no chips on
+Cashier disable every row instead of deleting the final definition.
 
 The item modal renders enabled/applicable definitions as multi-select chips.
-Selections remain a structured stable-ID array. The item free-text textarea is a
-separate field; chip labels are not concatenated into it. Edit mode restores the
-two values independently. The server rejects disabled, unknown, duplicate, or
+Selections remain a structured stable-ID array. Selecting a chip also mirrors
+its current label into the item free-text textarea on a separate line;
+deselecting it removes that exact line. Staff may add other preparation text in
+the same textarea. The server rejects disabled, unknown, duplicate, or
 inapplicable IDs with the existing configuration-validation boundary.
 
 At order creation, `_coffeepos_quick_notes` stores stable IDs and captured labels
@@ -452,7 +466,11 @@ real WordPress/WooCommerce environment.
 - [ ] One shared accessible staff navigation appears on all and only staff
       application screens.
 - [ ] Admin-configured quick-note chips include the four approved defaults,
-      support multiple selections, and remain separate from item free text.
+      support multiple selections, retain stable IDs, and mirror selected labels
+      into item free text without removing other staff-entered lines.
+- [ ] Settings can add and remove quick-note rows through a PHP-owned template;
+      invalid or duplicate IDs are rejected before any setting is updated and a
+      saved ID is read-only.
 - [ ] Historical quick-note metadata remains readable and new orders capture IDs
       and labels without making labels primary identifiers.
 - [ ] The revisioned order note remains separate from item notes, persists on the

@@ -678,16 +678,27 @@ optional current-shift status
 WordPress logout action
 ```
 
-It is present on every staff application screen and absent from Login and
-Customer Display. Collapsing it for tablet layouts must preserve focus order,
-labels, Escape behavior, and access to logout.
+It is present on every staff application screen as a persistent left sidebar
+and absent from Login and Customer Display. Desktop layouts show the icon and
+label for each permitted destination. The server-rendered default is the compact
+icon rail so the first paint never exposes labels before JavaScript initializes.
+Staff may expand the sidebar for the current page, but every new page load starts
+compact. This presentation state is not authorization or application state. The
+rail keeps an accessible label
+and title for every destination. Navigation links may scroll vertically while
+staff identity and logout remain available at the bottom. The toggle exposes
+its expanded state and the responsive form must preserve logical focus order,
+visible focus, and access to logout.
 
 ## Phase 12 Order Note
 
-The Order Note component is a cart-level textarea with save/clear state. It is
-not inside an item modal and never changes any item's note. It binds to the
-revisioned `CartView.order_note`, supports a maximum of 2000 characters, safely
-retains text after a recoverable error, and exposes saving/saved/error feedback.
+The Order Note component uses a compact cart trigger/summary plus a PHP-owned
+dialog containing the cart-level textarea and save/clear state. It is not inside
+an item modal and never changes any item's note. It binds to the revisioned
+`CartView.order_note`, supports a maximum of 2000 characters, safely retains
+text after a recoverable error, and exposes saving/saved/error feedback. The
+dialog uses the shared Escape, focus-trap, backdrop-close, and focus-restoration
+lifecycle.
 
 ## Phase 12 Receipt
 

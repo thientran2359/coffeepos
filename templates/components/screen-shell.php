@@ -11,6 +11,7 @@ $screen = (string) ($context['screen'] ?? 'unknown');
 $title = isset($title) ? (string) $title : ucfirst(str_replace('-', ' ', $screen));
 $route = (string) ($context['route'] ?? '');
 $contentTemplate = COFFEEPOS_PATH . 'templates/' . sanitize_key($screen) . '/content.php';
+$isStaffScreen = ! in_array($screen, ['login', 'customer'], true);
 
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
@@ -26,8 +27,9 @@ $contentTemplate = COFFEEPOS_PATH . 'templates/' . sanitize_key($screen) . '/con
     data-coffeepos-screen="<?php echo esc_attr($screen); ?>"
     data-coffeepos-route="<?php echo esc_url($route); ?>"
     data-screen="<?php echo esc_attr($screen); ?>"
+    class="<?php echo $isStaffScreen ? 'is-staff-nav-collapsed' : ''; ?>"
 >
-    <?php if (! in_array($screen, ['login', 'customer'], true)) : ?>
+    <?php if ($isStaffScreen) : ?>
         <?php require COFFEEPOS_PATH . 'templates/components/staff-navigation.php'; ?>
     <?php endif; ?>
     <?php if (is_readable($contentTemplate)) : ?>

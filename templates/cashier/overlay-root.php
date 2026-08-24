@@ -11,6 +11,7 @@ if (! defined('ABSPATH')) {
     <?php require COFFEEPOS_PATH . 'templates/components/product-modal.php'; ?>
     <?php require COFFEEPOS_PATH . 'templates/components/context-dialogs.php'; ?>
     <?php require COFFEEPOS_PATH . 'templates/components/coupon-selector.php'; ?>
+    <?php require COFFEEPOS_PATH . 'templates/components/order-note-dialog.php'; ?>
     <?php require COFFEEPOS_PATH . 'templates/components/checkout-modal.php'; ?>
     <?php require COFFEEPOS_PATH . 'templates/components/payment-success.php'; ?>
     <?php require COFFEEPOS_PATH . 'templates/receipt/receipt.php'; ?>

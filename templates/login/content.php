@@ -25,8 +25,6 @@ $redirectTo = (string) ($context['redirect_to'] ?? '');
             </div>
             <a class="coffeepos-btn coffeepos-btn-primary" href="<?php echo esc_url(wp_logout_url(\CoffeePOS\POS\Router::routeUrl())); ?>"><?php esc_html_e('Sign out', 'coffeepos'); ?></a>
         <?php else : ?>
-            <h2><?php esc_html_e('Sign in', 'coffeepos'); ?></h2>
-            <p><?php esc_html_e('Use your WordPress username or email and password.', 'coffeepos'); ?></p>
 
             <?php if ($error !== '') : ?>
                 <p class="coffeepos-login__error" role="alert"><?php echo esc_html($error); ?></p>

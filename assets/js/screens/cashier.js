@@ -352,6 +352,10 @@
                 couponSelector.open();
             } else if (action === 'remove-coupon' && cart) {
                 mutate(function () { return api.removeCoupon(cartPayload(cart)); }).catch(function () {});
+            } else if (action === 'open-order-note') {
+                cartPanel.openOrderNote();
+            } else if (action === 'close-order-note') {
+                cartPanel.closeOrderNote();
             } else if (action === 'save-order-note' && cart) {
                 const input = root.querySelector('[data-component="order-note-input"]');
                 cartPanel.setOrderNoteStatus('Saving…');

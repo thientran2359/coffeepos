@@ -66,12 +66,14 @@ $assert(strpos($settings, 'if ($ids === [] || $ids ===') !== false, 'TC-15 Phase
 $assert(strpos($source('includes/Admin/AdminBootstrap.php'), '[product_ids]') !== false && strpos($settings, 'sanitizeIdList') !== false, 'TC-15 quick-note applicability must be administrator-editable and normalized.');
 $cartApi = $source('includes/REST/CartController.php') . $source('assets/js/api/client.js');
 $assert(strpos($cartApi, '/cart/order-note') !== false && strpos($cartApi, 'setOrderNote') !== false && strpos($cartApi, 'clearOrderNote') !== false, 'TC-16 order-note REST/client wiring is incomplete.');
+$cartUi = $source('templates/cashier/cart-panel.php') . $source('templates/cashier/overlay-root.php') . $source('templates/components/order-note-dialog.php') . $source('assets/js/components/cart-panel.js');
+$assert(strpos($cartUi, 'data-component="cart-context-row"') !== false && strpos($cartUi, 'data-component="order-note-trigger"') !== false && strpos($cartUi, 'data-component="order-note-dialog"') !== false && strpos($cartUi, 'openOrderNote') !== false, 'TC-16 compact cart context/order-note dialog wiring is incomplete.');
 $orderGateway = $source('includes/Integration/WooCommerce/WooCommerceOrderGateway.php');
 $assert(strpos($orderGateway, "'_coffeepos_order_note'") !== false && strpos($orderGateway, 'quickNoteMetadata') !== false, 'TC-17 note order persistence is incomplete.');
 $receipt = $source('templates/receipt/receipt.php') . $source('assets/js/components/receipt-printer.js');
 $assert(strpos($receipt, 'coffeepos-receipt-item-template') !== false && strpos($receipt, 'Receipt data is incomplete') !== false && strpos($receipt, 'innerHTML') === false, 'TC-18 authoritative PHP-owned receipt rendering is incomplete.');
-$navigation = $source('templates/components/staff-navigation.php') . $source('templates/components/screen-shell.php');
-$assert(strpos($navigation, 'staff-navigation') !== false && strpos($navigation, "['login', 'customer']") !== false, 'TC-19 shared navigation boundary is incomplete.');
+$navigation = $source('templates/components/staff-navigation.php') . $source('templates/components/screen-shell.php') . $source('assets/css/app.css') . $source('assets/js/app.js');
+$assert(strpos($navigation, 'staff-navigation') !== false && strpos($navigation, "['login', 'customer']") !== false && strpos($navigation, 'coffeepos-staff-nav__icon') !== false && strpos($navigation, 'grid-template-columns: 220px') !== false && strpos($navigation, 'toggle-staff-navigation') !== false && strpos($navigation, 'update(true)') !== false && strpos($navigation, "class=\"<?php echo \$isStaffScreen ? 'is-staff-nav-collapsed' : ''; ?>\"") !== false, 'TC-19 shared default-collapsed left-sidebar navigation boundary is incomplete.');
 
 if ($failures !== []) {
     foreach ($failures as $failure) { echo '[FAIL] ' . $failure . PHP_EOL; }

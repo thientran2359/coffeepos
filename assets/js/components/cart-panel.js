@@ -24,8 +24,16 @@
         const couponEmpty = root.querySelector('[data-component="coupon-empty"]');
         const couponApplied = root.querySelector('[data-component="coupon-applied"]');
         const couponCode = root.querySelector('[data-component="coupon-code"]');
+        const orderNoteDialog = root.querySelector('[data-component="order-note-dialog"]');
+        const orderNoteTrigger = root.querySelector('[data-component="order-note-trigger"]');
+        const orderNoteSummary = root.querySelector('[data-component="order-note-summary"]');
         const orderNote = root.querySelector('[data-component="order-note-input"]');
         const orderNoteStatus = root.querySelector('[data-component="order-note-status"]');
+        const orderNoteLifecycle = CoffeePOS.ui.createDialogLifecycle(orderNoteDialog, null, function () {
+            if (orderNoteStatus) {
+                orderNoteStatus.textContent = '';
+            }
+        });
 
         function setStatus(status) {
             setState(panel, status);
@@ -74,11 +82,19 @@
             couponApplied.hidden = !appliedCode;
             couponCode.textContent = String(appliedCode);
 
+            const note = String(cart && cart.order_note || '');
             if (orderNote && window.document.activeElement !== orderNote) {
-                orderNote.value = String(cart && cart.order_note || '');
+                orderNote.value = note;
             }
             if (orderNoteStatus) {
                 orderNoteStatus.textContent = '';
+            }
+            if (orderNoteSummary) {
+                orderNoteSummary.textContent = note || 'No order note';
+            }
+            if (orderNoteTrigger) {
+                setState(orderNoteTrigger, note ? 'set' : 'empty');
+                orderNoteTrigger.setAttribute('aria-label', note ? 'Edit order note' : 'Add order note');
             }
 
             const ready = Boolean(cart && cart.validation && cart.validation.checkout_ready);
@@ -99,6 +115,13 @@
                 }
             },
             setError: function () { setStatus('error'); },
+            openOrderNote: function () {
+                if (orderNoteStatus) {
+                    orderNoteStatus.textContent = '';
+                }
+                orderNoteLifecycle.open();
+            },
+            closeOrderNote: function () { orderNoteLifecycle.close(); },
             setOrderNoteStatus: function (message) {
                 if (orderNoteStatus) { orderNoteStatus.textContent = String(message || ''); }
             }

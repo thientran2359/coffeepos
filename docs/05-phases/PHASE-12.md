@@ -187,9 +187,13 @@ current route, displays the staff display name, may show current shift state,
 and includes WordPress logout. A Settings destination may point to the native
 CoffeePOS admin settings page only for `coffeepos_manage_settings` users.
 
-The component supports desktop and tablet compact/drawer layouts, visible focus,
-logical focus order, Escape-to-close where a drawer is used, and no hidden
-keyboard trap. Login and Customer Display do not render it.
+The component is a persistent left sidebar that starts as a compact icon rail
+on every page load and may be expanded by staff for the current page. Desktop
+links show icons and labels when expanded; compact links retain accessible
+labels and titles, and the toggle exposes its current expanded state. Its route
+list may scroll vertically while staff identity and WordPress logout remain
+available at the bottom. It preserves visible focus, logical focus order, and
+has no hidden keyboard trap. Login and Customer Display do not render it.
 
 Menu filtering is not authorization. Direct routes, REST data, exports, receipt,
 refund, cancel, and reorder repeat exact server checks.
@@ -418,7 +422,7 @@ Do not partially migrate authorization so one path still relies only on
 - anonymous `/pos/`, wrong credentials, valid credentials, remember-me, logout,
   expired session, safe return route, no-access, and forbidden direct route
 - each role sees only expected navigation/screens/actions
-- desktop and tablet navigation, keyboard focus, drawer behavior, and logout
+- desktop sidebar and tablet icon-rail navigation, keyboard focus, and logout
 - item quick-note select/edit plus independent free-text item note
 - order note save/clear/error, KDS/Queue/History display, and Customer Display
   non-disclosure

@@ -29,6 +29,11 @@ The Cashier workflow requires:
 ```text
 CASHIER
 │
+├── SHARED STAFF SIDEBAR
+│   ├── Permitted Destinations
+│   ├── Current Screen
+│   └── Staff Identity + Logout
+│
 ├── HEADER
 │   ├── Brand
 │   ├── Current Shift
@@ -44,9 +49,9 @@ CASHIER
 │
 ├── CART
 │   ├── Order Type
-│   ├── Customer
+│   ├── Customer + Coupon compact context row
 │   ├── Cart Items
-│   ├── Coupon
+│   ├── Order Note summary/action
 │   ├── Subtotal
 │   ├── Discount
 │   ├── Total
@@ -57,6 +62,7 @@ CASHIER
     ├── Customer Lookup
     ├── Table Selector
     ├── Coupon Selector
+    ├── Order Note Dialog
     ├── Hold Cart
     ├── Held Cart List
     ├── Checkout
@@ -85,6 +91,9 @@ Shift
 ```
 
 Do not overload the header with operational controls from other screens.
+Cross-screen navigation belongs to the shared left staff sidebar. The Cashier
+header remains dedicated to current-shift, current-cashier, and operational
+actions.
 
 ---
 
@@ -581,6 +590,20 @@ Remove coupon
 → server/cart recalculation
 → update totals
 ```
+
+Customer and Coupon share one compact context row in the Cashier cart. Each
+half keeps its own stable action and state. On narrow screens the labels may
+truncate visually, but the actions and accessible labels remain available.
+
+---
+
+# 21.1 Order Note Dialog
+
+The cart shows a compact Order Note trigger and a one-line saved-note summary.
+Activating it opens the PHP-owned Order Note dialog. The dialog owns the
+textarea, save/clear feedback, Close action, backdrop close, Escape close, focus
+trap, and focus restoration. Moving the editor into the dialog does not change
+the revisioned order-note API or make the note item-level/customer-visible.
 
 ---
 

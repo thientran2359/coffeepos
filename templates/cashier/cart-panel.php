@@ -35,20 +35,36 @@ if (! defined('ABSPATH')) {
     </div>
 </section>
 
-<section class="coffeepos-customer-summary" data-component="customer-summary" data-state="empty">
-    <div>
-        <h3><?php esc_html_e('Customer', 'coffeepos'); ?></h3>
-        <p data-component="customer-name"><?php esc_html_e('Guest customer', 'coffeepos'); ?></p>
-        <small data-component="customer-phone" hidden></small>
-        <small data-component="customer-membership" hidden></small>
-    </div>
-    <button type="button" class="coffeepos-icon-button" data-action="open-customer" title="<?php esc_attr_e('Find customer', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Find customer', 'coffeepos'); ?>">
-        <span aria-hidden="true">+</span>
-    </button>
-    <button type="button" class="coffeepos-link-button" data-action="remove-customer" hidden>
-        <?php esc_html_e('Use guest', 'coffeepos'); ?>
-    </button>
-</section>
+<div class="coffeepos-cart-context-row" data-component="cart-context-row">
+    <section class="coffeepos-customer-summary" data-component="customer-summary" data-state="empty">
+        <div>
+            <h3><?php esc_html_e('Customer', 'coffeepos'); ?></h3>
+            <p data-component="customer-name"><?php esc_html_e('Guest customer', 'coffeepos'); ?></p>
+            <small data-component="customer-phone" hidden></small>
+            <small data-component="customer-membership" hidden></small>
+        </div>
+        <button type="button" class="coffeepos-icon-button" data-action="open-customer" title="<?php esc_attr_e('Find customer', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Find customer', 'coffeepos'); ?>">
+            <span aria-hidden="true">+</span>
+        </button>
+        <button type="button" class="coffeepos-link-button" data-action="remove-customer" hidden>
+            <?php esc_html_e('Use guest', 'coffeepos'); ?>
+        </button>
+    </section>
+
+    <section class="coffeepos-coupon" data-component="coupon" data-state="empty">
+        <div>
+            <h3><?php esc_html_e('Coupon', 'coffeepos'); ?></h3>
+            <p data-component="coupon-empty"><?php esc_html_e('No coupon applied', 'coffeepos'); ?></p>
+            <p data-component="coupon-applied" hidden>
+                <strong data-component="coupon-code"><?php esc_html_e('COFFEE10', 'coffeepos'); ?></strong>
+                <button type="button" class="coffeepos-link-button" data-action="remove-coupon"><?php esc_html_e('Remove', 'coffeepos'); ?></button>
+            </p>
+        </div>
+        <button type="button" class="coffeepos-icon-button" data-action="open-coupon" title="<?php esc_attr_e('Add coupon', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Add coupon', 'coffeepos'); ?>">
+            <span aria-hidden="true">+</span>
+        </button>
+    </section>
+</div>
 
 <section class="coffeepos-cart-items" data-component="cart-items" data-state="loading" aria-live="polite">
     <div data-component="cart-item-list"></div>
@@ -95,29 +111,13 @@ if (! defined('ABSPATH')) {
     </article>
 </template>
 
-<section class="coffeepos-coupon" data-component="coupon" data-state="empty">
-    <div>
-        <h3><?php esc_html_e('Coupon', 'coffeepos'); ?></h3>
-        <p data-component="coupon-empty"><?php esc_html_e('No coupon applied', 'coffeepos'); ?></p>
-        <p data-component="coupon-applied" hidden>
-            <strong data-component="coupon-code"><?php esc_html_e('COFFEE10', 'coffeepos'); ?></strong>
-            <button type="button" class="coffeepos-link-button" data-action="remove-coupon"><?php esc_html_e('Remove', 'coffeepos'); ?></button>
-        </p>
-    </div>
-    <button type="button" class="coffeepos-icon-button" data-action="open-coupon" title="<?php esc_attr_e('Add coupon', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Add coupon', 'coffeepos'); ?>">
-        <span aria-hidden="true">+</span>
-    </button>
-</section>
-
-<section class="coffeepos-order-note-editor" data-component="order-note-editor" data-state="idle">
-    <label for="coffeepos-order-note"><?php esc_html_e('Order note', 'coffeepos'); ?></label>
-    <textarea id="coffeepos-order-note" data-component="order-note-input" maxlength="2000" rows="2" placeholder="<?php esc_attr_e('Private note for the whole order', 'coffeepos'); ?>"></textarea>
-    <div>
-        <small data-component="order-note-status" role="status"></small>
-        <button type="button" class="coffeepos-link-button" data-action="clear-order-note"><?php esc_html_e('Clear', 'coffeepos'); ?></button>
-        <button type="button" class="coffeepos-btn coffeepos-btn-light" data-action="save-order-note"><?php esc_html_e('Save note', 'coffeepos'); ?></button>
-    </div>
-</section>
+<button type="button" class="coffeepos-order-note-trigger" data-component="order-note-trigger" data-action="open-order-note" data-state="empty">
+    <span>
+        <strong><?php esc_html_e('Order note', 'coffeepos'); ?></strong>
+        <small data-component="order-note-summary"><?php esc_html_e('No order note', 'coffeepos'); ?></small>
+    </span>
+    <span class="coffeepos-order-note-trigger__action" aria-hidden="true">+</span>
+</button>
 
 <section class="coffeepos-cart-summary" data-component="cart-summary" data-state="normal">
     <div>

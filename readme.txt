@@ -19,6 +19,7 @@ system.
 Features include:
 
 * Cashier catalog, product variations, item notes, coupons, and cart management.
+* Capability-protected quick stock updates with required adjustment reasons.
 * Dine-in tables and takeaway service.
 * Guest and WooCommerce customer/member identification.
 * Cash and manually confirmed bank-transfer checkout.

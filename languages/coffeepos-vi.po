@@ -2326,3 +2326,80 @@ msgstr "Các mục đã chọn của bạn sẽ xuất hiện ở đây."
 #: templates/login/content.php:27
 msgid "Your WordPress account is signed in but has no CoffeePOS screen permission. Contact an administrator."
 msgstr "Tài khoản WordPress của bạn đã đăng nhập nhưng không có quyền truy cập màn hình CoffeePOS. Liên hệ với quản trị viên."
+
+#: templates/components/stock-modal.php
+msgid "Close stock editor"
+msgstr "Đóng trình cập nhật tồn kho"
+
+#: templates/components/stock-modal.php
+msgid "Current stock"
+msgstr "Tồn kho hiện tại"
+
+#: assets/js/components/stock-modal.js
+msgid "Enter a non-negative whole stock quantity."
+msgstr "Nhập số lượng tồn kho là số nguyên không âm."
+
+#: assets/js/components/stock-modal.js
+msgid "Enter a reason of at least 3 characters."
+msgstr "Nhập lý do có ít nhất 3 ký tự."
+
+#: templates/components/stock-modal.php
+msgid "Example: New delivery or sold out at counter"
+msgstr "Ví dụ: Nhập hàng mới hoặc đã bán hết tại quầy"
+
+#: templates/components/stock-modal.php
+msgid "Inventory"
+msgstr "Tồn kho"
+
+#: templates/components/stock-modal.php
+msgid "Loading stock..."
+msgstr "Đang tải tồn kho..."
+
+#: templates/components/stock-modal.php
+msgid "New stock quantity"
+msgstr "Số lượng tồn kho mới"
+
+#: templates/components/stock-modal.php
+msgid "New stock status"
+msgstr "Trạng thái tồn kho mới"
+
+#: templates/components/stock-modal.php
+msgid "Product option"
+msgstr "Tùy chọn sản phẩm"
+
+#: templates/components/stock-modal.php
+msgid "Required for the inventory audit log."
+msgstr "Bắt buộc để lưu nhật ký kiểm tra tồn kho."
+
+#: assets/js/components/stock-modal.js
+msgid "Select a stock status."
+msgstr "Chọn trạng thái tồn kho."
+
+#: assets/js/components/stock-modal.js
+msgid "Stock could not be loaded."
+msgstr "Không thể tải thông tin tồn kho."
+
+#: assets/js/components/stock-modal.js
+msgid "Stock could not be updated."
+msgstr "Không thể cập nhật tồn kho."
+
+#: templates/components/stock-modal.php
+msgid "Stock editor unavailable"
+msgstr "Trình cập nhật tồn kho không khả dụng"
+
+#: assets/js/screens/cashier.js
+msgid "Stock updated."
+msgstr "Đã cập nhật tồn kho."
+
+#: includes/REST/RestResponder.php
+msgid "The stock adjustment is invalid. Check the quantity, status, and reason."
+msgstr "Điều chỉnh tồn kho không hợp lệ. Hãy kiểm tra số lượng, trạng thái và lý do."
+
+#: templates/cashier/menu-panel.php templates/components/product-card.php
+#: templates/components/stock-modal.php assets/js/components/stock-modal.js
+msgid "Update stock"
+msgstr "Cập nhật tồn kho"
+
+#: includes/REST/StockController.php
+msgid "You are not allowed to update product stock."
+msgstr "Bạn không được phép cập nhật tồn kho sản phẩm."

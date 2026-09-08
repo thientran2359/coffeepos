@@ -2325,3 +2325,79 @@ msgstr ""
 msgid "Your WordPress account is signed in but has no CoffeePOS screen permission. Contact an administrator."
 msgstr ""
 
+#: templates/components/stock-modal.php
+msgid "Close stock editor"
+msgstr ""
+
+#: templates/components/stock-modal.php
+msgid "Current stock"
+msgstr ""
+
+#: assets/js/components/stock-modal.js
+msgid "Enter a non-negative whole stock quantity."
+msgstr ""
+
+#: assets/js/components/stock-modal.js
+msgid "Enter a reason of at least 3 characters."
+msgstr ""
+
+#: templates/components/stock-modal.php
+msgid "Example: New delivery or sold out at counter"
+msgstr ""
+
+#: templates/components/stock-modal.php
+msgid "Inventory"
+msgstr ""
+
+#: templates/components/stock-modal.php
+msgid "Loading stock..."
+msgstr ""
+
+#: templates/components/stock-modal.php
+msgid "New stock quantity"
+msgstr ""
+
+#: templates/components/stock-modal.php
+msgid "New stock status"
+msgstr ""
+
+#: templates/components/stock-modal.php
+msgid "Product option"
+msgstr ""
+
+#: templates/components/stock-modal.php
+msgid "Required for the inventory audit log."
+msgstr ""
+
+#: assets/js/components/stock-modal.js
+msgid "Select a stock status."
+msgstr ""
+
+#: assets/js/components/stock-modal.js
+msgid "Stock could not be loaded."
+msgstr ""
+
+#: assets/js/components/stock-modal.js
+msgid "Stock could not be updated."
+msgstr ""
+
+#: templates/components/stock-modal.php
+msgid "Stock editor unavailable"
+msgstr ""
+
+#: assets/js/screens/cashier.js
+msgid "Stock updated."
+msgstr ""
+
+#: includes/REST/RestResponder.php
+msgid "The stock adjustment is invalid. Check the quantity, status, and reason."
+msgstr ""
+
+#: templates/cashier/menu-panel.php templates/components/product-card.php
+#: templates/components/stock-modal.php assets/js/components/stock-modal.js
+msgid "Update stock"
+msgstr ""
+
+#: includes/REST/StockController.php
+msgid "You are not allowed to update product stock."
+msgstr ""

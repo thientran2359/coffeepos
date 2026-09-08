@@ -290,11 +290,44 @@
 }
 
 .coffeepos-product-card {
+    position: relative;
     min-width: 0;
     background: var(--coffeepos-surface);
     border: 1px solid var(--coffeepos-border);
     border-radius: var(--coffeepos-radius);
     transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.coffeepos-product-stock-button {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    color: var(--coffeepos-primary-dark);
+    background: rgba(255, 255, 255, .94);
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: .72;
+    transition: opacity 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.coffeepos-product-stock-button:hover,
+.coffeepos-product-stock-button:focus-visible {
+    opacity: 1;
+    border-color: var(--coffeepos-primary);
+    box-shadow: 0 0 0 2px rgba(18, 113, 91, .13);
+}
+
+.coffeepos-product-stock-button svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
 }
 
 .coffeepos-product-card:hover {
@@ -322,7 +355,7 @@
     grid-template-columns: 58px minmax(0, 1fr);
     align-items: center;
     gap: 10px;
-    padding: 10px;
+    padding: 10px 42px 10px 10px;
     color: inherit;
     background: transparent;
     border: 0;
@@ -433,7 +466,7 @@
 #coffeepos-app.is-density-compact .coffeepos-product-card-button {
     min-height: 78px;
     gap: 7px;
-    padding: 7px;
+    padding: 7px 38px 7px 7px;
 }
 
 .coffeepos-cart-panel {
@@ -1070,6 +1103,97 @@
     font-weight: 650;
     cursor: pointer;
     transition: color 120ms ease, background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+[data-component="quick-notes"] {
+    gap: 6px;
+}
+
+[data-component="quick-notes"] .coffeepos-option-button {
+    min-height: 32px;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.coffeepos-stock-modal__dialog {
+    width: min(520px, calc(100vw - 32px));
+}
+
+.coffeepos-stock-modal__loading,
+.coffeepos-stock-modal__error,
+.coffeepos-stock-modal__content {
+    padding: 20px 22px;
+}
+
+.coffeepos-stock-modal__error p {
+    margin-bottom: 0;
+}
+
+.coffeepos-stock-modal__content {
+    display: grid;
+    gap: 16px;
+}
+
+.coffeepos-stock-current {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 14px;
+    background: #eef4f1;
+    border-radius: 9px;
+}
+
+.coffeepos-stock-current strong {
+    color: var(--coffeepos-primary-dark);
+}
+
+.coffeepos-stock-modal .coffeepos-field {
+    gap: 5px;
+}
+
+.coffeepos-stock-modal select,
+.coffeepos-stock-modal input[type="number"],
+.coffeepos-stock-modal textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px 11px;
+    border: 1px solid var(--coffeepos-border-strong);
+    border-radius: 8px;
+    font: inherit;
+}
+
+.coffeepos-stock-modal .coffeepos-field small {
+    color: var(--coffeepos-text-muted);
+    font-size: 12px;
+}
+
+.coffeepos-stock-status {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.coffeepos-stock-status legend {
+    grid-column: 1 / -1;
+    margin-bottom: 2px;
+    font-weight: 700;
+}
+
+.coffeepos-stock-status label {
+    padding: 10px;
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 8px;
+}
+
+.coffeepos-stock-modal .coffeepos-modal-actions {
+    margin: 0 -22px -20px;
+    padding: 14px 22px 0;
+    border-top: 1px solid var(--coffeepos-border);
 }
 
 .coffeepos-option-button:hover {

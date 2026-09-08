@@ -50,4 +50,9 @@ $imageUrl = (string) ($product['image_url'] ?? '');
             <?php endif; ?>
         </span>
     </button>
+    <?php if (current_user_can(\CoffeePOS\Support\Capabilities::MANAGE_STOCK)) : ?>
+        <button type="button" class="coffeepos-product-stock-button" data-action="edit-product-stock" aria-label="<?php esc_attr_e('Update stock', 'coffeepos'); ?>" title="<?php esc_attr_e('Update stock', 'coffeepos'); ?>">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Zm8 4.3 6-3.4L12 5 6 8.4l6 3.4Zm-6 5 5 2.8v-6.1l-5-2.8v6.1Zm7 2.8 5-2.8v-6.1l-5 2.8v6.1Z"/></svg>
+        </button>
+    <?php endif; ?>
 </article>

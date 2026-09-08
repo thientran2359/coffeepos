@@ -12,6 +12,8 @@ final class RouteRegistrar
 
     private ProductController $productController;
 
+    private StockController $stockController;
+
     private CartController $cartController;
 
     private CheckoutController $checkoutController;
@@ -29,6 +31,7 @@ final class RouteRegistrar
     public function __construct(
         ?HealthController $healthController = null,
         ?ProductController $productController = null,
+        ?StockController $stockController = null,
         ?CartController $cartController = null,
         ?CheckoutController $checkoutController = null,
         ?OperationalOrderController $operationalOrderController = null,
@@ -39,6 +42,7 @@ final class RouteRegistrar
     {
         $this->healthController = $healthController ?? new HealthController();
         $this->productController = $productController ?? new ProductController();
+        $this->stockController = $stockController ?? new StockController();
         $this->cartController = $cartController ?? new CartController();
         $this->checkoutController = $checkoutController ?? new CheckoutController();
         $this->operationalOrderController = $operationalOrderController ?? new OperationalOrderController();
@@ -56,6 +60,7 @@ final class RouteRegistrar
     {
         $this->healthController->register(self::NAMESPACE);
         $this->productController->register(self::NAMESPACE);
+        $this->stockController->register(self::NAMESPACE);
         $this->cartController->register(self::NAMESPACE);
         $this->checkoutController->register(self::NAMESPACE);
         $this->operationalOrderController->register(self::NAMESPACE);
@@ -69,6 +74,7 @@ final class RouteRegistrar
             self::NAMESPACE . '/products',
             self::NAMESPACE . '/products/(?P<id>\\d+)',
             self::NAMESPACE . '/products/(?P<id>\\d+)/variation',
+            self::NAMESPACE . '/products/(?P<id>\\d+)/stock',
             self::NAMESPACE . '/categories',
             self::NAMESPACE . '/cart/session',
             self::NAMESPACE . '/cart',

@@ -121,6 +121,7 @@ final class AssetLoader
             'canCancelOrders' => current_user_can(\CoffeePOS\Support\Capabilities::CANCEL_ORDERS),
             'canReorderOrders' => current_user_can(\CoffeePOS\Support\Capabilities::REORDER_ORDERS),
             'canReprintReceipts' => current_user_can(\CoffeePOS\Support\Capabilities::REPRINT_RECEIPTS),
+            'canManageStock' => current_user_can(\CoffeePOS\Support\Capabilities::MANAGE_STOCK),
             'i18n' => [
                 'addItem' => __('Add item', 'coffeepos'),
                 'editItem' => __('Edit item', 'coffeepos'),
@@ -284,6 +285,7 @@ final class AssetLoader
         wp_register_script('coffeepos-component-catalog-renderer', COFFEEPOS_URL . 'assets/js/components/catalog-renderer.js', ['coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-cart-panel', COFFEEPOS_URL . 'assets/js/components/cart-panel.js', ['coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-product-modal', COFFEEPOS_URL . 'assets/js/components/product-modal.js', ['coffeepos-api-client', 'coffeepos-ui-modal', 'coffeepos-ui-template-renderer'], $version, true);
+        wp_register_script('coffeepos-component-stock-modal', COFFEEPOS_URL . 'assets/js/components/stock-modal.js', ['coffeepos-api-client', 'coffeepos-ui-modal', 'coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-cart-context', COFFEEPOS_URL . 'assets/js/components/cart-context.js', ['coffeepos-api-client', 'coffeepos-ui-modal', 'coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-coupon-selector', COFFEEPOS_URL . 'assets/js/components/coupon-selector.js', ['coffeepos-api-client', 'coffeepos-ui-template-renderer'], $version, true);
         $this->registerReceiptPrinter($version, 'coffeepos-ui-template-renderer');
@@ -312,6 +314,7 @@ final class AssetLoader
                 'coffeepos-component-product-card',
                 'coffeepos-component-cart-panel',
                 'coffeepos-component-product-modal',
+                'coffeepos-component-stock-modal',
                 'coffeepos-component-cart-context',
                 'coffeepos-component-coupon-selector',
                 'coffeepos-component-checkout',

@@ -16,6 +16,8 @@ final class Phase01ErrorCodes
 
     public const OUT_OF_STOCK = 'out_of_stock';
 
+    public const INVALID_STOCK_ADJUSTMENT = 'invalid_stock_adjustment';
+
     public const INVALID_ORDER_TYPE = 'invalid_order_type';
 
     public const TABLE_REQUIRED = 'table_required';

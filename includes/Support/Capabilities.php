@@ -21,6 +21,7 @@ final class Capabilities
     public const REFUND_ORDERS = 'coffeepos_refund_orders';
     public const VIEW_REPORTS = 'coffeepos_view_reports';
     public const MANAGE_SETTINGS = 'coffeepos_manage_settings';
+    public const MANAGE_STOCK = 'coffeepos_manage_stock';
 
     private const ROLE_CAPABILITIES = [
         'coffeepos_cashier' => [
@@ -29,6 +30,7 @@ final class Capabilities
             self::VIEW_ORDER_HISTORY,
             self::REPRINT_RECEIPTS,
             self::REORDER_ORDERS,
+            self::MANAGE_STOCK,
         ],
         'coffeepos_kitchen' => [
             self::ACCESS_KDS,
@@ -43,6 +45,7 @@ final class Capabilities
             self::REPRINT_RECEIPTS,
             self::REORDER_ORDERS,
             self::CANCEL_ORDERS,
+            self::MANAGE_STOCK,
         ],
         'coffeepos_manager' => [
             self::ACCESS_CASHIER,
@@ -56,6 +59,7 @@ final class Capabilities
             self::REFUND_ORDERS,
             self::VIEW_REPORTS,
             self::MANAGE_SETTINGS,
+            self::MANAGE_STOCK,
         ],
     ];
 

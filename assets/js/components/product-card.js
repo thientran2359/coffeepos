@@ -5,7 +5,7 @@
 
     CoffeePOS.components = CoffeePOS.components || {};
 
-    CoffeePOS.components.createProductCardController = function (root, onSelect) {
+    CoffeePOS.components.createProductCardController = function (root, onSelect, onEditStock) {
         let selectedCard = null;
 
         function restore(card) {
@@ -32,6 +32,19 @@
         });
 
         root.addEventListener('click', function (event) {
+            const stockTrigger = event.target.closest('[data-action="edit-product-stock"]');
+
+            if (stockTrigger) {
+                const stockCard = stockTrigger.closest('[data-component="product-card"]');
+                if (stockCard && typeof onEditStock === 'function') {
+                    onEditStock({
+                        productId: stockCard.getAttribute('data-product-id') || '',
+                        name: (stockCard.querySelector('.coffeepos-product-name') || {}).textContent || ''
+                    });
+                }
+                return;
+            }
+
             const trigger = event.target.closest('[data-action="select-product"]');
             const card = trigger && trigger.closest('[data-component="product-card"]');
 

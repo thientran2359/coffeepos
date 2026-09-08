@@ -159,6 +159,15 @@
                     signal: signal
                 });
             },
+            loadProductStock: function (productId, signal) {
+                return client.request('products/' + encodeURIComponent(String(productId)) + '/stock', { signal: signal });
+            },
+            updateProductStock: function (productId, payload) {
+                return client.request('products/' + encodeURIComponent(String(productId)) + '/stock', {
+                    method: 'PATCH',
+                    body: payload
+                });
+            },
             createCartSession: function () {
                 return client.request('cart/session', { method: 'POST', body: {} });
             },

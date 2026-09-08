@@ -114,6 +114,7 @@ final class RestResponder
             Phase01ErrorCodes::INVALID_REFUND,
             Phase01ErrorCodes::INVALID_REPORT_RANGE,
             Phase01ErrorCodes::REPORT_RANGE_TOO_LARGE,
+            Phase01ErrorCodes::INVALID_STOCK_ADJUSTMENT,
         ], true)) {
             return 400;
         }
@@ -139,6 +140,7 @@ final class RestResponder
             Phase01ErrorCodes::VARIATION_NOT_FOUND => __('The selected variation was not found.', 'coffeepos'),
             Phase01ErrorCodes::INVALID_QUANTITY => __('The selected quantity is invalid.', 'coffeepos'),
             Phase01ErrorCodes::OUT_OF_STOCK => __('The requested item is out of stock.', 'coffeepos'),
+            Phase01ErrorCodes::INVALID_STOCK_ADJUSTMENT => __('The stock adjustment is invalid. Check the quantity, status, and reason.', 'coffeepos'),
             Phase01ErrorCodes::INVALID_ORDER_TYPE => __('The selected service type is invalid.', 'coffeepos'),
             Phase01ErrorCodes::TABLE_REQUIRED => __('Select a table for dine-in service.', 'coffeepos'),
             Phase01ErrorCodes::TABLE_NOT_ALLOWED => __('A table cannot be used with this service type.', 'coffeepos'),

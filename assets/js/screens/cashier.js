@@ -220,8 +220,15 @@
             function (modalState) { store.setProductModal(modalState); }
         );
 
+        const stockModal = CoffeePOS.components.createStockModalController(root, renderer, api, function () {
+            toast.show(__('Stock updated.', 'coffeepos'), 'success');
+            loadCatalog();
+        });
+
         CoffeePOS.components.createProductCardController(root, function (product) {
             productModal.openAdd(Number(product.productId));
+        }, function (product) {
+            stockModal.open(product);
         });
 
         function findItem(itemId) {

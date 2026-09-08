@@ -32,6 +32,7 @@ capability của họ cho phép.
 |---|---|
 | **WooCommerce-native** | Sản phẩm, biến thể, giá, tồn kho, coupon, khách hàng, đơn hàng và refund vẫn thuộc WooCommerce. |
 | **Server-authoritative** | Trình duyệt không được quyết định giá, tổng tiền, tồn kho, quyền hoặc trạng thái thanh toán. |
+| **Quick stock** | Nhân viên có quyền có thể cập nhật số lượng hoặc trạng thái tồn kho ngay trên product card, kèm lý do bắt buộc. |
 | **Hai màn hình tự ghép nối** | Cashier và Customer Display tự tìm nhau trong cùng browser profile, không cần sao chép `pos_session_id`. |
 | **Vận hành theo vai trò** | Role và capability riêng cho Cashier, Kitchen, Supervisor và Manager. |
 | **Sẵn sàng tiếng Việt** | Có sẵn catalog PHP/JavaScript tiếng Việt và nền tảng WordPress gettext. |

@@ -42,6 +42,7 @@
         let contextController = null;
         let couponSelector = null;
         let checkoutController = null;
+        let heldCarts = null;
         const orderType = CoffeePOS.components.createOrderTypeController(root, function (requested) {
             if (mutationPending) {
                 return;
@@ -278,6 +279,9 @@
                 checkoutController.reconcileCart(cart);
                 checkoutController.resumeCart(cart);
             }
+            if (heldCarts) {
+                heldCarts.setCart(cart);
+            }
         }
 
         function applyDefaultService(cart, isFresh) {
@@ -345,6 +349,18 @@
                 syncBridge.publishWorkflow(type, payload);
             }
         );
+        heldCarts = CoffeePOS.components.createHeldCartsController(
+            root,
+            renderer,
+            api,
+            function () { return store.getState().cart; },
+            function (cart, isFresh) {
+                applyCart(cart);
+                applyDefaultService(cart, isFresh === true);
+            },
+            confirmDialog,
+            toast
+        );
 
         function updateQuantity(item, quantity) {
             const cart = store.getState().cart;
@@ -389,6 +405,8 @@
                 mutate(function () { return api.removeCoupon(cartPayload(cart)); }).catch(function () {});
             } else if (action === 'open-order-note') {
                 cartPanel.openOrderNote();
+            } else if (action === 'open-held-carts') {
+                heldCarts.open();
             } else if (action === 'close-order-note') {
                 cartPanel.closeOrderNote();
             } else if (action === 'save-order-note' && cart) {
@@ -422,6 +440,7 @@
             categoryNav.init();
             search.init();
             orderType.init();
+            heldCarts.init();
             root.addEventListener('click', onClick);
             root.addEventListener('coffeepos:confirm', onConfirm);
             loadCatalog();

@@ -99,7 +99,7 @@
 
 .coffeepos-staff-nav__links a {
     min-height: 46px;
-    padding: 5px 7px;
+    padding: 5px; 
     border-radius: 9px;
     white-space: nowrap;
 }
@@ -120,6 +120,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 1rem;
 }
 
 .coffeepos-staff-nav__account {

@@ -14,6 +14,8 @@ final class RouteRegistrar
 
     private StockController $stockController;
 
+    private HeldCartController $heldCartController;
+
     private CartController $cartController;
 
     private CheckoutController $checkoutController;
@@ -32,6 +34,7 @@ final class RouteRegistrar
         ?HealthController $healthController = null,
         ?ProductController $productController = null,
         ?StockController $stockController = null,
+        ?HeldCartController $heldCartController = null,
         ?CartController $cartController = null,
         ?CheckoutController $checkoutController = null,
         ?OperationalOrderController $operationalOrderController = null,
@@ -43,6 +46,7 @@ final class RouteRegistrar
         $this->healthController = $healthController ?? new HealthController();
         $this->productController = $productController ?? new ProductController();
         $this->stockController = $stockController ?? new StockController();
+        $this->heldCartController = $heldCartController ?? new HeldCartController();
         $this->cartController = $cartController ?? new CartController();
         $this->checkoutController = $checkoutController ?? new CheckoutController();
         $this->operationalOrderController = $operationalOrderController ?? new OperationalOrderController();
@@ -61,6 +65,7 @@ final class RouteRegistrar
         $this->healthController->register(self::NAMESPACE);
         $this->productController->register(self::NAMESPACE);
         $this->stockController->register(self::NAMESPACE);
+        $this->heldCartController->register(self::NAMESPACE);
         $this->cartController->register(self::NAMESPACE);
         $this->checkoutController->register(self::NAMESPACE);
         $this->operationalOrderController->register(self::NAMESPACE);
@@ -75,6 +80,9 @@ final class RouteRegistrar
             self::NAMESPACE . '/products/(?P<id>\\d+)',
             self::NAMESPACE . '/products/(?P<id>\\d+)/variation',
             self::NAMESPACE . '/products/(?P<id>\\d+)/stock',
+            self::NAMESPACE . '/held-carts',
+            self::NAMESPACE . '/held-carts/(?P<id>\\d+)',
+            self::NAMESPACE . '/held-carts/(?P<id>\\d+)/resume',
             self::NAMESPACE . '/categories',
             self::NAMESPACE . '/cart/session',
             self::NAMESPACE . '/cart',

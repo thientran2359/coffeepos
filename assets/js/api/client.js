@@ -195,6 +195,21 @@
             clearCart: function (payload) {
                 return client.request('cart', { method: 'DELETE', body: payload });
             },
+            holdCart: function (payload) {
+                return client.request('held-carts', { method: 'POST', body: payload });
+            },
+            loadHeldCarts: function (signal) {
+                return client.request('held-carts?limit=100', { signal: signal });
+            },
+            loadHeldCart: function (heldCartId, signal) {
+                return client.request('held-carts/' + encodeURIComponent(String(heldCartId)), { signal: signal });
+            },
+            resumeHeldCart: function (heldCartId, payload) {
+                return client.request('held-carts/' + encodeURIComponent(String(heldCartId)) + '/resume', { method: 'POST', body: payload });
+            },
+            deleteHeldCart: function (heldCartId) {
+                return client.request('held-carts/' + encodeURIComponent(String(heldCartId)), { method: 'DELETE' });
+            },
             setOrderNote: function (payload) {
                 return client.request('cart/order-note', { method: 'PUT', body: payload });
             },

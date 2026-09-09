@@ -75,6 +75,7 @@ final class RestResponder
             Phase01ErrorCodes::ORDER_STATE_CONFLICT,
             Phase01ErrorCodes::SHIFT_ALREADY_OPEN,
             Phase01ErrorCodes::SHIFT_STATE_CONFLICT,
+            Phase01ErrorCodes::HELD_CART_STATE_CONFLICT,
         ], true)) {
             return 409;
         }
@@ -88,6 +89,10 @@ final class RestResponder
         }
 
         if ($code === Phase01ErrorCodes::SHIFT_WRITE_FAILED) {
+            return 500;
+        }
+
+        if ($code === Phase01ErrorCodes::HELD_CART_WRITE_FAILED) {
             return 500;
         }
 
@@ -115,6 +120,7 @@ final class RestResponder
             Phase01ErrorCodes::INVALID_REPORT_RANGE,
             Phase01ErrorCodes::REPORT_RANGE_TOO_LARGE,
             Phase01ErrorCodes::INVALID_STOCK_ADJUSTMENT,
+            Phase01ErrorCodes::INVALID_HELD_CART,
         ], true)) {
             return 400;
         }
@@ -125,6 +131,7 @@ final class RestResponder
             Phase01ErrorCodes::CUSTOMER_NOT_FOUND,
             Phase01ErrorCodes::ORDER_NOT_FOUND,
             Phase01ErrorCodes::SHIFT_NOT_FOUND,
+            Phase01ErrorCodes::HELD_CART_NOT_FOUND,
         ], true)) {
             return 404;
         }
@@ -141,6 +148,10 @@ final class RestResponder
             Phase01ErrorCodes::INVALID_QUANTITY => __('The selected quantity is invalid.', 'coffeepos'),
             Phase01ErrorCodes::OUT_OF_STOCK => __('The requested item is out of stock.', 'coffeepos'),
             Phase01ErrorCodes::INVALID_STOCK_ADJUSTMENT => __('The stock adjustment is invalid. Check the quantity, status, and reason.', 'coffeepos'),
+            Phase01ErrorCodes::INVALID_HELD_CART => __('The held cart data is invalid.', 'coffeepos'),
+            Phase01ErrorCodes::HELD_CART_NOT_FOUND => __('The held cart was not found.', 'coffeepos'),
+            Phase01ErrorCodes::HELD_CART_STATE_CONFLICT => __('Hold or clear the current cart before resuming another cart.', 'coffeepos'),
+            Phase01ErrorCodes::HELD_CART_WRITE_FAILED => __('The held cart could not be saved.', 'coffeepos'),
             Phase01ErrorCodes::INVALID_ORDER_TYPE => __('The selected service type is invalid.', 'coffeepos'),
             Phase01ErrorCodes::TABLE_REQUIRED => __('Select a table for dine-in service.', 'coffeepos'),
             Phase01ErrorCodes::TABLE_NOT_ALLOWED => __('A table cannot be used with this service type.', 'coffeepos'),

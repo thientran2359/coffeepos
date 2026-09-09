@@ -7,6 +7,7 @@ namespace CoffeePOS\Application\Cart;
 use CoffeePOS\Application\Contracts\CartSessionStoreInterface;
 use CoffeePOS\Application\Contracts\CartReconstructorInterface;
 use CoffeePOS\Application\Contracts\MoneyFormatterInterface;
+use CoffeePOS\Application\Contracts\PricingGatewayInterface;
 use CoffeePOS\Application\Contracts\TableProviderInterface;
 use CoffeePOS\Application\Customer\CustomerService;
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
@@ -21,6 +22,7 @@ use CoffeePOS\Domain\Cart\CartItem;
 use CoffeePOS\Domain\Customer\CustomerContext;
 use CoffeePOS\Domain\Order\OrderType;
 use CoffeePOS\Domain\Order\TableContext;
+use CoffeePOS\Domain\Payment\PaymentContext;
 use CoffeePOS\Domain\Product\ModifierSelection;
 use CoffeePOS\Domain\Product\QuickNoteSelection;
 use CoffeePOS\Domain\Shared\Money;
@@ -45,6 +47,8 @@ final class CartSessionService implements CartReconstructorInterface
 
     private bool $requireDineInTable;
 
+    private ?PricingGatewayInterface $pricingGateway;
+
     public function __construct(
         CartSessionStoreInterface $sessionStore,
         CartService $cartService,
@@ -54,7 +58,8 @@ final class CartSessionService implements CartReconstructorInterface
         MoneyFormatterInterface $moneyFormatter,
         ?CustomerService $customerService = null,
         ?TableProviderInterface $tableProvider = null,
-        bool $requireDineInTable = true
+        bool $requireDineInTable = true,
+        ?PricingGatewayInterface $pricingGateway = null
     ) {
         $this->sessionStore = $sessionStore;
         $this->cartService = $cartService;
@@ -65,6 +70,7 @@ final class CartSessionService implements CartReconstructorInterface
         $this->customerService = $customerService;
         $this->tableProvider = $tableProvider;
         $this->requireDineInTable = $requireDineInTable;
+        $this->pricingGateway = $pricingGateway;
     }
 
     public function createSession(string $currency): CartView
@@ -96,6 +102,125 @@ final class CartSessionService implements CartReconstructorInterface
         }
 
         return $this->project($this->sessionStore->save($cart, 0));
+    }
+
+    public function resetAfterHold(string $posSessionId, int $expectedRevision): CartView
+    {
+        $cart = $this->loadForMutation($posSessionId, $expectedRevision);
+
+        if (! $cart->hasItems()) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::EMPTY_CART, 'An empty cart cannot be held.');
+        }
+
+        $this->cartService->clear($cart);
+        $this->cartService->setCustomerContext($cart, CustomerContext::guest());
+        $this->cartService->setOrderType($cart, OrderType::TAKEAWAY);
+        $this->cartService->setPaymentContext($cart, PaymentContext::none());
+
+        return $this->persist($cart, $expectedRevision);
+    }
+
+    public function resumeSuspended(string $posSessionId, int $expectedRevision, array $snapshot): CartView
+    {
+        $cart = $this->loadForMutation($posSessionId, $expectedRevision);
+
+        if ($cart->hasItems()) {
+            throw Phase01Exception::withCode(
+                Phase01ErrorCodes::HELD_CART_STATE_CONFLICT,
+                'Hold or clear the current cart before resuming another cart.'
+            );
+        }
+
+        if (($snapshot['state'] ?? Cart::STATE_ACTIVE) !== Cart::STATE_ACTIVE) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_HELD_CART, 'Held cart is not an active pre-checkout cart.');
+        }
+
+        $inputs = (array) ($snapshot['items'] ?? []);
+        if ($inputs === []) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_HELD_CART, 'Held cart has no items.');
+        }
+
+        $items = [];
+        foreach ($inputs as $input) {
+            if (! is_array($input)) {
+                throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_HELD_CART, 'Held cart item data is invalid.');
+            }
+
+            $items[] = $this->buildCartItem($input);
+        }
+
+        $this->cartService->clear($cart);
+        $this->cartService->setCustomerContext($cart, CustomerContext::guest());
+        $this->cartService->setOrderType($cart, OrderType::TAKEAWAY);
+        $this->cartService->setPaymentContext($cart, PaymentContext::none());
+
+        foreach ($items as $item) {
+            $this->cartService->addItem($cart, $item);
+        }
+
+        $customer = (array) ($snapshot['customer'] ?? []);
+        if (empty($customer['is_guest']) && (int) ($customer['customer_id'] ?? 0) > 0) {
+            if ($this->customerService === null) {
+                throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_CONFIGURATION, 'Customer service is not configured.');
+            }
+
+            $currentCustomer = $this->customerService->findById((int) $customer['customer_id'])->toArray();
+            $this->cartService->setCustomerContext($cart, CustomerContext::member(
+                (int) $currentCustomer['customer_id'],
+                (string) $currentCustomer['phone'],
+                (string) $currentCustomer['display_name'],
+                is_array($currentCustomer['membership'] ?? null) ? $currentCustomer['membership'] : null
+            ));
+        }
+
+        $orderType = (string) ($snapshot['order_type'] ?? OrderType::TAKEAWAY);
+        if ($orderType === OrderType::DINE_IN) {
+            $table = (array) ($snapshot['table'] ?? []);
+            $tableId = (int) ($table['table_id'] ?? 0);
+
+            if ($tableId <= 0 && ! $this->requireDineInTable) {
+                $this->cartService->setOrderType($cart, OrderType::DINE_IN, TableContext::none());
+            } else {
+                if ($this->tableProvider === null) {
+                    throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_CONFIGURATION, 'Table provider is not configured.');
+                }
+
+                $currentTable = $this->tableProvider->findAvailableById($tableId);
+                if ($currentTable === null) {
+                    throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_TABLE, 'Held cart table is no longer available.');
+                }
+
+                $this->cartService->setOrderType($cart, OrderType::DINE_IN, TableContext::from(
+                    (int) $currentTable['id'],
+                    (string) $currentTable['label']
+                ));
+            }
+        } elseif ($orderType !== OrderType::TAKEAWAY) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_HELD_CART, 'Held cart order type is invalid.');
+        }
+
+        $note = (string) ($snapshot['order_note'] ?? '');
+        $noteLength = function_exists('mb_strlen') ? mb_strlen($note) : strlen($note);
+        if ($noteLength > 2000) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_HELD_CART, 'Held cart order note is too long.');
+        }
+        $cart->setOrderNote($note);
+
+        $payment = (array) ($snapshot['payment'] ?? []);
+        $couponCode = trim((string) ($payment['coupon_code'] ?? ''));
+        if ($couponCode !== '') {
+            if ($this->pricingGateway === null) {
+                throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_CONFIGURATION, 'Pricing gateway is not configured.');
+            }
+
+            $pricing = $this->pricingGateway->calculate($cart, $couponCode);
+            $this->cartService->setPaymentContext($cart, PaymentContext::withCoupon(
+                strtoupper($couponCode),
+                (int) ($pricing['discount_minor'] ?? 0)
+            ));
+        }
+
+        return $this->persist($cart, $expectedRevision);
     }
 
     public function getSession(string $posSessionId): CartView

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CoffeePOS\Integration\WooCommerce;
 
+use CoffeePOS\Application\Contracts\CartSnapshotSerializerInterface;
 use CoffeePOS\Domain\Cart\Cart;
 use CoffeePOS\Domain\Cart\CartItem;
 use CoffeePOS\Domain\Customer\CustomerContext;
@@ -14,7 +15,7 @@ use CoffeePOS\Domain\Product\ModifierSelection;
 use CoffeePOS\Domain\Product\QuickNoteSelection;
 use CoffeePOS\Domain\Shared\Money;
 
-final class WooCommerceCartSerializer
+final class WooCommerceCartSerializer implements CartSnapshotSerializerInterface
 {
     public function toPayload(Cart $cart): array
     {

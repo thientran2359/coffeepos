@@ -23,8 +23,9 @@ $cashier = (string) ($cashierView['cashier'] ?? __('Cashier', 'coffeepos'));
     </div>
 
     <nav class="coffeepos-cashier-utilities" aria-label="<?php esc_attr_e('Cashier utility actions', 'coffeepos'); ?>">
-        <button type="button" class="coffeepos-icon-button" data-action="open-held-carts" disabled title="<?php esc_attr_e('Held carts', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Held carts', 'coffeepos'); ?>">
+        <button type="button" class="coffeepos-icon-button coffeepos-held-carts-trigger" data-action="open-held-carts" title="<?php esc_attr_e('Held carts', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Held carts', 'coffeepos'); ?>">
             <span aria-hidden="true">H</span>
+            <span class="coffeepos-held-carts-count" data-component="held-carts-count" hidden>0</span>
         </button>
         <button type="button" class="coffeepos-icon-button" data-action="open-customer-display" disabled title="<?php esc_attr_e('Customer display', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Customer display', 'coffeepos'); ?>">
             <span aria-hidden="true">D</span>

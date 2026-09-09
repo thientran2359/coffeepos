@@ -2403,3 +2403,131 @@ msgstr "Cập nhật tồn kho"
 #: includes/REST/StockController.php
 msgid "You are not allowed to update product stock."
 msgstr "Bạn không được phép cập nhật tồn kho sản phẩm."
+
+#: templates/components/held-carts.php
+msgid "Suspended orders"
+msgstr "Đơn tạm giữ"
+
+#: templates/components/held-carts.php
+msgid "Close held carts"
+msgstr "Đóng danh sách đơn tạm giữ"
+
+#: templates/components/held-carts.php
+msgid "Save the current cart and continue with a new customer."
+msgstr "Lưu giỏ hàng hiện tại và tiếp tục phục vụ khách mới."
+
+#: templates/components/held-carts.php
+msgid "Hold current cart"
+msgstr "Tạm giữ giỏ hàng hiện tại"
+
+#: templates/components/held-carts.php
+msgid "Loading held carts..."
+msgstr "Đang tải đơn tạm giữ..."
+
+#: templates/components/held-carts.php
+msgid "Try again"
+msgstr "Thử lại"
+
+#: templates/components/held-carts.php
+msgid "No held carts"
+msgstr "Không có đơn tạm giữ"
+
+#: templates/components/held-carts.php
+msgid "Held orders will appear here."
+msgstr "Các đơn được tạm giữ sẽ xuất hiện tại đây."
+
+#: templates/components/held-carts.php assets/js/components/held-carts.js
+msgid "Hold cart"
+msgstr "Tạm giữ giỏ hàng"
+
+#: templates/components/held-carts.php
+msgid "Close hold cart"
+msgstr "Đóng hộp thoại tạm giữ giỏ hàng"
+
+#: templates/components/held-carts.php
+msgid "Cart label"
+msgstr "Nhãn giỏ hàng"
+
+#: templates/components/held-carts.php
+msgid "Use a customer name, table, or another short identifier."
+msgstr "Dùng tên khách, tên bàn hoặc một nội dung ngắn để nhận biết."
+
+#: templates/components/held-carts.php
+msgid "items"
+msgstr "món"
+
+#: templates/components/held-carts.php assets/js/components/held-carts.js
+msgid "Resume"
+msgstr "Khôi phục"
+
+#: templates/components/held-carts.php
+msgid "Delete"
+msgstr "Xóa"
+
+#: includes/REST/HeldCartController.php
+msgid "You are not allowed to access held carts."
+msgstr "Bạn không được phép truy cập đơn tạm giữ."
+
+#: includes/REST/RestResponder.php
+msgid "The held cart data is invalid."
+msgstr "Dữ liệu đơn tạm giữ không hợp lệ."
+
+#: includes/REST/RestResponder.php
+msgid "The held cart was not found."
+msgstr "Không tìm thấy đơn tạm giữ."
+
+#: includes/REST/RestResponder.php assets/js/components/held-carts.js
+msgid "Hold or clear the current cart before resuming another cart."
+msgstr "Hãy tạm giữ hoặc xóa giỏ hàng hiện tại trước khi khôi phục giỏ khác."
+
+#: includes/REST/RestResponder.php
+msgid "The held cart could not be saved."
+msgstr "Không thể lưu đơn tạm giữ."
+
+#: assets/js/components/held-carts.js
+msgid "Held carts could not be loaded."
+msgstr "Không thể tải danh sách đơn tạm giữ."
+
+#: assets/js/components/held-carts.js
+msgid "Add at least one item before holding the cart."
+msgstr "Hãy thêm ít nhất một món trước khi tạm giữ giỏ hàng."
+
+#: assets/js/components/held-carts.js
+msgid "Enter a label for the held cart."
+msgstr "Nhập nhãn cho giỏ hàng tạm giữ."
+
+#: assets/js/components/held-carts.js
+msgid "Cart held successfully."
+msgstr "Đã tạm giữ giỏ hàng."
+
+#: assets/js/components/held-carts.js
+msgid "The cart could not be held."
+msgstr "Không thể tạm giữ giỏ hàng."
+
+#: assets/js/components/held-carts.js
+msgid "Resuming..."
+msgstr "Đang khôi phục..."
+
+#: assets/js/components/held-carts.js
+msgid "Held cart resumed."
+msgstr "Đã khôi phục giỏ hàng tạm giữ."
+
+#: assets/js/components/held-carts.js
+msgid "The held cart could not be resumed."
+msgstr "Không thể khôi phục giỏ hàng tạm giữ."
+
+#: assets/js/components/held-carts.js
+msgid "Held cart deleted."
+msgstr "Đã xóa đơn tạm giữ."
+
+#: assets/js/components/held-carts.js
+msgid "The held cart could not be deleted."
+msgstr "Không thể xóa đơn tạm giữ."
+
+#: assets/js/components/held-carts.js
+msgid "Delete held cart?"
+msgstr "Xóa đơn tạm giữ?"
+
+#: assets/js/components/held-carts.js
+msgid "This suspended cart will be permanently removed."
+msgstr "Giỏ hàng tạm giữ này sẽ bị xóa vĩnh viễn."

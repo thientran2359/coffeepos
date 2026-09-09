@@ -10,6 +10,7 @@ if (! defined('ABSPATH')) {
 <div class="coffeepos-overlay-root" data-component="overlay-root" aria-live="polite">
     <?php require COFFEEPOS_PATH . 'templates/components/product-modal.php'; ?>
     <?php require COFFEEPOS_PATH . 'templates/components/stock-modal.php'; ?>
+    <?php require COFFEEPOS_PATH . 'templates/components/held-carts.php'; ?>
     <?php require COFFEEPOS_PATH . 'templates/components/context-dialogs.php'; ?>
     <?php require COFFEEPOS_PATH . 'templates/components/coupon-selector.php'; ?>
     <?php require COFFEEPOS_PATH . 'templates/components/order-note-dialog.php'; ?>

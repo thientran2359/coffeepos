@@ -286,6 +286,7 @@ final class AssetLoader
         wp_register_script('coffeepos-component-cart-panel', COFFEEPOS_URL . 'assets/js/components/cart-panel.js', ['coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-product-modal', COFFEEPOS_URL . 'assets/js/components/product-modal.js', ['coffeepos-api-client', 'coffeepos-ui-modal', 'coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-stock-modal', COFFEEPOS_URL . 'assets/js/components/stock-modal.js', ['coffeepos-api-client', 'coffeepos-ui-modal', 'coffeepos-ui-template-renderer'], $version, true);
+        wp_register_script('coffeepos-component-held-carts', COFFEEPOS_URL . 'assets/js/components/held-carts.js', ['coffeepos-api-client', 'coffeepos-ui-modal', 'coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-cart-context', COFFEEPOS_URL . 'assets/js/components/cart-context.js', ['coffeepos-api-client', 'coffeepos-ui-modal', 'coffeepos-ui-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-coupon-selector', COFFEEPOS_URL . 'assets/js/components/coupon-selector.js', ['coffeepos-api-client', 'coffeepos-ui-template-renderer'], $version, true);
         $this->registerReceiptPrinter($version, 'coffeepos-ui-template-renderer');
@@ -315,6 +316,7 @@ final class AssetLoader
                 'coffeepos-component-cart-panel',
                 'coffeepos-component-product-modal',
                 'coffeepos-component-stock-modal',
+                'coffeepos-component-held-carts',
                 'coffeepos-component-cart-context',
                 'coffeepos-component-coupon-selector',
                 'coffeepos-component-checkout',

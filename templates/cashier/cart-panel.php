@@ -105,7 +105,9 @@ $membershipEnabled = (bool) \CoffeePOS\Infrastructure\Settings\Settings::get(\Co
             <button type="button" class="coffeepos-icon-button" data-action="decrease-quantity" data-attr="data-cart-item-key:item_id" aria-label="<?php esc_attr_e('Decrease quantity', 'coffeepos'); ?>">&#8722;</button>
             <span data-component="cart-item-quantity" data-field="quantity"></span>
             <button type="button" class="coffeepos-icon-button" data-action="increase-quantity" data-attr="data-cart-item-key:item_id" aria-label="<?php esc_attr_e('Increase quantity', 'coffeepos'); ?>">+</button>
-            <button type="button" class="coffeepos-icon-button" data-action="edit-cart-item" data-attr="data-cart-item-key:item_id" aria-label="<?php esc_attr_e('Edit item', 'coffeepos'); ?>">E</button>
+            <button type="button" class="coffeepos-icon-button" data-action="edit-cart-item" data-attr="data-cart-item-key:item_id" aria-label="<?php esc_attr_e('Edit item', 'coffeepos'); ?>" title="<?php esc_attr_e('Edit item', 'coffeepos'); ?>">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m16 3 5 5L8 21H3v-5L16 3Z"/><path d="m13 6 5 5"/></svg>
+            </button>
             <button type="button" class="coffeepos-icon-button" data-action="remove-cart-item" data-attr="data-cart-item-key:item_id" aria-label="<?php esc_attr_e('Remove item', 'coffeepos'); ?>">&#215;</button>
         </div>
         <div class="coffeepos-cart-item-price"><span data-field="line_total_display"></span></div>

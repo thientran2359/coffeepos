@@ -18,6 +18,14 @@ final class Phase01ErrorCodes
 
     public const INVALID_STOCK_ADJUSTMENT = 'invalid_stock_adjustment';
 
+    public const INVALID_HELD_CART = 'invalid_held_cart';
+
+    public const HELD_CART_NOT_FOUND = 'held_cart_not_found';
+
+    public const HELD_CART_STATE_CONFLICT = 'held_cart_state_conflict';
+
+    public const HELD_CART_WRITE_FAILED = 'held_cart_write_failed';
+
     public const INVALID_ORDER_TYPE = 'invalid_order_type';
 
     public const TABLE_REQUIRED = 'table_required';

@@ -7,6 +7,8 @@
         const panel = root.querySelector('[data-component="customer-cart"]');
         const itemsTarget = root.querySelector('[data-component="customer-cart-items"]');
         const empty = root.querySelector('[data-component="customer-cart-empty"]');
+        const member = panel.querySelector('[data-component="customer-member"]');
+        const membershipBadge = panel.querySelector('[data-field="customer-membership"]');
         function text(field, value) { const element = panel.querySelector('[data-field="' + field + '"]'); if (element) { element.textContent = String(value || ''); } }
         function render(cart, screenState) {
             const items = cart && Array.isArray(cart.items) ? cart.items : [];
@@ -15,12 +17,15 @@
             text('customer-discount', cart && cart.discount && cart.discount.display);
             text('customer-total', cart && cart.total && cart.total.display);
             const customer = cart && cart.customer || {};
-            const isGuest = customer.mode === 'guest' || customer.is_guest === true;
+            const isGuest = !cart || customer.mode === 'guest' || customer.is_guest === true || !customer.display_name;
             text('customer-mode', isGuest ? __('Guest', 'coffeepos') : __('Member', 'coffeepos'));
             text('customer-name', isGuest ? '' : customer.display_name);
             text('customer-phone-masked', isGuest ? '' : customer.phone_masked);
             const membership = customer.membership || {};
-            text('customer-membership', membership.tier_label || membership.status_label || membership.points_display || '');
+            const membershipLabel = isGuest ? '' : (membership.tier_label || membership.status_label || membership.points_display || '');
+            text('customer-membership', membershipLabel);
+            member.hidden = isGuest;
+            membershipBadge.hidden = membershipLabel === '';
             const service = cart && cart.order_type === 'dine_in'
                 ? __('Dine-in', 'coffeepos') + (cart.table && cart.table.table_label ? ' — ' + cart.table.table_label : '') : __('Takeaway', 'coffeepos');
             text('customer-service', cart ? service : '');

@@ -17,6 +17,7 @@ $icons = [
     'shifts' => 'S',
     'order-history' => 'H',
     'reports' => 'R',
+    'members' => 'M',
     'settings' => '⚙',
 ];
 $displayName = (string) $user->display_name;

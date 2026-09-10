@@ -83,6 +83,8 @@ phase06_assert(strpos($customer_screen, "'display.reset'") !== false, 'Customer 
 phase06_assert(strpos($cashier_sync, "'state.snapshot'") !== false, 'Cashier must answer with a snapshot.');
 phase06_assert(strpos($cashier_sync, 'customer_display') !== false, 'Cashier must publish the safe cart projection.');
 phase06_assert(strpos($customer_content . $customer_menu . $customer_cart, 'data-action="add') === false, 'Customer templates must not expose mutation controls.');
+phase06_assert(strpos($customer_cart, '<span class="coffeepos-eyebrow" data-field="customer-service">') !== false, 'Customer service context must replace the static cart eyebrow.');
+phase06_assert(strpos($customer_cart, 'data-component="customer-member"') !== false && strpos($customer_cart, 'coffeepos-customer-membership-badge') !== false, 'Customer name and membership tier must share a member summary with a tier badge.');
 phase06_assert(strpos($customer_menu . $customer_templates, 'customer-category-nav') === false && strpos($customer_templates, 'coffeepos-customer-category-button-template') === false, 'Customer Display must render category sections without category jump navigation.');
 phase06_assert(strpos($checkout, 'resumeCart') !== false && strpos($checkout, 'checkout_order_id') !== false, 'A frozen cart must resume its existing payment workflow.');
 phase06_assert(strpos($checkout, "cart.state === 'completed'") !== false, 'A completed cart must recover its paid result and next-cart action after reload.');

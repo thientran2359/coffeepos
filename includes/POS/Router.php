@@ -13,7 +13,7 @@ final class Router
 {
     public const QUERY_VAR_SCREEN = 'coffeepos_screen';
 
-    public const REWRITE_SCHEMA_VERSION = '2';
+    public const REWRITE_SCHEMA_VERSION = '3';
 
     private const SCREENS = [
         'entry',
@@ -24,6 +24,7 @@ final class Router
         'order-history',
         'shifts',
         'reports',
+        'members',
         'settings',
     ];
 
@@ -125,12 +126,16 @@ final class Router
         }
 
         $settingsNotice = $screen === 'settings' ? $this->settingsScreen->handleRequest() : [];
+        $membershipNotice = $screen === 'members' ? MembershipScreen::handleRequest() : [];
+        $membershipData = $screen === 'members' ? MembershipScreen::data($membershipNotice) : [];
         $resolvedTemplate = $this->templateLoader->prepare($screen, [
             'screen' => $screen,
             'route' => self::routeUrl($screen),
             'rest_namespace' => RouteRegistrar::NAMESPACE,
             'navigation' => self::navigationItems(),
             'settings_notice' => $settingsNotice,
+            'membership_notice' => $membershipNotice,
+            'membership_data' => $membershipData,
             'settings_diagnostics' => $screen === 'settings' ? $this->settingsScreen->diagnostics() : [],
         ]);
 
@@ -186,6 +191,7 @@ final class Router
             'shifts' => __('Shifts', 'coffeepos'),
             'order-history' => __('Order History', 'coffeepos'),
             'reports' => __('Reports', 'coffeepos'),
+            'members' => __('Members', 'coffeepos'),
         ];
         $items = [];
 
@@ -259,7 +265,7 @@ final class Router
 
     private function firstPermittedRoute(): string
     {
-        foreach (['cashier', 'kds', 'order-queue', 'shifts', 'order-history', 'reports', 'settings'] as $screen) {
+        foreach (['cashier', 'kds', 'order-queue', 'shifts', 'order-history', 'reports', 'members', 'settings'] as $screen) {
             if (Capabilities::currentUserCanAccessScreen($screen)) {
                 return self::routeUrl($screen);
             }

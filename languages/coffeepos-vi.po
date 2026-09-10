@@ -2531,3 +2531,196 @@ msgstr "Xóa đơn tạm giữ?"
 #: assets/js/components/held-carts.js
 msgid "This suspended cart will be permanently removed."
 msgstr "Giỏ hàng tạm giữ này sẽ bị xóa vĩnh viễn."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Invalid membership tiers."
+msgstr "Cấu hình hạng hội viên không hợp lệ."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Use unique tier codes and thresholds, a name, and a non-negative amount."
+msgstr "Mã hạng và ngưỡng chi tiêu phải duy nhất; nhập tên hạng và số tiền không âm."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "A tier coupon does not exist in WooCommerce."
+msgstr "Có mã giảm giá của hạng chưa tồn tại trong WooCommerce."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Membership tiers saved."
+msgstr "Đã lưu các hạng hội viên."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Find one member by phone before changing their tier."
+msgstr "Hãy tìm chính xác một hội viên bằng số điện thoại trước khi đổi hạng."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Enter a reason for the tier change."
+msgstr "Nhập lý do thay đổi hạng hội viên."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Member tier loaded."
+msgstr "Đã tải hạng hội viên."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Member tier saved."
+msgstr "Đã lưu hạng hội viên."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Membership update failed."
+msgstr "Không thể cập nhật hội viên."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Membership tiers"
+msgstr "Hạng hội viên"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Only paid CoffeePOS orders count, after refunds. Enter thresholds in store currency. Empty rows are ignored; clear a row to remove it."
+msgstr "Chỉ tính đơn CoffeePOS đã thanh toán, sau khi trừ hoàn tiền. Nhập ngưỡng theo tiền tệ cửa hàng. Dòng trống được bỏ qua; xóa nội dung cả dòng để bỏ hạng."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Tier code"
+msgstr "Mã hạng"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Tier name"
+msgstr "Tên hạng"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Minimum spend"
+msgstr "Ngưỡng chi tiêu"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Save membership tiers"
+msgstr "Lưu các hạng hội viên"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Change member tier"
+msgstr "Thay đổi hạng hội viên"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Find member"
+msgstr "Tìm hội viên"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "CoffeePOS net spend"
+msgstr "Chi tiêu CoffeePOS sau hoàn tiền"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Member tier"
+msgstr "Hạng của hội viên"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Automatic tier"
+msgstr "Xét hạng tự động"
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "A manual tier stays fixed until Automatic tier is selected."
+msgstr "Hạng thủ công được giữ đến khi chọn Xét hạng tự động."
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Save member tier"
+msgstr "Lưu hạng hội viên"
+
+#: includes/POS/Router.php templates/members/index.php templates/members/content.php
+msgid "Members"
+msgstr "Hội viên"
+
+#: templates/members/content.php
+msgid "Customer management"
+msgstr "Quản lý khách hàng"
+
+#: includes/POS/MembershipScreen.php
+msgid "You are not allowed to manage CoffeePOS members."
+msgstr "Bạn không được phép quản lý hội viên CoffeePOS."
+
+#: includes/POS/MembershipScreen.php
+msgid "The membership form expired. Please try again."
+msgstr "Biểu mẫu hội viên đã hết hạn. Vui lòng thử lại."
+
+#: templates/members/membership.php
+msgid "Only paid CoffeePOS orders count, after refunds. Empty rows are ignored."
+msgstr "Chỉ tính đơn CoffeePOS đã thanh toán sau khi trừ hoàn tiền. Các dòng trống sẽ được bỏ qua."
+
+#: templates/members/membership.php
+msgid "Find a member by phone to review or override their tier."
+msgstr "Tìm hội viên bằng số điện thoại để xem hoặc thay đổi hạng."
+
+#: templates/members/membership.php
+msgid "No tier"
+msgstr "Chưa có hạng"
+
+#: templates/members/directory.php
+msgid "Member directory"
+msgstr "Danh sách hội viên"
+
+#: templates/members/directory.php
+#, php-format
+msgid "Total: %d members"
+msgstr "Tổng cộng: %d hội viên"
+
+#: templates/members/directory.php
+msgid "Search members"
+msgstr "Tìm kiếm hội viên"
+
+#: templates/members/directory.php
+msgid "Search name, email or phone"
+msgstr "Tìm theo tên, email hoặc số điện thoại"
+
+#: templates/members/directory.php
+msgid "No members found."
+msgstr "Không tìm thấy hội viên."
+
+#: templates/members/directory.php
+msgid "Member pages"
+msgstr "Các trang hội viên"
+
+#: templates/members/directory.php
+msgid "Close member details"
+msgstr "Đóng chi tiết hội viên"
+
+#: templates/members/directory.php
+msgid "Reason when changing tier"
+msgstr "Lý do khi thay đổi hạng"
+
+#: templates/members/directory.php
+msgid "Update member"
+msgstr "Cập nhật hội viên"
+
+#: templates/members/directory.php
+msgid "CoffeePOS order history"
+msgstr "Lịch sử đơn hàng CoffeePOS"
+
+#: templates/members/directory.php
+msgid "This member has no CoffeePOS orders."
+msgstr "Hội viên này chưa có đơn hàng CoffeePOS."
+
+#: includes/POS/MembershipScreen.php
+msgid "Invalid membership action."
+msgstr "Thao tác hội viên không hợp lệ."
+
+#: includes/POS/MembershipScreen.php
+msgid "Member updated."
+msgstr "Đã cập nhật hội viên."
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "Member was not found."
+msgstr "Không tìm thấy hội viên."
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "Member name and phone are required."
+msgstr "Tên và số điện thoại hội viên là bắt buộc."
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "Enter a valid member email."
+msgstr "Hãy nhập email hội viên hợp lệ."
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "This phone number belongs to another member."
+msgstr "Số điện thoại này thuộc về một hội viên khác."
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "This email belongs to another account."
+msgstr "Email này thuộc về một tài khoản khác."
+
+#: templates/members/directory.php
+msgid "Quick edit"
+msgstr "Sửa nhanh"

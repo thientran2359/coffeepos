@@ -25,9 +25,26 @@
 
         };
 
+        const storageKey = 'coffeepos.staff_nav_collapsed';
+
         update(root.classList.contains('is-staff-nav-collapsed'));
+        try {
+            const savedState = window.localStorage.getItem(storageKey);
+            if (savedState === 'true' || savedState === 'false') {
+                update(savedState === 'true');
+            }
+        } catch (error) {
+            // Keep the server default when browser storage is unavailable.
+        }
+
         toggle.addEventListener('click', function () {
-            update(!root.classList.contains('is-staff-nav-collapsed'));
+            const collapsed = !root.classList.contains('is-staff-nav-collapsed');
+            update(collapsed);
+            try {
+                window.localStorage.setItem(storageKey, String(collapsed));
+            } catch (error) {
+                // Navigation remains usable when preferences cannot be saved.
+            }
         });
     }
 
@@ -78,6 +95,11 @@
 
         if (screen === 'reports' && window.CoffeePOS.screens.createReportsController) {
             screenController = window.CoffeePOS.screens.createReportsController(root);
+            screenController.init();
+        }
+
+        if (screen === 'members' && window.CoffeePOS.screens.createMembersController) {
+            screenController = window.CoffeePOS.screens.createMembersController(root);
             screenController.init();
         }
 

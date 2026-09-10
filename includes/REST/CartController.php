@@ -17,12 +17,13 @@ use CoffeePOS\Application\Product\VariationService;
 use CoffeePOS\Infrastructure\Settings\SettingsProductConfigurationProvider;
 use CoffeePOS\Infrastructure\Settings\SettingsTableProvider;
 use CoffeePOS\Infrastructure\Settings\Settings;
-use CoffeePOS\Infrastructure\Customer\NullMembershipProvider;
+use CoffeePOS\Integration\WooCommerce\WooCommerceMembershipProvider;
 use CoffeePOS\Infrastructure\Concurrency\MySqlLockProvider;
 use CoffeePOS\Integration\WooCommerce\WooCommerceCartSessionStore;
 use CoffeePOS\Integration\WooCommerce\WooCommerceCustomerGateway;
 use CoffeePOS\Integration\WooCommerce\WooCommerceMoney;
 use CoffeePOS\Integration\WooCommerce\WooCommerceMoneyFormatter;
+use CoffeePOS\Integration\WooCommerce\WooCommercePricingGateway;
 use CoffeePOS\Integration\WooCommerce\WooCommerceProductGateway;
 use CoffeePOS\Integration\WooCommerce\WooCommerceStockGateway;
 use CoffeePOS\Integration\WooCommerce\WooCommerceVariationGateway;
@@ -58,9 +59,10 @@ final class CartController
             new SettingsProductConfigurationProvider()
         );
 
+        $membershipProvider = new WooCommerceMembershipProvider();
         $this->customerService = $customerService ?? new CustomerService(
             new WooCommerceCustomerGateway(),
-            new NullMembershipProvider(),
+            $membershipProvider,
             new MySqlLockProvider(),
             Settings::memberRequiredFields()
         );
@@ -74,7 +76,9 @@ final class CartController
             new WooCommerceMoneyFormatter(),
             $this->customerService,
             $this->tableProvider,
-            (bool) Settings::get(Settings::OPTION_REQUIRE_DINE_IN_TABLE)
+            (bool) Settings::get(Settings::OPTION_REQUIRE_DINE_IN_TABLE),
+            new WooCommercePricingGateway(),
+            $membershipProvider
         );
         $this->money = $money ?? new WooCommerceMoney();
     }

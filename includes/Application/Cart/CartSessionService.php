@@ -7,6 +7,7 @@ namespace CoffeePOS\Application\Cart;
 use CoffeePOS\Application\Contracts\CartSessionStoreInterface;
 use CoffeePOS\Application\Contracts\CartReconstructorInterface;
 use CoffeePOS\Application\Contracts\MoneyFormatterInterface;
+use CoffeePOS\Application\Contracts\MembershipCouponProviderInterface;
 use CoffeePOS\Application\Contracts\PricingGatewayInterface;
 use CoffeePOS\Application\Contracts\TableProviderInterface;
 use CoffeePOS\Application\Customer\CustomerService;
@@ -49,6 +50,8 @@ final class CartSessionService implements CartReconstructorInterface
 
     private ?PricingGatewayInterface $pricingGateway;
 
+    private ?MembershipCouponProviderInterface $membershipCouponProvider;
+
     public function __construct(
         CartSessionStoreInterface $sessionStore,
         CartService $cartService,
@@ -59,7 +62,8 @@ final class CartSessionService implements CartReconstructorInterface
         ?CustomerService $customerService = null,
         ?TableProviderInterface $tableProvider = null,
         bool $requireDineInTable = true,
-        ?PricingGatewayInterface $pricingGateway = null
+        ?PricingGatewayInterface $pricingGateway = null,
+        ?MembershipCouponProviderInterface $membershipCouponProvider = null
     ) {
         $this->sessionStore = $sessionStore;
         $this->cartService = $cartService;
@@ -71,6 +75,7 @@ final class CartSessionService implements CartReconstructorInterface
         $this->tableProvider = $tableProvider;
         $this->requireDineInTable = $requireDineInTable;
         $this->pricingGateway = $pricingGateway;
+        $this->membershipCouponProvider = $membershipCouponProvider;
     }
 
     public function createSession(string $currency): CartView
@@ -333,6 +338,9 @@ final class CartSessionService implements CartReconstructorInterface
 
         $cart = $this->loadForMutation($posSessionId, $expectedRevision);
         $customer = $this->customerService->findById($customerId)->toArray();
+        if ($cart->customerContext()->customerId() !== $customerId) {
+            $this->cartService->setPaymentContext($cart, PaymentContext::none());
+        }
         $this->cartService->setCustomerContext($cart, CustomerContext::member(
             (int) $customer['customer_id'],
             (string) $customer['phone'],
@@ -347,6 +355,7 @@ final class CartSessionService implements CartReconstructorInterface
     {
         $cart = $this->loadForMutation($posSessionId, $expectedRevision);
         $this->cartService->setCustomerContext($cart, CustomerContext::guest());
+        $this->cartService->setPaymentContext($cart, PaymentContext::none());
 
         return $this->persist($cart, $expectedRevision);
     }
@@ -450,6 +459,8 @@ final class CartSessionService implements CartReconstructorInterface
 
     private function persist(Cart $cart, int $expectedRevision): CartView
     {
+        $this->refreshCoupon($cart);
+
         try {
             return $this->project($this->sessionStore->save($cart, $expectedRevision));
         } catch (Phase01Exception $exception) {
@@ -469,6 +480,55 @@ final class CartSessionService implements CartReconstructorInterface
                 $exception->getMessage(),
                 $context
             );
+        }
+    }
+
+    private function refreshCoupon(Cart $cart): void
+    {
+        if (! $cart->hasItems()) {
+            if ($cart->paymentContext()->hasCoupon()) {
+                $this->cartService->setPaymentContext($cart, PaymentContext::none());
+            }
+            return;
+        }
+
+        if ($this->pricingGateway === null) {
+            return;
+        }
+
+        $couponCode = trim((string) $cart->paymentContext()->couponCode());
+        if ($couponCode !== '') {
+            try {
+                $pricing = $this->pricingGateway->calculate($cart, $couponCode);
+                $this->cartService->setPaymentContext($cart, PaymentContext::withCoupon(
+                    strtoupper($couponCode),
+                    (int) ($pricing['discount_minor'] ?? 0)
+                ));
+                return;
+            } catch (Phase01Exception $exception) {
+                $this->cartService->setPaymentContext($cart, PaymentContext::none());
+            }
+        }
+
+        if ($this->membershipCouponProvider === null || $cart->customerContext()->isGuest()) {
+            return;
+        }
+
+        $preferred = $this->membershipCouponProvider->preferredCouponForMembership(
+            $cart->customerContext()->membership()
+        );
+        if ($preferred === '') {
+            return;
+        }
+
+        try {
+            $pricing = $this->pricingGateway->calculate($cart, $preferred);
+            $this->cartService->setPaymentContext($cart, PaymentContext::withCoupon(
+                strtoupper($preferred),
+                (int) ($pricing['discount_minor'] ?? 0)
+            ));
+        } catch (Phase01Exception $exception) {
+            // A tier coupon can still be ineligible because of WooCommerce rules.
         }
     }
 

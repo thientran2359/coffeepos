@@ -16,7 +16,7 @@ use CoffeePOS\Application\Product\ProductService;
 use CoffeePOS\Application\Product\VariationService;
 use CoffeePOS\Infrastructure\Cart\WpdbSuspendedCartRepository;
 use CoffeePOS\Infrastructure\Concurrency\MySqlLockProvider;
-use CoffeePOS\Infrastructure\Customer\NullMembershipProvider;
+use CoffeePOS\Integration\WooCommerce\WooCommerceMembershipProvider;
 use CoffeePOS\Infrastructure\Settings\Settings;
 use CoffeePOS\Infrastructure\Settings\SettingsProductConfigurationProvider;
 use CoffeePOS\Infrastructure\Settings\SettingsTableProvider;
@@ -48,9 +48,10 @@ final class HeldCartController
         $product = new ProductService(new WooCommerceProductGateway());
         $variation = new VariationService(new WooCommerceVariationGateway());
         $configuration = new ProductConfigurationService($product, $variation, new SettingsProductConfigurationProvider());
+        $membershipProvider = new WooCommerceMembershipProvider();
         $customer = new CustomerService(
             new WooCommerceCustomerGateway(),
-            new NullMembershipProvider(),
+            $membershipProvider,
             new MySqlLockProvider(),
             Settings::memberRequiredFields()
         );
@@ -66,7 +67,8 @@ final class HeldCartController
             $customer,
             $tables,
             (bool) Settings::get(Settings::OPTION_REQUIRE_DINE_IN_TABLE),
-            $pricing
+            $pricing,
+            $membershipProvider
         );
 
         $this->service = new SuspendedCartService(

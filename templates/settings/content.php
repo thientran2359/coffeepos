@@ -202,6 +202,20 @@ $diagnostics = is_array($context['settings_diagnostics'] ?? null) ? $context['se
                 <label class="coffeepos-settings__check"><input type="checkbox" name="<?php echo esc_attr(Settings::OPTION_MEMBER_REQUIRED_FIELDS); ?>[]" value="name" <?php checked(in_array('name', $requiredFields, true)); ?>><span><?php esc_html_e('Name', 'coffeepos'); ?></span></label>
                 <label class="coffeepos-settings__check"><input type="checkbox" name="<?php echo esc_attr(Settings::OPTION_MEMBER_REQUIRED_FIELDS); ?>[]" value="email" <?php checked(in_array('email', $requiredFields, true)); ?>><span><?php esc_html_e('Email', 'coffeepos'); ?></span></label>
             </fieldset>
+            <?php
+            $tierRows = (array) $settingValue(Settings::OPTION_MEMBERSHIP_TIERS);
+            $tierRows = array_merge($tierRows, array_fill(0, min(2, 30 - count($tierRows)), ['code' => '', 'label' => '', 'minimum' => '', 'coupon' => '']));
+            ?>
+            <div class="coffeepos-settings__card-heading coffeepos-settings__subheading"><div><h3><?php esc_html_e('Membership tiers', 'coffeepos'); ?></h3><p><?php esc_html_e('Only paid CoffeePOS orders count, after refunds. Empty rows are ignored.', 'coffeepos'); ?></p></div></div>
+            <div class="coffeepos-settings__tier-list">
+                <?php foreach ($tierRows as $index => $tierRow) : ?>
+                    <fieldset class="coffeepos-settings__tier-row">
+                        <?php foreach (['code' => __('Tier code', 'coffeepos'), 'label' => __('Tier name', 'coffeepos'), 'minimum' => __('Minimum spend', 'coffeepos'), 'coupon' => __('Coupon', 'coffeepos')] as $field => $fieldLabel) : ?>
+                            <label class="coffeepos-settings__field"><span><?php echo esc_html($fieldLabel); ?></span><input type="text" name="<?php echo esc_attr(Settings::OPTION_MEMBERSHIP_TIERS . '[' . $index . '][' . $field . ']'); ?>" value="<?php echo esc_attr((string) ($tierRow[$field] ?? '')); ?>"></label>
+                        <?php endforeach; ?>
+                    </fieldset>
+                <?php endforeach; ?>
+            </div>
         </section>
 
         <details class="coffeepos-settings__card coffeepos-settings__advanced">

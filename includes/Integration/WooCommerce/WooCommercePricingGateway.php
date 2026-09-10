@@ -13,6 +13,11 @@ final class WooCommercePricingGateway implements PricingGatewayInterface
 {
     public function calculate(Cart $cart, ?string $couponCode = null): array
     {
+        if (trim((string) $couponCode) !== '' && ! (new WooCommerceMembershipProvider())->couponAllowed(
+            (string) $couponCode, (int) $cart->customerContext()->customerId()
+        )) {
+            throw Phase01Exception::withCode(Phase01ErrorCodes::COUPON_NOT_APPLICABLE, 'Member tier does not qualify for this coupon.');
+        }
         if (! class_exists('WC_Cart') || ! function_exists('wc_get_product')) {
             throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_CONFIGURATION, 'WooCommerce cart pricing is unavailable.');
         }

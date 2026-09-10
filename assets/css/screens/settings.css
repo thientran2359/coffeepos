@@ -341,6 +341,27 @@
     min-width: 180px;
 }
 
+.coffeepos-settings__subheading {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #e8e1d6;
+}
+
+.coffeepos-settings__tier-list {
+    display: grid;
+    gap: 10px;
+}
+
+.coffeepos-settings__tier-row {
+    display: grid;
+    grid-template-columns: .8fr 1.2fr 1fr 1fr;
+    gap: 10px;
+    margin: 0;
+    padding: 12px;
+    border: 1px solid #ded7ca;
+    border-radius: 10px;
+}
+
 @media (max-width: 820px) {
     .coffeepos-settings {
         padding: 14px;
@@ -352,6 +373,10 @@
     }
 
     .coffeepos-settings__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .coffeepos-settings__tier-row {
         grid-template-columns: 1fr;
     }
 

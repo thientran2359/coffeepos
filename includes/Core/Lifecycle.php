@@ -72,6 +72,7 @@ final class Lifecycle
         }
 
         delete_option(Migrator::OPTION_DB_VERSION);
+        delete_metadata('user', 0, '_coffeepos_tier_override', '', true);
         delete_option('coffeepos_installed_version');
         delete_option('coffeepos_rewrite_version');
     }

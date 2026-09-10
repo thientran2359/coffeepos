@@ -90,6 +90,7 @@ final class Bootstrap
         add_action('init', [$this->migrator, 'maybeMigrate'], 6);
 
         $this->routeRegistrar->register();
+        add_filter('woocommerce_coupon_is_valid', [\CoffeePOS\Integration\WooCommerce\WooCommerceMembershipProvider::class, 'validateWooCoupon'], 20, 3);
         $this->router->register();
         $this->assetLoader->register();
     }

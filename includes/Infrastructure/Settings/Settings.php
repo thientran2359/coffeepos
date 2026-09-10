@@ -53,6 +53,7 @@ final class Settings
     public const OPTION_RECEIPT_AUTO_PRINT = 'coffeepos_receipt_auto_print';
     public const OPTION_RECEIPT_FOOTER = 'coffeepos_receipt_footer';
     public const OPTION_MEMBERSHIP_ENABLED = 'coffeepos_membership_enabled';
+    public const OPTION_MEMBERSHIP_TIERS = 'coffeepos_membership_tiers';
     public const OPTION_MEMBER_CREATE_ENABLED = 'coffeepos_member_create_enabled';
     public const OPTION_MEMBER_REQUIRED_FIELDS = 'coffeepos_member_required_fields';
     public const OPTION_KDS_SOUND_ENABLED = 'coffeepos_kds_sound_enabled';
@@ -99,6 +100,11 @@ final class Settings
 
         if ($ids === [] || $ids === ['less_ice', 'no_ice', 'less_sweet', 'no_sugar', 'extra_milk', 'takeaway']) {
             update_option(self::OPTION_QUICK_NOTES, self::definitions()[self::OPTION_QUICK_NOTES]['default']);
+        }
+
+        $membershipTiers = get_option(self::OPTION_MEMBERSHIP_TIERS, []);
+        if (is_array($membershipTiers) && $membershipTiers === []) {
+            update_option(self::OPTION_MEMBERSHIP_TIERS, MembershipTierConfiguration::defaultTiers());
         }
     }
 
@@ -514,6 +520,10 @@ final class Settings
                 'type' => 'boolean', 'default' => true,
                 'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
             ],
+            self::OPTION_MEMBERSHIP_TIERS => [
+                'type' => 'array', 'default' => MembershipTierConfiguration::defaultTiers(),
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
             self::OPTION_MEMBER_CREATE_ENABLED => [
                 'type' => 'boolean', 'default' => true,
                 'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
@@ -542,6 +552,10 @@ final class Settings
 
         if (! current_user_can($capability)) {
             return get_option($optionName, $definition['default']);
+        }
+
+        if ($optionName === self::OPTION_MEMBERSHIP_TIERS) {
+            return MembershipTierConfiguration::validateTiers($value);
         }
 
         if (in_array($optionName, [

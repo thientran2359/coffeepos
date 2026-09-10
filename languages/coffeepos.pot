@@ -2529,3 +2529,196 @@ msgstr ""
 #: assets/js/components/held-carts.js
 msgid "This suspended cart will be permanently removed."
 msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Invalid membership tiers."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Use unique tier codes and thresholds, a name, and a non-negative amount."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "A tier coupon does not exist in WooCommerce."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Membership tiers saved."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Find one member by phone before changing their tier."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Enter a reason for the tier change."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Member tier loaded."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Member tier saved."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Membership update failed."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Membership tiers"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Only paid CoffeePOS orders count, after refunds. Enter thresholds in store currency. Empty rows are ignored; clear a row to remove it."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Tier code"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Tier name"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Minimum spend"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Save membership tiers"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Change member tier"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Find member"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "CoffeePOS net spend"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Member tier"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Automatic tier"
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "A manual tier stays fixed until Automatic tier is selected."
+msgstr ""
+
+#: templates/settings/membership.php includes/POS/MembershipSettings.php includes/Infrastructure/Settings/MembershipTierConfiguration.php
+msgid "Save member tier"
+msgstr ""
+
+#: includes/POS/Router.php templates/members/index.php templates/members/content.php
+msgid "Members"
+msgstr ""
+
+#: templates/members/content.php
+msgid "Customer management"
+msgstr ""
+
+#: includes/POS/MembershipScreen.php
+msgid "You are not allowed to manage CoffeePOS members."
+msgstr ""
+
+#: includes/POS/MembershipScreen.php
+msgid "The membership form expired. Please try again."
+msgstr ""
+
+#: templates/members/membership.php
+msgid "Only paid CoffeePOS orders count, after refunds. Empty rows are ignored."
+msgstr ""
+
+#: templates/members/membership.php
+msgid "Find a member by phone to review or override their tier."
+msgstr ""
+
+#: templates/members/membership.php
+msgid "No tier"
+msgstr ""
+
+#: templates/members/directory.php
+msgid "Member directory"
+msgstr ""
+
+#: templates/members/directory.php
+#, php-format
+msgid "Total: %d members"
+msgstr ""
+
+#: templates/members/directory.php
+msgid "Search members"
+msgstr ""
+
+#: templates/members/directory.php
+msgid "Search name, email or phone"
+msgstr ""
+
+#: templates/members/directory.php
+msgid "No members found."
+msgstr ""
+
+#: templates/members/directory.php
+msgid "Member pages"
+msgstr ""
+
+#: templates/members/directory.php
+msgid "Close member details"
+msgstr ""
+
+#: templates/members/directory.php
+msgid "Reason when changing tier"
+msgstr ""
+
+#: templates/members/directory.php
+msgid "Update member"
+msgstr ""
+
+#: templates/members/directory.php
+msgid "CoffeePOS order history"
+msgstr ""
+
+#: templates/members/directory.php
+msgid "This member has no CoffeePOS orders."
+msgstr ""
+
+#: includes/POS/MembershipScreen.php
+msgid "Invalid membership action."
+msgstr ""
+
+#: includes/POS/MembershipScreen.php
+msgid "Member updated."
+msgstr ""
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "Member was not found."
+msgstr ""
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "Member name and phone are required."
+msgstr ""
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "Enter a valid member email."
+msgstr ""
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "This phone number belongs to another member."
+msgstr ""
+
+#: includes/Integration/WooCommerce/WooCommerceMemberDirectory.php
+msgid "This email belongs to another account."
+msgstr ""
+
+#: templates/members/directory.php
+msgid "Quick edit"
+msgstr ""

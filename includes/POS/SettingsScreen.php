@@ -95,6 +95,7 @@ final class SettingsScreen
         Settings::update(Settings::OPTION_RECEIPT_AUTO_PRINT, ! empty($input[Settings::OPTION_RECEIPT_AUTO_PRINT]));
         Settings::update(Settings::OPTION_RECEIPT_FOOTER, (string) ($input[Settings::OPTION_RECEIPT_FOOTER] ?? ''));
         Settings::update(Settings::OPTION_MEMBERSHIP_ENABLED, ! empty($input[Settings::OPTION_MEMBERSHIP_ENABLED]));
+        Settings::update(Settings::OPTION_MEMBERSHIP_TIERS, $input[Settings::OPTION_MEMBERSHIP_TIERS] ?? []);
         Settings::update(Settings::OPTION_MEMBER_CREATE_ENABLED, ! empty($input[Settings::OPTION_MEMBER_CREATE_ENABLED]));
         Settings::update(Settings::OPTION_MEMBER_REQUIRED_FIELDS, is_array($input[Settings::OPTION_MEMBER_REQUIRED_FIELDS] ?? null) ? $input[Settings::OPTION_MEMBER_REQUIRED_FIELDS] : ['phone']);
         Settings::update(Settings::OPTION_KDS_SOUND_ENABLED, ! empty($input[Settings::OPTION_KDS_SOUND_ENABLED]));
@@ -151,6 +152,13 @@ final class SettingsScreen
 
     private function validateSettings(array $input): string
     {
+        if (isset($input[Settings::OPTION_MEMBERSHIP_TIERS])) {
+            try {
+                MembershipSettings::validateTiers($input[Settings::OPTION_MEMBERSHIP_TIERS]);
+            } catch (\Throwable $error) {
+                return $error->getMessage();
+            }
+        }
         if (trim((string) ($input[Settings::OPTION_STORE_NAME] ?? '')) === '') {
             return __('POS store name is required.', 'coffeepos');
         }

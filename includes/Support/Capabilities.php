@@ -77,6 +77,7 @@ final class Capabilities
         'shifts' => self::MANAGE_OWN_SHIFT,
         'order-history' => self::VIEW_ORDER_HISTORY,
         'reports' => self::VIEW_REPORTS,
+        'members' => self::MANAGE_SETTINGS,
         'settings' => self::MANAGE_SETTINGS,
     ];
 

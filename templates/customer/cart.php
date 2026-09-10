@@ -4,13 +4,14 @@ if (! defined('ABSPATH')) { exit; }
 ?>
 <aside class="coffeepos-customer-cart" data-component="customer-cart" data-state="idle">
     <header>
-        <span class="coffeepos-eyebrow"><?php esc_html_e('Your order', 'coffeepos'); ?></span>
+        <span class="coffeepos-eyebrow" data-field="customer-service"></span>
         <h2 data-field="customer-state-title"><?php esc_html_e('Ready when you are', 'coffeepos'); ?></h2>
-        <p data-field="customer-service"></p>
         <p class="coffeepos-customer-identity" data-field="customer-mode"><?php esc_html_e('Guest', 'coffeepos'); ?></p>
-        <p data-field="customer-name"></p>
-        <p data-field="customer-phone-masked"></p>
-        <p data-field="customer-membership"></p>
+        <div class="coffeepos-customer-member" data-component="customer-member">
+            <strong data-field="customer-name"></strong>
+            <span class="coffeepos-customer-membership-badge" data-field="customer-membership" hidden></span>
+        </div>
+        <p class="coffeepos-customer-phone" data-field="customer-phone-masked"></p>
     </header>
     <div class="coffeepos-customer-cart__items" data-component="customer-cart-items"></div>
     <p data-component="customer-cart-empty"><?php esc_html_e('Your selected items will appear here.', 'coffeepos'); ?></p>

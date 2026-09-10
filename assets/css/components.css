@@ -183,7 +183,7 @@
 
 body.coffeepos:not(.coffeepos-screen-login):not(.coffeepos-screen-customer) #coffeepos-app {
     display: grid;
-    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-columns: 240px minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
 }
 

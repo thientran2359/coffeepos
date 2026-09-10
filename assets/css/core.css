@@ -1,4 +1,12 @@
 /* CoffeePOS foundations: design tokens, document defaults, accessibility, and shared text treatments. */
+@font-face {
+    font-family: "Be Vietnam Pro";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../fonts/be-vietnam-pro/BeVietnamPro-Variable.ttf") format("truetype-variations");
+}
+
 :root {
     --coffeepos-bg: #eef1ed;
     --coffeepos-surface: #ffffff;
@@ -33,7 +41,7 @@ body.coffeepos {
     overflow: hidden;
     background: var(--coffeepos-bg);
     color: var(--coffeepos-text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-family: var(--coffeepos-font-family, "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
     line-height: 1.4;
 }
 
@@ -79,6 +87,7 @@ textarea:focus-visible,
     min-height: 620px;
     display: flex;
     flex-direction: column;
+    font-size: 1rem;
 }
 
 .coffeepos-eyebrow {

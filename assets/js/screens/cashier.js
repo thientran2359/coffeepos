@@ -250,6 +250,7 @@
             const customerName = root.querySelector('[data-component="customer-name"]');
             const customerPhone = root.querySelector('[data-component="customer-phone"]');
             const membership = root.querySelector('[data-component="customer-membership"]');
+            const openCustomer = root.querySelector('[data-action="open-customer"]');
             const removeCustomer = root.querySelector('[data-action="remove-customer"]');
             const tableLabel = root.querySelector('[data-component="selected-table-label"]');
             const membershipData = customer.membership;
@@ -260,6 +261,7 @@
             customerPhone.hidden = isGuest || customerPhone.textContent === '';
             membership.textContent = membershipData && String(membershipData.status_label || membershipData.tier_label || '');
             membership.hidden = membership.textContent === '';
+            openCustomer.hidden = !isGuest;
             removeCustomer.hidden = isGuest;
             orderType.setSelected(cart && cart.order_type || 'takeaway', false);
             tableLabel.textContent = cart && cart.table && cart.table.table_label

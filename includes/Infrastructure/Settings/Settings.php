@@ -31,6 +31,7 @@ final class Settings
     public const OPTION_ORDER_QUEUE_POLL_INTERVAL = 'coffeepos_order_queue_poll_interval_ms';
     public const OPTION_RECEIPT_PRINT_ORDER_NOTE = 'coffeepos_receipt_print_order_note';
     public const OPTION_BRAND_COLOR = 'coffeepos_brand_color';
+    public const OPTION_FONT_FAMILY = 'coffeepos_font_family';
     public const OPTION_NAV_DEFAULT_COLLAPSED = 'coffeepos_nav_default_collapsed';
     public const OPTION_INTERFACE_DENSITY = 'coffeepos_interface_density';
     public const OPTION_SHOW_PRODUCT_IMAGES = 'coffeepos_show_product_images';
@@ -167,6 +168,37 @@ final class Settings
         }
 
         return sprintf('#%02x%02x%02x', $channels[0], $channels[1], $channels[2]);
+    }
+
+    public static function fontChoices(): array
+    {
+        return [
+            'be-vietnam-pro' => ['label' => 'Be Vietnam Pro (' . __('Bundled', 'coffeepos') . ')', 'family' => 'Be Vietnam Pro', 'google' => ''],
+            'google-roboto' => ['label' => 'Roboto — Google Fonts', 'family' => 'Roboto', 'google' => 'Roboto'],
+            'google-open-sans' => ['label' => 'Open Sans — Google Fonts', 'family' => 'Open Sans', 'google' => 'Open+Sans'],
+            'google-noto-sans' => ['label' => 'Noto Sans — Google Fonts', 'family' => 'Noto Sans', 'google' => 'Noto+Sans'],
+            'google-montserrat' => ['label' => 'Montserrat — Google Fonts', 'family' => 'Montserrat', 'google' => 'Montserrat'],
+            'google-inter' => ['label' => 'Inter — Google Fonts', 'family' => 'Inter', 'google' => 'Inter'],
+            'google-nunito-sans' => ['label' => 'Nunito Sans — Google Fonts', 'family' => 'Nunito Sans', 'google' => 'Nunito+Sans'],
+        ];
+    }
+
+    public static function getFontFamilyCss(): string
+    {
+        $choices = self::fontChoices();
+        $choice = $choices[(string) self::get(self::OPTION_FONT_FAMILY)] ?? $choices['be-vietnam-pro'];
+
+        return sprintf('"%s", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', $choice['family']);
+    }
+
+    public static function getGoogleFontStylesheetUrl(): string
+    {
+        $choices = self::fontChoices();
+        $choice = $choices[(string) self::get(self::OPTION_FONT_FAMILY)] ?? $choices['be-vietnam-pro'];
+
+        return $choice['google'] === ''
+            ? ''
+            : 'https://fonts.googleapis.com/css2?family=' . $choice['google'] . ':wght@400;500;600;700;800&display=swap';
     }
 
     public static function isStaffNavCollapsed(): bool
@@ -464,6 +496,10 @@ final class Settings
                 'type' => 'string', 'default' => '#12715b',
                 'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
             ],
+            self::OPTION_FONT_FAMILY => [
+                'type' => 'string', 'default' => 'be-vietnam-pro',
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
             self::OPTION_NAV_DEFAULT_COLLAPSED => [
                 'type' => 'boolean', 'default' => true,
                 'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
@@ -579,6 +615,10 @@ final class Settings
             $color = strtolower(trim((string) $value));
 
             return preg_match('/^#[0-9a-f]{6}$/', $color) === 1 ? $color : $definition['default'];
+        }
+
+        if ($optionName === self::OPTION_FONT_FAMILY) {
+            return isset(self::fontChoices()[(string) $value]) ? (string) $value : $definition['default'];
         }
 
         if ($optionName === self::OPTION_INTERFACE_DENSITY) {

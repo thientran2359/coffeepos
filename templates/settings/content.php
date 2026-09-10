@@ -78,6 +78,15 @@ $diagnostics = is_array($context['settings_diagnostics'] ?? null) ? $context['se
                     <input class="coffeepos-settings__color" type="color" name="<?php echo esc_attr(Settings::OPTION_BRAND_COLOR); ?>" value="<?php echo esc_attr((string) $settingValue(Settings::OPTION_BRAND_COLOR)); ?>">
                 </label>
                 <label class="coffeepos-settings__field">
+                    <span><?php esc_html_e('Interface font', 'coffeepos'); ?></span>
+                    <select name="<?php echo esc_attr(Settings::OPTION_FONT_FAMILY); ?>">
+                        <?php foreach (Settings::fontChoices() as $fontValue => $fontChoice) : ?>
+                            <option value="<?php echo esc_attr($fontValue); ?>" <?php selected((string) $settingValue(Settings::OPTION_FONT_FAMILY), $fontValue); ?>><?php echo esc_html($fontChoice['label']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small><?php esc_html_e('The bundled default works offline. Google Fonts choices require an internet connection on each POS display.', 'coffeepos'); ?></small>
+                </label>
+                <label class="coffeepos-settings__field">
                     <span><?php esc_html_e('Interface density', 'coffeepos'); ?></span>
                     <select name="<?php echo esc_attr(Settings::OPTION_INTERFACE_DENSITY); ?>">
                         <option value="normal" <?php selected((string) $settingValue(Settings::OPTION_INTERFACE_DENSITY), 'normal'); ?>><?php esc_html_e('Normal', 'coffeepos'); ?></option>

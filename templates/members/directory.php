@@ -42,7 +42,7 @@ $listUrl = \CoffeePOS\POS\Router::routeUrl('members');
 <?php else : $membership = (array) ($detail['membership'] ?? []); ?>
 <div class="coffeepos-members__detail-page" data-member-quick-edit="<?php echo isset($_GET['quick_edit']) ? '1' : '0'; ?>">
     <main class="coffeepos-members__card coffeepos-members__orders">
-        <div class="coffeepos-members__card-heading"><div><h2><?php esc_html_e('CoffeePOS order history', 'coffeepos'); ?></h2><p><?php echo esc_html((string) $detail['name']); ?></p></div><a class="coffeepos-btn" href="<?php echo esc_url($listUrl); ?>"><?php esc_html_e('Members', 'coffeepos'); ?></a></div>
+        <div class="coffeepos-members__card-heading"><div><h2><?php esc_html_e('Order history', 'coffeepos'); ?></h2><p><?php echo esc_html((string) $detail['name']); ?></p></div><a class="coffeepos-btn" href="<?php echo esc_url($listUrl); ?>"><?php esc_html_e('Members', 'coffeepos'); ?></a></div>
         <?php if ($detail['orders'] === []) : ?><p class="coffeepos-members__empty"><?php esc_html_e('This member has no CoffeePOS orders.', 'coffeepos'); ?></p><?php else : ?>
         <div class="coffeepos-members__order-list">
             <?php foreach ($detail['orders'] as $order) : ?><button type="button" class="coffeepos-members__order" data-action="view-member-order" data-order-id="<?php echo esc_attr((string) $order['id']); ?>"><span><strong><?php echo esc_html(sprintf(__('Order #%s', 'coffeepos'), $order['number'])); ?></strong><small><?php echo esc_html($order['date']); ?></small></span><span><span class="coffeepos-status-badge"><?php echo esc_html($order['status']); ?></span><b><?php echo esc_html($order['total']); ?></b></span></button><?php endforeach; ?>

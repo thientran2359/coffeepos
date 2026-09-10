@@ -1,0 +1,117 @@
+/* CoffeePOS scoped element baseline. Keeps theme/plugin CSS outside the POS contract. */
+body.coffeepos #coffeepos-app,
+body.coffeepos #coffeepos-app *,
+body.coffeepos #coffeepos-app *::before,
+body.coffeepos #coffeepos-app *::after {
+    box-sizing: border-box;
+}
+
+body.coffeepos :where(h1, h2, h3, h4, h5, h6) {
+    margin: 0;
+    padding: 0;
+    color: inherit;
+    font-family: inherit;
+    font-style: normal;
+    line-height: 1.2;
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+body.coffeepos :where(h1) { font-size: 2rem; font-weight: 700; }
+body.coffeepos :where(h2) { font-size: 1.5rem; font-weight: 700; }
+body.coffeepos :where(h3) { font-size: 1.17rem; font-weight: 700; }
+body.coffeepos :where(h4, h5, h6) { font-size: 1rem; font-weight: 700; }
+
+body.coffeepos :where(p, figure, blockquote, dl, dd) {
+    margin: 0;
+}
+
+body.coffeepos :where(ul, ol) {
+    margin: 0;
+    padding: 0;
+}
+
+body.coffeepos :where(a) {
+    color: inherit;
+    font-family: inherit;
+}
+
+body.coffeepos :where(img, svg) {
+    max-width: 100%;
+    height: auto;
+}
+
+body.coffeepos :where(input, select, textarea) {
+    margin: 0;
+    color: var(--coffeepos-text);
+    font: inherit;
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+body.coffeepos :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]), select, textarea) {
+    min-width: 0;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid var(--coffeepos-border-strong);
+    border-radius: 8px;
+    color: var(--coffeepos-text);
+    background: var(--coffeepos-surface);
+    box-shadow: none;
+}
+
+body.coffeepos :where(textarea) {
+    resize: vertical;
+}
+
+body.coffeepos :where(input, textarea)::placeholder {
+    color: var(--coffeepos-text-muted);
+    opacity: .78;
+}
+
+body.coffeepos :where(input[type="checkbox"], input[type="radio"]) {
+    accent-color: var(--coffeepos-primary);
+}
+
+body.coffeepos .button {
+    min-height: 40px;
+    padding: 7px 12px;
+    border: 1px solid var(--coffeepos-border-strong);
+    border-radius: var(--coffeepos-radius);
+    color: var(--coffeepos-text);
+    background: var(--coffeepos-surface);
+    box-shadow: none;
+    cursor: pointer;
+}
+
+body.coffeepos :where(button, input, select, textarea):disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+body.coffeepos :where(label, legend) {
+    color: inherit;
+    font-family: inherit;
+}
+
+body.coffeepos :where(fieldset) {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+body.coffeepos :where(table) {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+    color: inherit;
+    font: inherit;
+}
+
+body.coffeepos :where(th, td) {
+    padding: 0;
+    border: 0;
+    text-align: left;
+    vertical-align: top;
+}

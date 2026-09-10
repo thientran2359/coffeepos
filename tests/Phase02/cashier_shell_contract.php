@@ -232,12 +232,17 @@ $run('Cart shell exposes all future action hooks without enabling checkout', sta
         'data-action="remove-cart-item"',
         'data-component="order-type"',
         'data-component="customer-summary"',
+        'data-action="open-customer"',
+        'data-action="remove-customer"',
         'data-component="coupon"',
         'data-component="cart-summary"',
         'data-component="checkout"',
     ] as $contract) {
         $assertContains($contract, $files['cashierCart'], 'Missing cart shell contract');
     }
+
+    $assertContains('coffeepos-customer-remove', $files['cashierCart'], 'Selected customer must expose the compact remove icon');
+    $assertContains("esc_attr_e('Remove customer from cart'", $files['cashierCart'], 'Customer remove icon must describe its cart-only action');
 
     $assert((bool) preg_match('/data-action="checkout"[^>]*disabled/', $files['cashierCart']), 'Checkout must be disabled by default');
 });

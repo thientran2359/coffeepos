@@ -148,13 +148,20 @@ final class AssetLoader
 
     private function enqueuePosStyles(?string $screen, string $version): void
     {
-        $this->registerStyle('coffeepos-core', 'core.css', [], $version);
+        $fontDependencies = [];
+        $googleFontUrl = Settings::getGoogleFontStylesheetUrl();
+        if ($googleFontUrl !== '') {
+            wp_register_style('coffeepos-google-font', $googleFontUrl, [], null);
+            $fontDependencies[] = 'coffeepos-google-font';
+        }
+        $this->registerStyle('coffeepos-core', 'core.css', $fontDependencies, $version);
+        $this->registerStyle('coffeepos-base', 'base.css', ['coffeepos-core'], $version);
 
         if ($screen === 'customer') {
             $this->registerStyle(
                 'coffeepos-screen-customer',
                 'screens/customer-display.css',
-                ['coffeepos-core'],
+                ['coffeepos-base'],
                 $version
             );
             wp_enqueue_style('coffeepos-screen-customer');
@@ -163,7 +170,7 @@ final class AssetLoader
             return;
         }
 
-        $this->registerStyle('coffeepos-components', 'components.css', ['coffeepos-core'], $version);
+        $this->registerStyle('coffeepos-components', 'components.css', ['coffeepos-base'], $version);
 
         $screenFiles = [
             'entry' => 'screens/login.css',
@@ -212,9 +219,10 @@ final class AssetLoader
     private function enqueueAppearanceStyles(string $handle): void
     {
         $appearanceCss = sprintf(
-            ':root{--coffeepos-primary:%s;--coffeepos-primary-dark:%s;}',
+            ':root{--coffeepos-primary:%s;--coffeepos-primary-dark:%s;--coffeepos-font-family:%s;}',
             Settings::getBrandColor(),
-            Settings::getBrandDarkColor()
+            Settings::getBrandDarkColor(),
+            Settings::getFontFamilyCss()
         );
         $customCss = Settings::getCustomCss();
 

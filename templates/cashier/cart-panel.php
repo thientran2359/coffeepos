@@ -47,8 +47,8 @@ $membershipEnabled = (bool) \CoffeePOS\Infrastructure\Settings\Settings::get(\Co
         <button type="button" class="coffeepos-icon-button" data-action="open-customer" title="<?php esc_attr_e('Find customer', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Find customer', 'coffeepos'); ?>">
             <span aria-hidden="true">+</span>
         </button>
-        <button type="button" class="coffeepos-link-button" data-action="remove-customer" hidden>
-            <?php esc_html_e('Use guest', 'coffeepos'); ?>
+        <button type="button" class="coffeepos-icon-button coffeepos-customer-remove" data-action="remove-customer" title="<?php esc_attr_e('Remove customer from cart', 'coffeepos'); ?>" aria-label="<?php esc_attr_e('Remove customer from cart', 'coffeepos'); ?>" hidden>
+            <span aria-hidden="true">&#215;</span>
         </button>
     </section>
 

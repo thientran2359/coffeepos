@@ -47,17 +47,14 @@ if (! defined('ABSPATH')) {
                 <div data-component="modifier-selector"></div>
             </section>
 
-            <section class="coffeepos-product-config-section" data-component="quick-notes-section" hidden>
-                <h4><?php esc_html_e('Quick notes', 'coffeepos'); ?></h4>
-                <p class="coffeepos-product-config-section__hint"><?php esc_html_e('Select one or more. Selected labels are added to the item note.', 'coffeepos'); ?></p>
-                <div class="coffeepos-option-list" data-component="quick-notes"></div>
-            </section>
-
-            <label class="coffeepos-field">
-                <span><?php esc_html_e('Item note', 'coffeepos'); ?></span>
+            <section class="coffeepos-field coffeepos-product-note-field">
+                <label for="coffeepos-product-custom-note"><?php esc_html_e('Item note', 'coffeepos'); ?></label>
                 <small><?php esc_html_e('Quick-note labels appear on separate lines. Add any other preparation instructions here.', 'coffeepos'); ?></small>
-                <textarea data-component="product-custom-note" rows="3" maxlength="500"></textarea>
-            </label>
+                <div class="coffeepos-product-note-field__quick-notes" data-component="quick-notes-section" hidden>
+                    <div class="coffeepos-option-list" data-component="quick-notes"></div>
+                </div>
+                <textarea id="coffeepos-product-custom-note" data-component="product-custom-note" rows="3" maxlength="500"></textarea>
+            </section>
 
             <div class="coffeepos-quantity-control" data-component="quantity-control">
                 <span><?php esc_html_e('Quantity', 'coffeepos'); ?></span>

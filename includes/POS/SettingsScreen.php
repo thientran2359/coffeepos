@@ -72,6 +72,7 @@ final class SettingsScreen
         Settings::update(Settings::OPTION_QUICK_NOTES, $quickNotes);
         Settings::update(Settings::OPTION_RECEIPT_PRINT_ORDER_NOTE, ! empty($input[Settings::OPTION_RECEIPT_PRINT_ORDER_NOTE]));
         Settings::update(Settings::OPTION_BRAND_COLOR, (string) ($input[Settings::OPTION_BRAND_COLOR] ?? ''));
+        Settings::update(Settings::OPTION_FONT_FAMILY, (string) ($input[Settings::OPTION_FONT_FAMILY] ?? 'be-vietnam-pro'));
         Settings::update(Settings::OPTION_NAV_DEFAULT_COLLAPSED, ! empty($input[Settings::OPTION_NAV_DEFAULT_COLLAPSED]));
         Settings::update(Settings::OPTION_INTERFACE_DENSITY, (string) ($input[Settings::OPTION_INTERFACE_DENSITY] ?? 'normal'));
         Settings::update(Settings::OPTION_SHOW_PRODUCT_IMAGES, ! empty($input[Settings::OPTION_SHOW_PRODUCT_IMAGES]));

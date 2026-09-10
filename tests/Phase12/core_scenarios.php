@@ -75,17 +75,23 @@ $assert(strpos($settingsUi, '[product_ids]') !== false && strpos($settings, 'san
 $assert(strpos($settingsUi, 'service_tables_text') !== false && strpos($settingsUi, 'coffeepos_save_settings') !== false && strpos($settings, 'serviceTablesFromText') !== false, 'TC-15 Dine-in table textarea/settings save contract is incomplete.');
 $assert(strpos($settingsUi, 'coffeepos-quick-note-row-template') !== false && strpos($settingsUi, 'add-quick-note') !== false && strpos($settingsUi, 'remove-quick-note') !== false && strpos($settingsUi, 'createSettingsController') !== false && strpos($settingsUi, 'validateQuickNotes') !== false && strpos($settingsUi, 'coffeepos-screen-settings') !== false, 'TC-15 dynamic quick-note settings management is incomplete.');
 $reducedSettings = $settingsUi . $source('includes/REST/CartController.php') . $source('includes/REST/CheckoutController.php') . $source('includes/Application/Checkout/CheckoutService.php') . $source('includes/Integration/WooCommerce/WooCommerceOrderGateway.php');
-foreach (['OPTION_STORE_NAME', 'OPTION_DEFAULT_ORDER_TYPE', 'OPTION_CASH_ENABLED', 'OPTION_RECEIPT_PAPER_WIDTH', 'OPTION_MEMBERSHIP_ENABLED', 'OPTION_KDS_SOUND_ENABLED'] as $optionConstant) {
+foreach (['OPTION_STORE_NAME', 'OPTION_FONT_FAMILY', 'OPTION_DEFAULT_ORDER_TYPE', 'OPTION_CASH_ENABLED', 'OPTION_RECEIPT_PAPER_WIDTH', 'OPTION_MEMBERSHIP_ENABLED', 'OPTION_KDS_SOUND_ENABLED'] as $optionConstant) {
     $assert(strpos($reducedSettings, $optionConstant) !== false, 'TC-15 reduced Settings group is not wired: ' . $optionConstant);
 }
 $assert(strpos($reducedSettings, 'enabledPaymentMethods') !== false && strpos($reducedSettings, 'Payment method is disabled') !== false, 'TC-15 disabled payment methods are not enforced server-side.');
 $assert(strpos($reducedSettings, 'settings_action') !== false && strpos($reducedSettings, 'schema_version') !== false && strpos($reducedSettings, 'settings_diagnostics') !== false, 'TC-15 Advanced export/import/diagnostics contract is incomplete.');
 $appearance = $settingsUi . $source('templates/components/screen-shell.php') . $source('templates/components/staff-navigation.php') . $source('assets/css/components.css') . $source('assets/css/screens/cashier.css');
 $assert(strpos($appearance, 'OPTION_BRAND_COLOR') !== false && strpos($appearance, 'OPTION_CUSTOM_CSS') !== false && strpos($appearance, 'enqueueAppearanceStyles') !== false && strpos($appearance, 'is-density-') !== false && strpos($appearance, 'is-product-images-hidden') !== false, 'TC-15 CoffeePOS Appearance settings are not applied by the POS shell.');
+$baseCss = $source('assets/css/base.css');
+$assert(strpos($settingsUi, "'coffeepos-base', 'base.css', ['coffeepos-core']") !== false && strpos($baseCss, 'body.coffeepos #coffeepos-app *') !== false && strpos($baseCss, ':where(button, input, select, textarea)') !== false, 'TC-15 scoped POS element baseline is missing or loaded in the wrong order.');
 $assert(strpos($settings, 'customCssHasUnsafeSyntax') !== false && strpos($settings, 'strlen($value) > 20000') !== false && strpos($appearance, 'maxlength="20000"') !== false, 'TC-15 Custom CSS safety and size boundaries are incomplete.');
 $assert(! \CoffeePOS\Infrastructure\Settings\Settings::customCssHasUnsafeSyntax('#coffeepos-app { --coffeepos-radius: 12px; }'), 'TC-15 safe scoped Custom CSS was rejected.');
 $assert(\CoffeePOS\Infrastructure\Settings\Settings::customCssHasUnsafeSyntax('@import "https://example.test/theme.css";'), 'TC-15 external Custom CSS import was accepted.');
 $assert(\CoffeePOS\Infrastructure\Settings\Settings::customCssHasUnsafeSyntax('.card { background: url(https://example.test/a.png); }'), 'TC-15 external Custom CSS URL was accepted.');
+$phase12Options[\CoffeePOS\Infrastructure\Settings\Settings::OPTION_FONT_FAMILY] = 'be-vietnam-pro';
+$assert(\CoffeePOS\Infrastructure\Settings\Settings::getGoogleFontStylesheetUrl() === '' && strpos(\CoffeePOS\Infrastructure\Settings\Settings::getFontFamilyCss(), 'Be Vietnam Pro') !== false, 'TC-15 bundled Be Vietnam Pro must be the offline default font.');
+$phase12Options[\CoffeePOS\Infrastructure\Settings\Settings::OPTION_FONT_FAMILY] = 'google-roboto';
+$assert(strpos(\CoffeePOS\Infrastructure\Settings\Settings::getGoogleFontStylesheetUrl(), 'fonts.googleapis.com/css2?family=Roboto') !== false, 'TC-15 allowlisted Google Font stylesheet URL is not generated.');
 $quickNoteValidator = new ReflectionMethod(\CoffeePOS\POS\SettingsScreen::class, 'validateQuickNotes');
 $quickNoteValidator->setAccessible(true);
 $settingsScreen = new \CoffeePOS\POS\SettingsScreen();
@@ -107,7 +113,10 @@ $cartUi = $source('templates/cashier/cart-panel.php') . $source('templates/cashi
 $assert(strpos($cartUi, 'data-component="cart-context-row"') !== false && strpos($cartUi, 'data-component="order-note-trigger"') !== false && strpos($cartUi, 'data-component="order-note-dialog"') !== false && strpos($cartUi, 'openOrderNote') !== false, 'TC-16 compact cart context/order-note dialog wiring is incomplete.');
 $assert(strpos($cartUi, 'coffeepos-table-badge') !== false && strpos($cartUi, 'data-action="open-table"') !== false && strpos($cartUi, 'data-component="selected-table-label"') !== false, 'TC-16 selected table badge must preserve the table-selection hooks.');
 $productModal = $source('templates/components/product-modal.php') . $source('assets/js/components/product-modal.js');
-$assert(strpos($productModal, 'toggle-quick-note') !== false && strpos($productModal, 'syncQuickNoteText') !== false && strpos($productModal, 'Selected labels are added to the item note') !== false, 'TC-16 quick-note chips do not mirror selected labels into the item note.');
+$quickNotesPosition = strpos($productModal, 'data-component="quick-notes-section"');
+$itemNotePosition = strpos($productModal, "esc_html_e('Item note'");
+$itemNoteInputPosition = strpos($productModal, 'data-component="product-custom-note"');
+$assert(strpos($productModal, 'toggle-quick-note') !== false && strpos($productModal, 'syncQuickNoteText') !== false && $quickNotesPosition !== false && $itemNotePosition !== false && $itemNotePosition < $quickNotesPosition && $quickNotesPosition < $itemNoteInputPosition && strpos($productModal, "esc_html_e('Quick notes'") === false, 'TC-16 quick-note chips must sit inside Item Note without a duplicate heading.');
 $orderGateway = $source('includes/Integration/WooCommerce/WooCommerceOrderGateway.php');
 $assert(strpos($orderGateway, "'_coffeepos_order_note'") !== false && strpos($orderGateway, 'quickNoteMetadata') !== false, 'TC-17 note order persistence is incomplete.');
 $receipt = $source('templates/receipt/receipt.php') . $source('assets/js/components/receipt-printer.js');

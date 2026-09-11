@@ -73,6 +73,10 @@ $sound = $source('assets/js/components/kds-sound.js');
 $templates = $source('templates/components/kds-templates.php') . $source('templates/components/order-queue-templates.php');
 $gatewaySource = $source('includes/Integration/WooCommerce/WooCommerceOperationalOrderGateway.php');
 $orderGatewaySource = $source('includes/Integration/WooCommerce/WooCommerceOrderGateway.php');
+$assetLoaderSource = $source('includes/Infrastructure/Assets/AssetLoader.php');
+$sortSource = $source('assets/js/state/operational-order-sort.js');
+$kdsStoreSource = $source('assets/js/state/kds-store.js');
+$queueStoreSource = $source('assets/js/state/order-queue-store.js');
 
 $assert(strpos($routes, "'/kds/orders'") !== false && strpos($routes, "'/order-queue/orders'") !== false, 'TC-25/26 operational routes missing.');
 $assert(strpos($polling, 'setInterval') === false && strpos($polling, 'setTimeout') !== false && strpos($polling, 'AbortController') !== false, 'TC-35/36 polling overlap contract missing.');
@@ -81,6 +85,10 @@ $assert(strpos($sound, 'localStorage') !== false && strpos($sound, 'initialized'
 $assert(strpos($templates, '<template') !== false && strpos($templates, 'data-action="transition-kds-order"') !== false && strpos($templates, 'data-action="cancel-order"') !== false, 'TC-57/58 PHP template hooks missing.');
 $assert(strpos($gatewaySource, 'wc_get_orders') !== false && strpos($gatewaySource, 'update_post_meta') === false, 'TC-24 HPOS CRUD contract failed.');
 $assert(strpos($orderGatewaySource, 'completePaymentForPreparation') !== false && strpos($orderGatewaySource, "? 'processing' : \$status") !== false, 'TC-29 paid POS orders must remain processing until KDS completion.');
+$assert(strpos($gatewaySource, "'paginate' => true") !== false && strpos($gatewaySource, 'count($items) < $limit') !== false, 'TC-30 active CoffeePOS orders must be filtered before the requested limit is applied.');
+$assert(strpos($sortSource, 'received_at') !== false && strpos($sortSource, 'left.id') !== false, 'TC-31 shared operational FIFO comparator is missing.');
+$assert(strpos($kdsStoreSource, 'sortOperationalOrders') !== false && strpos($queueStoreSource, 'sortOperationalOrders') !== false, 'TC-32 KDS and Queue stores must share FIFO ordering after polling and local replacement.');
+$assert(strpos($assetLoaderSource, 'coffeepos-state-operational-order-sort') !== false, 'TC-33 shared FIFO sorter asset is not registered.');
 
 if ($failures !== []) { fwrite(STDERR, "Phase 07 scenarios failed:\n- " . implode("\n- ", $failures) . "\n"); exit(1); }
 echo "Phase 07 core scenarios passed.\n";

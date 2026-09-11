@@ -52,7 +52,8 @@
     gap: 3px;
     margin: 7px 0 0;
     color: #9a5100;
-    font-weight: 700;
+    font-size: .85rem;
+    font-weight: 400;
 }
 
 .coffeepos-kds-item__notes span:empty {

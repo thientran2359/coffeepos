@@ -23,10 +23,24 @@
         let rolloverPending = false;
         let rolloverTimer = 0;
         let handshakeTimer = 0;
+        let disconnectedReloadTimer = 0;
+
+        function updateDisconnectedReload(state) {
+            if (state === 'connected' || state === 'unsupported') {
+                window.clearTimeout(disconnectedReloadTimer);
+                disconnectedReloadTimer = 0;
+                return;
+            }
+            if (disconnectedReloadTimer) { return; }
+            disconnectedReloadTimer = window.setTimeout(function () {
+                if (store.getState().connection !== 'connected') { window.location.reload(); }
+            }, 30000);
+        }
 
         function setConnection(state, message, actionable) {
             store.setConnection(state); connection.setAttribute('data-state', state); connection.textContent = message;
             syncState.hidden = !actionable; syncMessage.textContent = actionable ? message : '';
+            updateDisconnectedReload(state);
         }
         function render() {
             const state = store.getState();
@@ -183,7 +197,7 @@
             }
             connect(config.posSessionId);
         }
-        return { init: init, getState: store.getState, destroy: function () { if (transport) { transport.close(); } if (pairing) { pairing.close(); } window.clearTimeout(rolloverTimer); window.clearTimeout(handshakeTimer); } };
+        return { init: init, getState: store.getState, destroy: function () { if (transport) { transport.close(); } if (pairing) { pairing.close(); } window.clearTimeout(rolloverTimer); window.clearTimeout(handshakeTimer); window.clearTimeout(disconnectedReloadTimer); } };
     };
     window.CoffeePOS = CoffeePOS;
 }(window));

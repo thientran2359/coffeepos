@@ -82,6 +82,8 @@ $test('TC-26/28/49 cash checkout is paid and idempotent', static function () use
     $first = $checkout->checkout($cart->posSessionId(), 1, 'operation-cash-0001', ['method' => 'cash', 'received_amount' => '100.00'], 9);
     $second = $checkout->checkout($cart->posSessionId(), 1, 'operation-cash-0001', ['method' => 'cash', 'received_amount' => '100'], 9);
     $assert($first['payment']['state'] === 'paid' && $first['payment']['change'] === '15.00', 'Cash result is not authoritative.');
+    $assert($first['order']['total_display'] === '8500 VND', 'Checkout order total is missing its server-formatted display value.');
+    $assert($first['payment']['amount_display'] === '8500 VND' && $first['payment']['change_display'] === '1500 VND', 'Checkout payment amounts are missing server-formatted display values.');
     $assert($orders->creates === 1 && $first['order']['id'] === $second['order']['id'], 'Duplicate checkout created another order.');
     $assert($cart->state() === Cart::STATE_COMPLETED && $first['next_cart']['state'] === Cart::STATE_ACTIVE, 'Cart finalization/fresh cart failed.');
 });
@@ -98,6 +100,7 @@ $test('TC-29 pre-order VietQR preview creates no order', static function () use 
     $result = $checkout->previewBankTransfer($bankCart->posSessionId(), 0);
     $assert($result['payment']['state'] === 'awaiting_cashier_confirmation', 'Preview state is wrong.');
     $assert(($result['payment']['summary']['total']['amount_minor'] ?? -1) === 10000, 'Preview summary does not match authoritative VietQR pricing.');
+    $assert(($result['payment']['amount_display'] ?? '') === '10000 VND', 'VietQR preview amount is missing its server-formatted display value.');
     $assert($orders->creates === $creates && $bankCart->state() === Cart::STATE_ACTIVE, 'Preview created an order or froze the cart.');
 });
 $test('TC-30 bank checkout requires explicit cashier confirmation', static function () use ($assert, $checkout, $bankCart): void {

@@ -90,6 +90,10 @@ body.coffeepos-screen-customer {
 }
 
 .coffeepos-customer-product-row div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
     min-width: 0;
 }
 
@@ -99,8 +103,23 @@ body.coffeepos-screen-customer {
     font-size: 16px;
 }
 
-.coffeepos-customer-product-row small {
-    color: #8b5f13;
+.coffeepos-customer-product-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 20px;
+    margin-top: 0;
+    padding: 2px 7px;
+    border: 1px solid #e6b941;
+    border-radius: 999px;
+    color: #654400;
+    background: #ffe08a;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.coffeepos-customer-product-badge:empty {
+    display: none;
 }
 
 .coffeepos-customer-product-row > span {
@@ -265,8 +284,9 @@ body.coffeepos-screen-customer {
 
 .coffeepos-customer-payment__amount-label {
     display: block;
+    margin: 12px 0;
     color: #68766f;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: .04em;
     text-transform: uppercase;

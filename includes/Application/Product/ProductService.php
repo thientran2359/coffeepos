@@ -97,6 +97,7 @@ final class ProductService
             (array) ($product['category_ids'] ?? []),
             (int) ($product['menu_order'] ?? 0),
             (string) ($product['badge_label'] ?? ''),
+            (bool) ($product['is_featured'] ?? false),
             (array) ($product['attributes'] ?? [])
         );
     }

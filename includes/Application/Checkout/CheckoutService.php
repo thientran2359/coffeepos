@@ -138,6 +138,7 @@ final class CheckoutService
             'reference' => $this->bankReference($sessionId, $revision),
         ], []);
         $payment['summary'] = $this->pricingSummary($pricing);
+        $payment['amount_display'] = $payment['summary']['total']['display'];
         return ['payment' => $payment];
     }
 
@@ -160,8 +161,13 @@ final class CheckoutService
         if ($fresh === null && ! empty($order['next_pos_session_id'])) {
             $fresh = $this->store->load((string) $order['next_pos_session_id']);
         }
+        $currency = (string) ($order['currency'] ?? '');
+        $totalMinor = $this->toMinor((string) ($order['total'] ?? '0'));
+        $payment['amount_display'] = $this->formatter->format($totalMinor, $currency);
+        $change = (string) ($payment['change'] ?? '');
+        $payment['change_display'] = $change !== '' ? $this->formatter->format($this->toMinor($change), $currency) : '';
         return [
-            'order' => ['id' => $order['id'], 'number' => $order['number'], 'status' => $order['status'], 'total' => $order['total'], 'currency' => $order['currency']],
+            'order' => ['id' => $order['id'], 'number' => $order['number'], 'status' => $order['status'], 'total' => $order['total'], 'total_display' => $this->formatter->format($totalMinor, $currency), 'currency' => $currency],
             'payment' => $payment,
             'receipt' => ['available' => ($payment['state'] ?? '') === 'paid'],
             'next_cart' => $fresh ? $this->project($fresh) : null,

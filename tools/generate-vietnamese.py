@@ -24,6 +24,7 @@ OVERRIDES = {
     "Add item": "Thêm món",
     "Add order note": "Thêm ghi chú đơn hàng",
     "Add to cart": "Thêm vào giỏ hàng",
+    "Amount due": "Số tiền cần thanh toán",
     "Bank Transfer": "Chuyển khoản ngân hàng",
     "Bundled": "Đóng gói sẵn",
     "Cart": "Giỏ hàng",

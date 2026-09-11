@@ -1118,6 +1118,10 @@
     margin-top: 16px;
 }
 
+.coffeepos-payment-form {
+    margin-bottom: 16px;
+}
+
 .coffeepos-inline-form {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;

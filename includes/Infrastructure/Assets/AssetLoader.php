@@ -374,7 +374,8 @@ final class AssetLoader
     private function registerKdsScripts(string $version): void
     {
         $this->registerOperationsCommon($version);
-        wp_register_script('coffeepos-state-kds', COFFEEPOS_URL . 'assets/js/state/kds-store.js', ['coffeepos-core-app'], $version, true);
+        $this->registerOperationalOrderSorter($version);
+        wp_register_script('coffeepos-state-kds', COFFEEPOS_URL . 'assets/js/state/kds-store.js', ['coffeepos-state-operational-order-sort'], $version, true);
         wp_register_script('coffeepos-component-kds-grid', COFFEEPOS_URL . 'assets/js/components/kds-order-grid.js', ['coffeepos-operations-template-renderer'], $version, true);
         wp_register_script('coffeepos-component-kds-timer', COFFEEPOS_URL . 'assets/js/components/kds-timer.js', ['coffeepos-core-app'], $version, true);
         wp_register_script('coffeepos-component-kds-sound', COFFEEPOS_URL . 'assets/js/components/kds-sound.js', ['coffeepos-core-app'], $version, true);
@@ -384,7 +385,8 @@ final class AssetLoader
     private function registerOrderQueueScripts(string $version): void
     {
         $this->registerOperationsCommon($version);
-        wp_register_script('coffeepos-state-order-queue', COFFEEPOS_URL . 'assets/js/state/order-queue-store.js', ['coffeepos-core-app'], $version, true);
+        $this->registerOperationalOrderSorter($version);
+        wp_register_script('coffeepos-state-order-queue', COFFEEPOS_URL . 'assets/js/state/order-queue-store.js', ['coffeepos-state-operational-order-sort'], $version, true);
         wp_register_script('coffeepos-component-order-queue-list', COFFEEPOS_URL . 'assets/js/components/order-queue-list.js', ['coffeepos-operations-template-renderer'], $version, true);
         $this->registerReceiptPrinter($version, 'coffeepos-operations-template-renderer');
         wp_register_script('coffeepos-screen-order-queue', COFFEEPOS_URL . 'assets/js/screens/order-queue.js', ['coffeepos-operations-api-client', 'coffeepos-operations-toast', 'coffeepos-operations-modal', 'coffeepos-operations-polling', 'coffeepos-state-order-queue', 'coffeepos-component-order-queue-list', 'coffeepos-component-receipt-printer'], $version, true);
@@ -426,6 +428,11 @@ final class AssetLoader
     private function registerReceiptPrinter(string $version, string $rendererHandle): void
     {
         wp_register_script('coffeepos-component-receipt-printer', COFFEEPOS_URL . 'assets/js/components/receipt-printer.js', [$rendererHandle], $version, true);
+    }
+
+    private function registerOperationalOrderSorter(string $version): void
+    {
+        wp_register_script('coffeepos-state-operational-order-sort', COFFEEPOS_URL . 'assets/js/state/operational-order-sort.js', ['coffeepos-core-app'], $version, true);
     }
 
     private function setScriptTranslations(): void

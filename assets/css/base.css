@@ -23,7 +23,7 @@ body.coffeepos :where(h3) { font-size: 1.17rem; font-weight: 700; }
 body.coffeepos :where(h4, h5, h6) { font-size: 1rem; font-weight: 700; }
 
 body.coffeepos :where(p, figure, blockquote, dl, dd) {
-    margin: 0;
+    /* margin: 0; */
 }
 
 body.coffeepos :where(ul, ol) {

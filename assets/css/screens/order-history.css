@@ -185,7 +185,7 @@
 .coffeepos-history-totals {
     display: grid;
     gap: 7px;
-    margin: 18px 22px
+    padding: 18px 22px;
 }
 
 .coffeepos-history-totals div {

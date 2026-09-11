@@ -125,7 +125,7 @@ msgstr "Tất cả các loại"
 
 #: templates/customer/cart.php:25
 msgid "Amount due"
-msgstr "Số tiền đến hạn"
+msgstr "Số tiền cần thanh toán"
 
 #: assets/js/screens/order-history.js:106
 msgid "A new cashier cart will be created using current prices and availability."

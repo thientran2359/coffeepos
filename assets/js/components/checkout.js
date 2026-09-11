@@ -62,6 +62,7 @@
                 method: method,
                 state: state,
                 amount: normalizedTotal(cart),
+                amount_display: String(cart.total && cart.total.display || ''),
                 currency: String(cart.currency || '')
             };
         }
@@ -182,8 +183,8 @@
         }
         function showSuccess(data, allowAutoPrint) {
             success.querySelector('[data-field="success-order-number"]').textContent = String(data.order.number);
-            success.querySelector('[data-field="success-total"]').textContent = String(data.order.total + ' ' + data.order.currency);
-            const cashChange = data.payment.change ? sprintf(__('Change: %s', 'coffeepos'), data.payment.change) : '';
+            success.querySelector('[data-field="success-total"]').textContent = String(data.order.total_display || '');
+            const cashChange = data.payment.change_display ? sprintf(__('Change: %s', 'coffeepos'), data.payment.change_display) : '';
             success.querySelector('[data-field="success-change"]').textContent = cashChange;
             setOpen(success, true, 'paid');
             const orderKey = String(data.order.id);

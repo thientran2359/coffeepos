@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 use CoffeePOS\Application\Error\Phase01ErrorCodes;
 use CoffeePOS\Application\Error\Phase01Exception;
+use CoffeePOS\Application\Contracts\CategoryGatewayInterface;
+use CoffeePOS\Application\Contracts\ProductGatewayInterface;
+use CoffeePOS\Application\Product\CatalogService;
+use CoffeePOS\Application\Product\CategoryService;
+use CoffeePOS\Application\Product\ProductService;
 use CoffeePOS\Application\Product\VariationService;
 use CoffeePOS\Domain\Cart\Cart;
 use CoffeePOS\Domain\Cart\CartItem;
@@ -101,6 +106,45 @@ $test('TC-27/28 cart identity merges equal configuration only', static function 
     $cart->addItem($make(['no_ice']));
     $assert(count($cart->items()) === 2, 'Different configuration did not remain separate.');
     $assert($cart->totalQuantity() === 3, 'Equal configuration did not merge quantities.');
+});
+
+$test('Woo category admin order controls shared catalog sections', static function () use ($assert, $root): void {
+    $categories = new CategoryService(new class implements CategoryGatewayInterface {
+        public function search(array $criteria = []): array
+        {
+            return [
+                ['id' => 30, 'slug' => 'tea', 'name' => 'Tea', 'sort_order' => 30, 'count' => 1],
+                ['id' => 10, 'slug' => 'coffee', 'name' => 'Coffee', 'sort_order' => 10, 'count' => 1],
+                ['id' => 20, 'slug' => 'juice', 'name' => 'Juice', 'sort_order' => 20, 'count' => 1],
+            ];
+        }
+    });
+    $products = new ProductService(new class implements ProductGatewayInterface {
+        public function findById(int $productId): ?array { return null; }
+        public function search(array $criteria = []): array
+        {
+            return [
+                ['id' => 301, 'name' => 'Tea', 'price_minor' => 30000, 'currency' => 'VND', 'is_in_stock' => true, 'is_purchasable' => true, 'category_ids' => [30]],
+                ['id' => 101, 'name' => 'Coffee', 'price_minor' => 25000, 'currency' => 'VND', 'is_in_stock' => true, 'is_purchasable' => true, 'category_ids' => [10], 'menu_order' => 1],
+                ['id' => 102, 'name' => 'Featured Coffee', 'price_minor' => 30000, 'currency' => 'VND', 'is_in_stock' => true, 'is_purchasable' => true, 'category_ids' => [10], 'menu_order' => 99, 'is_featured' => true, 'badge_label' => 'Hot'],
+                ['id' => 201, 'name' => 'Juice', 'price_minor' => 35000, 'currency' => 'VND', 'is_in_stock' => true, 'is_purchasable' => true, 'category_ids' => [20]],
+            ];
+        }
+    });
+    $catalog = (new CatalogService($categories, $products))->load('VND')->toArray();
+    $assert(array_column($catalog['categories'], 'id') === [10, 20, 30], 'Catalog sections do not follow WooCommerce category admin order.');
+    $assert(array_column($catalog['categories'][0]['products'], 'id') === [102, 101], 'Featured products must appear before normal products inside each category section.');
+    $assert($catalog['categories'][0]['products'][0]['is_featured'] === true && $catalog['categories'][0]['products'][0]['badge_label'] === 'Hot', 'Featured product projection is missing its Hot badge.');
+
+    $gatewaySource = (string) file_get_contents($root . '/includes/Integration/WooCommerce/WooCommerceCategoryGateway.php');
+    $cashierRenderer = (string) file_get_contents($root . '/assets/js/components/catalog-renderer.js');
+    $customerRenderer = (string) file_get_contents($root . '/assets/js/components/customer-catalog.js');
+    $customerTemplate = (string) file_get_contents($root . '/templates/components/customer-display-templates.php');
+    $customerCss = (string) file_get_contents($root . '/assets/css/screens/customer-display.css');
+    $assert(strpos($gatewaySource, "'menu_order' => 'ASC'") !== false && strpos($gatewaySource, "'force_menu_order_sort' => true") !== false, 'Category gateway does not invoke WooCommerce term menu ordering.');
+    $assert(strpos($cashierRenderer, 'categories.forEach') !== false && strpos($customerRenderer, 'categories.forEach') !== false, 'Cashier and Customer Display must preserve CatalogView section order.');
+    $assert(strpos($customerTemplate, 'coffeepos-customer-product-badge') !== false, 'Customer Display featured badge template is missing.');
+    $assert(strpos($customerCss, '.coffeepos-customer-product-row div') !== false && strpos($customerCss, 'flex-wrap: wrap') !== false && strpos($customerCss, '.coffeepos-customer-product-badge') !== false, 'Customer Display Hot badge must sit inline with the product name and wrap safely.');
 });
 
 $test('Phase 03 modules are wired and checkout remains disabled', static function () use ($assert, $root): void {

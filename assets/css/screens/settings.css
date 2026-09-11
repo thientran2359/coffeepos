@@ -100,9 +100,11 @@
 
 .coffeepos-settings__field {
     display: grid;
+    align-content: start;
     gap: 7px;
     min-width: 0;
     font-weight: 700;
+    margin-top: 10px;
 }
 
 .coffeepos-settings__field input,

@@ -34,6 +34,8 @@ final class ProductView
 
     private string $badgeLabel;
 
+    private bool $featured;
+
     private array $attributes;
 
     public function __construct(
@@ -51,6 +53,7 @@ final class ProductView
         array $categoryIds = [],
         int $menuOrder = 0,
         string $badgeLabel = '',
+        bool $featured = false,
         array $attributes = []
     ) {
         $this->id = $id;
@@ -67,6 +70,7 @@ final class ProductView
         $this->categoryIds = array_values(array_unique(array_filter(array_map('intval', $categoryIds))));
         $this->menuOrder = $menuOrder;
         $this->badgeLabel = trim($badgeLabel);
+        $this->featured = $featured;
         $this->attributes = array_values($attributes);
     }
 
@@ -87,6 +91,7 @@ final class ProductView
             'category_ids' => $this->categoryIds,
             'menu_order' => $this->menuOrder,
             'badge_label' => $this->badgeLabel,
+            'is_featured' => $this->featured,
             'attributes' => $this->attributes,
         ];
     }

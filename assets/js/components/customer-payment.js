@@ -17,17 +17,17 @@
             if (!visible) { qr.hidden = true; qr.querySelector('img').removeAttribute('src'); return; }
             panel.setAttribute('data-state', screenState);
             const method = payment && payment.method;
+            const summary = payment && payment.summary ? payment.summary : cart;
             const stateText = screenState === 'payment_success'
                 ? __('Order completed successfully', 'coffeepos')
                 : (method === 'bank_transfer'
                     ? (payment && payment.provider_available === false ? __('Bank transfer is unavailable.', 'coffeepos') : __('Please scan the QR to transfer payment', 'coffeepos'))
                     : __('Please give the cash payment to the cashier', 'coffeepos'));
             text('customer-payment-status', stateText);
-            text('customer-payment-amount', payment && payment.amount ? payment.amount + ' ' + String(payment.currency || order && order.currency || '') : '');
+            text('customer-payment-amount', payment && payment.amount_display || summary && summary.total && summary.total.display);
             text('customer-payment-reference', payment && payment.reference);
-            text('customer-payment-change', payment && payment.change ? sprintf(__('Change: %s', 'coffeepos'), payment.change) : '');
+            text('customer-payment-change', payment && payment.change_display ? sprintf(__('Change: %s', 'coffeepos'), payment.change_display) : '');
             renderer.renderList('coffeepos-customer-payment-item-template', cart && Array.isArray(cart.items) ? cart.items : [], itemsTarget);
-            const summary = payment && payment.summary ? payment.summary : cart;
             text('customer-payment-subtotal', summary && summary.subtotal && summary.subtotal.display);
             text('customer-payment-discount', summary && summary.discount && summary.discount.display);
             text('customer-payment-total', summary && summary.total && summary.total.display);

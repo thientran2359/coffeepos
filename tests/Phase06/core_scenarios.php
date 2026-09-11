@@ -80,6 +80,8 @@ phase06_assert(strpos($customer_screen, 'getCustomerCart') !== false, 'Customer 
 phase06_assert(strpos($customer_screen, "'display.ready'") !== false, 'Customer Display must perform the ready handshake.');
 phase06_assert(strpos($customer_screen, "'state.requested'") !== false, 'Customer Display must request snapshots.');
 phase06_assert(strpos($customer_screen, "'display.reset'") !== false, 'Customer Display must handle session rollover.');
+phase06_assert(strpos($customer_screen, 'disconnectedReloadTimer') !== false && strpos($customer_screen, '30000') !== false && strpos($customer_screen, 'window.location.reload()') !== false, 'Customer Display must reload after 30 continuous seconds without a Cashier connection.');
+phase06_assert(strpos($customer_screen, "state === 'connected' || state === 'unsupported'") !== false, 'Connected and unsupported displays must not enter the disconnected reload loop.');
 phase06_assert(strpos($cashier_sync, "'state.snapshot'") !== false, 'Cashier must answer with a snapshot.');
 phase06_assert(strpos($cashier_sync, 'customer_display') !== false, 'Cashier must publish the safe cart projection.');
 phase06_assert(strpos($customer_content . $customer_menu . $customer_cart, 'data-action="add') === false, 'Customer templates must not expose mutation controls.');
@@ -95,6 +97,9 @@ phase06_assert(strpos($customer_cart, 'data-component="customer-payment-items"')
 phase06_assert(strpos($customer_payment, "renderer.renderList('coffeepos-customer-payment-item-template'") !== false, 'Customer payment overlay must render accepted cart items through TemplateRenderer.');
 phase06_assert(strpos($customer_payment, 'customer-payment-subtotal') !== false && strpos($customer_payment, 'customer-payment-discount') !== false && strpos($customer_payment, 'customer-payment-total') !== false, 'Customer payment overlay must show trusted subtotal, discount, and total values.');
 phase06_assert(strpos($customer_payment, 'payment && payment.summary') !== false, 'VietQR overlay totals must prefer the authoritative server pricing summary.');
+phase06_assert(strpos($customer_payment, 'payment && payment.amount_display || summary && summary.total && summary.total.display') !== false && strpos($customer_payment, "payment.amount + ' '") === false, 'Customer payment amount must use the payment display value with the trusted cart total as its compatibility fallback.');
+phase06_assert(strpos($customer_payment, 'payment.change_display') !== false, 'Customer payment change must use the server-formatted display value.');
+phase06_assert(strpos($checkout, 'data.order.total_display') !== false && strpos($checkout, 'data.payment.change_display') !== false, 'Cashier success amounts must use server-formatted display values.');
 phase06_assert(strpos(phase06_source('assets/js/screens/customer.js'), 'scheduleThankYou') === false, 'Payment success must remain until Cashier resets the display.');
 
 if ($failures !== array()) {

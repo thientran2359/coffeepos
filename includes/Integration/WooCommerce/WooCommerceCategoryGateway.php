@@ -20,8 +20,8 @@ final class WooCommerceCategoryGateway implements CategoryGatewayInterface
         $query = [
             'taxonomy' => 'product_cat',
             'hide_empty' => ! array_key_exists('hide_empty', $criteria) || ! empty($criteria['hide_empty']),
-            'orderby' => 'menu_order',
-            'order' => 'ASC',
+            'menu_order' => 'ASC',
+            'force_menu_order_sort' => true,
         ];
 
         if ($limit > 0) {

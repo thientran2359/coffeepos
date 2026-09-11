@@ -33,6 +33,7 @@ body.coffeepos-screen-order-queue {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--coffeepos-header);
 }
 
 .coffeepos-operations__tools [role="status"] {

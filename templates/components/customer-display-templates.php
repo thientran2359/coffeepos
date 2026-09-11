@@ -10,7 +10,7 @@ if (! defined('ABSPATH')) { exit; }
 </template>
 <template id="coffeepos-customer-product-row-template">
     <article class="coffeepos-customer-product-row" data-component="customer-product-row" data-key="occurrence_key" data-attr="data-product-id:id;data-occurrence-key:occurrence_key">
-        <div><strong data-field="name"></strong><small data-field="badge_label"></small></div>
+        <div><strong data-field="name"></strong><small class="coffeepos-customer-product-badge" data-field="badge_label"></small></div>
         <span data-field="price_display"></span>
     </article>
 </template>

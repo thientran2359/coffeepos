@@ -31,6 +31,10 @@ final class CatalogService
         }
 
         usort($products, static function (array $left, array $right): int {
+            $featured = ((int) ! empty($right['is_featured'])) <=> ((int) ! empty($left['is_featured']));
+            if ($featured !== 0) {
+                return $featured;
+            }
             $order = ((int) ($left['menu_order'] ?? 0)) <=> ((int) ($right['menu_order'] ?? 0));
 
             return $order !== 0 ? $order : (((int) $left['id']) <=> ((int) $right['id']));
@@ -60,6 +64,7 @@ final class CatalogService
                     'is_variable' => (bool) ($product['is_variable'] ?? false),
                     'is_in_stock' => (bool) ($product['is_in_stock'] ?? false),
                     'is_purchasable' => (bool) ($product['is_purchasable'] ?? false),
+                    'is_featured' => (bool) ($product['is_featured'] ?? false),
                     'badge_label' => (string) ($product['badge_label'] ?? ''),
                 ];
             }

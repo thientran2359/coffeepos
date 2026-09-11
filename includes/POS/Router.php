@@ -18,11 +18,11 @@ final class Router
     private const SCREENS = [
         'entry',
         'cashier',
+        'shifts',
         'customer',
         'kds',
         'order-queue',
         'order-history',
-        'shifts',
         'reports',
         'members',
         'settings',
@@ -186,9 +186,9 @@ final class Router
     {
         $labels = [
             'cashier' => __('Cashier', 'coffeepos'),
+            'shifts' => __('Shifts', 'coffeepos'),
             'kds' => __('Kitchen Display', 'coffeepos'),
             'order-queue' => __('Order Queue', 'coffeepos'),
-            'shifts' => __('Shifts', 'coffeepos'),
             'order-history' => __('Order History', 'coffeepos'),
             'reports' => __('Reports', 'coffeepos'),
             'members' => __('Members', 'coffeepos'),

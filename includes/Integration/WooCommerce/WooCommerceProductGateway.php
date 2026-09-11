@@ -91,7 +91,8 @@ final class WooCommerceProductGateway implements ProductGatewayInterface
             'image_url' => (string) wp_get_attachment_image_url($product->get_image_id(), 'thumbnail'),
             'category_ids' => array_map('intval', $product->get_category_ids()),
             'menu_order' => (int) $product->get_menu_order(),
-            'badge_label' => '',
+            'is_featured' => $product->is_featured(),
+            'badge_label' => $product->is_featured() ? 'Hot' : '',
             'attributes' => $includeAttributes ? $this->mapVariationAttributes($product) : [],
         ];
     }

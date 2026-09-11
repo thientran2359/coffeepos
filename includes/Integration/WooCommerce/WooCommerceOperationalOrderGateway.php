@@ -26,25 +26,34 @@ final class WooCommerceOperationalOrderGateway implements OperationalOrderGatewa
         if (! function_exists('wc_get_orders')) {
             return [];
         }
-        $orders = wc_get_orders([
-            'limit' => max(1, min(200, $limit)),
-            'return' => 'objects',
-            'status' => ['processing', 'on-hold'],
-            'orderby' => 'date',
-            'order' => 'ASC',
-            'meta_key' => '_coffeepos_pos_session_id',
-            'meta_compare' => 'EXISTS',
-        ]);
         $items = [];
-        foreach ($orders as $order) {
-            if (! is_object($order)) {
-                continue;
+        $page = 1;
+        $maxPages = 1;
+        do {
+            $result = wc_get_orders([
+                'limit' => 100,
+                'page' => $page,
+                'paginate' => true,
+                'return' => 'objects',
+                'status' => ['processing', 'on-hold'],
+                'orderby' => 'date',
+                'order' => 'ASC',
+                'meta_key' => '_coffeepos_pos_session_id',
+                'meta_compare' => 'EXISTS',
+            ]);
+            $orders = is_object($result) && isset($result->orders) ? (array) $result->orders : (is_array($result) ? $result : []);
+            $maxPages = is_object($result) && isset($result->max_num_pages) ? max(1, (int) $result->max_num_pages) : 1;
+            foreach ($orders as $order) {
+                if (! is_object($order)) {
+                    continue;
+                }
+                $projection = $this->project($order);
+                if (! empty($projection['eligible']) && in_array((string) $projection['kds']['state'], ['new', 'preparing', 'ready'], true)) {
+                    $items[] = $projection;
+                }
             }
-            $projection = $this->project($order);
-            if (! empty($projection['eligible']) && in_array((string) $projection['kds']['state'], ['new', 'preparing', 'ready'], true)) {
-                $items[] = $projection;
-            }
-        }
+            $page++;
+        } while (count($items) < $limit && $page <= $maxPages);
         usort($items, static function (array $left, array $right): int {
             $time = strcmp((string) $left['received_at'], (string) $right['received_at']);
             return $time !== 0 ? $time : ((int) $left['id'] <=> (int) $right['id']);

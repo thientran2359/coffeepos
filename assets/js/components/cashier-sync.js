@@ -141,6 +141,10 @@
             transport.post(type, data, Number(cart.revision), workflowSequence);
             snapshot();
         }
+        function publishCatalogInvalidated() {
+            if (!cart || !syncAvailable) { return false; }
+            return transport.post('catalog.invalidated', {}, Number(cart.revision), workflowSequence);
+        }
         function returnToCart() {
             if (!cart) { return; }
             screenState = safeCart(cart) && safeCart(cart).items.length ? 'cart' : 'idle';
@@ -161,6 +165,7 @@
         return {
             publishCart: publishCart,
             publishWorkflow: publishWorkflow,
+            publishCatalogInvalidated: publishCatalogInvalidated,
             returnToCart: returnToCart,
             snapshot: snapshot,
             destroy: function () {

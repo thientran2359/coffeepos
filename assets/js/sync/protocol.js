@@ -5,7 +5,8 @@
     const TYPES = [
         'display.ready', 'state.requested', 'state.snapshot', 'cart.updated',
         'customer.updated', 'checkout.started', 'payment.started',
-        'payment.updated', 'sale.completed', 'display.reset'
+        'payment.updated', 'sale.completed', 'display.reset',
+        'catalog.invalidated'
     ];
 
     function plainObject(value) {

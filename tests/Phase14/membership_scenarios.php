@@ -90,6 +90,7 @@ check(strpos($router, "'members'") !== false && strpos($router, "MembershipScree
 check(strpos($screen, "coffeepos_manage_membership") !== false && strpos($screen, 'MANAGE_SETTINGS') !== false, 'Member actions require capability and nonce');
 check(strpos($template, 'data-component="membership-screen"') !== false, 'Member screen uses a PHP-owned application template');
 check(strpos($directoryTemplate, 'coffeepos-members__detail-page') !== false && strpos($directoryTemplate, 'coffeepos-history-dialog') !== false, 'Member detail owns order history and an order detail dialog');
+check(strpos($directoryTemplate, 'data-component="member-pin-dialog"') !== false && strpos($memberScript, "temporary-pin'") !== false, 'Member PIN reset uses an AJAX one-time popup');
 check(strpos($memberScript, 'loadOrderDetail') !== false && strpos($memberScript, 'member-edit-dialog') !== false, 'Member screen opens order and quick-edit dialogs');
 check(strpos($directoryTemplate, 'data-action="quick-edit-member"') !== false && strpos($directoryTemplate, 'name="return_to_list"') !== false, 'Quick edit stays on the member directory before and after save');
 check(strpos($settingsTemplate, 'OPTION_MEMBERSHIP_TIERS') !== false, 'Tier configuration remains inside the Settings form');

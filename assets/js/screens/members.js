@@ -6,12 +6,20 @@
     CoffeePOS.screens = CoffeePOS.screens || {};
 
     CoffeePOS.screens.createMembersController = function (root) {
-        const api = CoffeePOS.api.createPosApi(CoffeePOS.api.createClient());
+        const client = CoffeePOS.api.createClient();
+        const api = CoffeePOS.api.createPosApi(client);
         const detailPage = root.querySelector('.coffeepos-members__detail-page');
         const orderDialog = root.querySelector('[data-component="history-detail-dialog"]');
         const editDialog = root.querySelector('[data-component="member-edit-dialog"]');
         const itemTemplate = root.querySelector('template[data-template="history-detail-item"]');
         const quickEditForm = root.querySelector('[data-component="member-quick-edit-form"]');
+        const pinResetForm = root.querySelector('[data-component="member-pin-reset-form"]');
+        const pinDialog = root.querySelector('[data-component="member-pin-dialog"]');
+        const config = window.CoffeePOSConfig || {};
+        const pinChannel = window.BroadcastChannel && config.displayPairingScope
+            ? new window.BroadcastChannel('coffeepos:member-pin:' + String(config.displayPairingScope))
+            : null;
+        let customerDisplayTransfer = null;
 
         function field(parent, name, value) {
             const node = parent && parent.querySelector('[data-field="' + name + '"]');
@@ -59,6 +67,94 @@
                 orderDialog.showModal();
             }
         }
+        async function resetTemporaryPin(event) {
+            event.preventDefault();
+            if (!pinResetForm || !pinDialog) { return; }
+            const confirmation = pinResetForm.querySelector('[name="confirm_pin_reset"]');
+            const customerId = pinResetForm.querySelector('[name="customer_id"]');
+            const submit = pinResetForm.querySelector('[name="membership_action"]');
+            const error = pinDialog.querySelector('[data-component="member-pin-error"]');
+            if (!confirmation || !confirmation.checked || !customerId) {
+                if (confirmation) { confirmation.focus(); }
+                return;
+            }
+            error.hidden = true;
+            if (submit) { submit.disabled = true; }
+            pinResetForm.setAttribute('aria-busy', 'true');
+            try {
+                const data = await client.request('members/' + encodeURIComponent(customerId.value) + '/temporary-pin', {
+                    method: 'POST',
+                    body: {confirmed: true}
+                });
+                field(pinDialog, 'temporary-pin', data.temporary_pin || '');
+                const displayButton = pinDialog.querySelector('[data-action="show-member-pin-customer"]');
+                const copyButton = pinDialog.querySelector('[data-action="copy-member-pin"]');
+                if (displayButton) { displayButton.disabled = false; displayButton.textContent = __('Show on Customer Display', 'coffeepos'); }
+                if (copyButton) { copyButton.textContent = __('Copy PIN', 'coffeepos'); }
+                confirmation.checked = false;
+                const status = root.querySelector('[data-component="member-pin-status"]');
+                if (status) { status.textContent = __('A temporary PIN is active and must be changed on first login.', 'coffeepos'); }
+                pinDialog.showModal();
+            } catch (failure) {
+                field(pinDialog, 'temporary-pin', '');
+                error.textContent = failure && failure.message ? failure.message : __('The member PIN could not be saved.', 'coffeepos');
+                error.hidden = false;
+                pinDialog.showModal();
+            } finally {
+                if (submit) { submit.disabled = false; }
+                pinResetForm.removeAttribute('aria-busy');
+            }
+        }
+        async function copyTemporaryPin(trigger) {
+            const value = pinDialog ? pinDialog.querySelector('[data-field="temporary-pin"]') : null;
+            const pin = value ? value.textContent.trim() : '';
+            if (!pin) { return; }
+            try {
+                if (window.navigator.clipboard && window.isSecureContext) {
+                    await window.navigator.clipboard.writeText(pin);
+                } else {
+                    const range = document.createRange();
+                    range.selectNodeContents(value);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    document.execCommand('copy');
+                    selection.removeAllRanges();
+                }
+                trigger.textContent = __('Copied', 'coffeepos');
+            } catch (failure) {
+                trigger.textContent = __('Copy failed', 'coffeepos');
+            }
+        }
+        function showTemporaryPinOnCustomerDisplay(trigger) {
+            const value = pinDialog ? pinDialog.querySelector('[data-field="temporary-pin"]') : null;
+            const pin = value ? value.textContent.trim() : '';
+            if (!pin || !pinChannel) {
+                trigger.textContent = __('Customer Display unavailable', 'coffeepos');
+                return;
+            }
+            const requestId = window.crypto && typeof window.crypto.randomUUID === 'function'
+                ? window.crypto.randomUUID()
+                : String(Date.now()) + '-' + Math.random().toString(16).slice(2);
+            customerDisplayTransfer = {requestId: requestId, trigger: trigger};
+            trigger.disabled = true;
+            trigger.textContent = __('Sending to Customer Display…', 'coffeepos');
+            pinChannel.postMessage({type: 'coffeepos:show-member-pin', request_id: requestId, pin: pin});
+            window.setTimeout(function () {
+                if (!customerDisplayTransfer || customerDisplayTransfer.requestId !== requestId) { return; }
+                trigger.disabled = false;
+                trigger.textContent = __('Open Customer Display first', 'coffeepos');
+                customerDisplayTransfer = null;
+            }, 1500);
+        }
+        function onCustomerDisplayMessage(event) {
+            if (!customerDisplayTransfer) { return; }
+            const message = event.data && typeof event.data === 'object' ? event.data : {};
+            if (message.type !== 'coffeepos:member-pin-shown' || message.request_id !== customerDisplayTransfer.requestId) { return; }
+            customerDisplayTransfer.trigger.disabled = false;
+            customerDisplayTransfer.trigger.textContent = __('Shown on Customer Display', 'coffeepos');
+            customerDisplayTransfer = null;
+        }
         function onClick(event) {
             const trigger = event.target.closest('[data-action]');
             if (!trigger) { return; }
@@ -80,9 +176,15 @@
             if (action === 'view-member-order') { openOrder(Number(trigger.getAttribute('data-order-id'))); }
             if (action === 'close-order-detail') { orderDialog.close(); }
             if (action === 'close-member-edit') { editDialog.close(); }
+            if (action === 'close-member-pin' && pinDialog) { pinDialog.close(); field(pinDialog, 'temporary-pin', ''); customerDisplayTransfer = null; }
+            if (action === 'copy-member-pin' && pinDialog) { copyTemporaryPin(trigger); }
+            if (action === 'show-member-pin-customer' && pinDialog) { showTemporaryPinOnCustomerDisplay(trigger); }
         }
         function init() {
             root.addEventListener('click', onClick);
+            if (pinChannel) { pinChannel.addEventListener('message', onCustomerDisplayMessage); }
+            if (pinResetForm) { pinResetForm.addEventListener('submit', resetTemporaryPin); }
+            if (pinDialog) { pinDialog.addEventListener('close', function () { field(pinDialog, 'temporary-pin', ''); customerDisplayTransfer = null; }); }
             if (detailPage && detailPage.getAttribute('data-member-quick-edit') === '1' && editDialog) {
                 editDialog.showModal();
             }

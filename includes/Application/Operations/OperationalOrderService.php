@@ -20,10 +20,12 @@ final class OperationalOrderService
     ];
 
     private OperationalOrderGatewayInterface $orders;
+    private bool $kdsEnabled;
 
-    public function __construct(OperationalOrderGatewayInterface $orders)
+    public function __construct(OperationalOrderGatewayInterface $orders, bool $kdsEnabled = true)
     {
         $this->orders = $orders;
+        $this->kdsEnabled = $kdsEnabled;
     }
 
     public function listKds(array $states, int $limit): array
@@ -54,7 +56,7 @@ final class OperationalOrderService
             $currentState = (string) ($order['kds']['state'] ?? '');
             $currentType = (string) ($order['service']['order_type'] ?? 'takeaway');
             if (($state === 'all' || $state === $currentState) && ($orderType === 'all' || $orderType === $currentType)) {
-                $items[] = OrderQueueView::fromArray($order);
+                $items[] = OrderQueueView::fromArray($order, ! $this->kdsEnabled);
             }
         }
         return $items;
@@ -91,7 +93,11 @@ final class OperationalOrderService
             if ($state !== $expectedState || $revision !== $expectedRevision) {
                 throw Phase01Exception::withCode(Phase01ErrorCodes::ORDER_STATE_CONFLICT, 'Order state changed on another screen.', ['order' => KdsOrderView::fromArray($current)]);
             }
-            if (! isset(self::TRANSITIONS[$state]) || ! in_array($targetState, self::TRANSITIONS[$state], true)) {
+            $directQueueCompletion = ! $this->kdsEnabled
+                && $surface === 'order_queue'
+                && $targetState === 'completed'
+                && in_array($state, ['new', 'preparing'], true);
+            if (! $directQueueCompletion && (! isset(self::TRANSITIONS[$state]) || ! in_array($targetState, self::TRANSITIONS[$state], true))) {
                 throw Phase01Exception::withCode(Phase01ErrorCodes::INVALID_ORDER_STATE, 'The requested order transition is not allowed.', ['order' => KdsOrderView::fromArray($current)]);
             }
 
@@ -118,7 +124,7 @@ final class OperationalOrderService
 
     private function result(array $order): array
     {
-        return ['order' => KdsOrderView::fromArray($order), 'queue_order' => in_array((string) ($order['kds']['state'] ?? ''), self::ACTIVE_STATES, true) ? OrderQueueView::fromArray($order) : null];
+        return ['order' => KdsOrderView::fromArray($order), 'queue_order' => in_array((string) ($order['kds']['state'] ?? ''), self::ACTIVE_STATES, true) ? OrderQueueView::fromArray($order, ! $this->kdsEnabled) : null];
     }
 
     private function limit(int $limit): int

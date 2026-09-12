@@ -9,6 +9,7 @@ use CoffeePOS\Infrastructure\Assets\AssetLoader;
 use CoffeePOS\Infrastructure\Database\Migrator;
 use CoffeePOS\Infrastructure\Settings\Settings;
 use CoffeePOS\POS\Router;
+use CoffeePOS\POS\MemberPortalRouter;
 use CoffeePOS\REST\RouteRegistrar;
 use CoffeePOS\Support\Capabilities;
 
@@ -26,6 +27,8 @@ final class Bootstrap
 
     private AssetLoader $assetLoader;
 
+    private MemberPortalRouter $memberPortalRouter;
+
     private AdminBootstrap $adminBootstrap;
 
     public function __construct(
@@ -35,7 +38,8 @@ final class Bootstrap
         ?RouteRegistrar $routeRegistrar = null,
         ?Router $router = null,
         ?AssetLoader $assetLoader = null,
-        ?AdminBootstrap $adminBootstrap = null
+        ?AdminBootstrap $adminBootstrap = null,
+        ?MemberPortalRouter $memberPortalRouter = null
     ) {
         $this->environment = $environment ?? new Environment();
         $this->settings = $settings ?? new Settings();
@@ -44,6 +48,7 @@ final class Bootstrap
         $this->router = $router ?? new Router();
         $this->assetLoader = $assetLoader ?? new AssetLoader();
         $this->adminBootstrap = $adminBootstrap ?? new AdminBootstrap($this->environment, $this->migrator);
+        $this->memberPortalRouter = $memberPortalRouter ?? new MemberPortalRouter();
     }
 
     public function run(): void
@@ -92,6 +97,7 @@ final class Bootstrap
         $this->routeRegistrar->register();
         add_filter('woocommerce_coupon_is_valid', [\CoffeePOS\Integration\WooCommerce\WooCommerceMembershipProvider::class, 'validateWooCoupon'], 20, 3);
         $this->router->register();
+        $this->memberPortalRouter->register();
         $this->assetLoader->register();
     }
 

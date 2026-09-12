@@ -200,7 +200,8 @@ body.coffeepos-screen-members #coffeepos-app {
 }
 
 .coffeepos-member-edit-dialog,
-.coffeepos-history-dialog {
+.coffeepos-history-dialog,
+.coffeepos-member-pin-dialog {
     box-sizing: border-box;
     width: min(720px, calc(100vw - 32px));
     max-height: calc(100vh - 32px);
@@ -214,16 +215,26 @@ body.coffeepos-screen-members #coffeepos-app {
 }
 
 .coffeepos-member-edit-dialog::backdrop,
-.coffeepos-history-dialog::backdrop { background: rgba(20, 31, 26, .62); }
+.coffeepos-history-dialog::backdrop,
+.coffeepos-member-pin-dialog::backdrop { background: rgba(20, 31, 26, .62); }
 .coffeepos-member-edit-dialog > header,
-.coffeepos-history-dialog > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--coffeepos-border); }
+.coffeepos-history-dialog > header,
+.coffeepos-member-pin-dialog > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--coffeepos-border); }
 .coffeepos-member-edit-dialog header h2,
 .coffeepos-member-edit-dialog header p,
 .coffeepos-history-dialog header h2,
-.coffeepos-history-dialog header p { margin: 0; }
+.coffeepos-history-dialog header p,
+.coffeepos-member-pin-dialog header h2,
+.coffeepos-member-pin-dialog header p { margin: 0; }
 .coffeepos-member-edit-dialog header button,
-.coffeepos-history-dialog header button { width: 40px; height: 40px; border: 0; border-radius: 8px; background: #f4f6f4; font-size: 24px; cursor: pointer; }
+.coffeepos-history-dialog header button,
+.coffeepos-member-pin-dialog header button { width: 40px; height: 40px; border: 0; border-radius: 8px; background: #f4f6f4; font-size: 24px; cursor: pointer; }
 .coffeepos-member-edit-dialog__body { padding: 20px; }
+.coffeepos-member-pin-dialog { width: min(520px, calc(100vw - 32px)); }
+.coffeepos-member-pin-dialog__body { display: grid; gap: 18px; padding: 24px; }
+.coffeepos-member-pin-dialog__body > p { margin: 0; color: var(--coffeepos-text-muted); }
+.coffeepos-member-pin-dialog__value { display: block; padding: 18px; border: 1px dashed var(--coffeepos-primary); border-radius: 12px; background: #f1f8f5; color: var(--coffeepos-text); font-size: clamp(32px, 8vw, 48px); font-weight: 800; letter-spacing: .22em; text-align: center; }
+.coffeepos-member-pin-dialog__actions { display: flex; justify-content: flex-end; gap: 10px; }
 .coffeepos-history-detail-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 18px 20px; }
 .coffeepos-history-detail-meta p { display: grid; gap: 3px; margin: 0; }
 .coffeepos-history-detail-meta span { color: var(--coffeepos-text-muted); font-size: 13px; }
@@ -316,6 +327,46 @@ body.coffeepos-screen-members #coffeepos-app {
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
+}
+
+.coffeepos-members__temporary-pin,
+.coffeepos-members__pin {
+    display: grid;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 10px;
+    background: #f7faf8;
+}
+
+.coffeepos-members__temporary-pin strong {
+    font-size: 30px;
+    letter-spacing: .18em;
+}
+
+.coffeepos-members__temporary-pin small,
+.coffeepos-members__pin small,
+.coffeepos-members__pin p {
+    margin: 0;
+    color: var(--coffeepos-text-muted);
+}
+
+.coffeepos-members__pin h3 {
+    margin: 0;
+}
+
+.coffeepos-members .coffeepos-members__pin-confirm {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.coffeepos-members .coffeepos-members__pin-confirm input {
+    width: 18px;
+    min-height: 18px;
+    margin-top: 2px;
 }
 
 @media (max-width: 980px) {

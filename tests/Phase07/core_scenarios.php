@@ -63,6 +63,13 @@ $assert($ready['queue_order']['actions']['can_complete'] === true, 'TC-11 ready/
 $complete = $service->transition(101, 'ready', 2, 'completed', 'operation-complete-101', 9, 'order_queue');
 $assert($complete['queue_order'] === null && $complete['order']['kds']['state'] === 'completed', 'TC-12 completion did not leave active queue.');
 
+$gateway->orders[103] = $record(103, 'new', 0);
+$directQueueService = new OperationalOrderService($gateway, false);
+$directQueue = $directQueueService->listQueue('new', 'all', 100);
+$assert(count($directQueue) === 1 && $directQueue[0]['actions']['can_complete'] === true, 'TC-12a KDS-disabled Queue must expose direct completion.');
+$directComplete = $directQueueService->transition(103, 'new', 0, 'completed', 'operation-complete-103', 9, 'order_queue');
+$assert($directComplete['queue_order'] === null && $directComplete['order']['kds']['state'] === 'completed', 'TC-12b KDS-disabled direct completion failed.');
+
 $cancel = $service->transition(102, 'preparing', 2, 'cancelled', 'operation-cancel-102', 9, 'order_queue', 'Customer request');
 $assert($cancel['order']['kds']['state'] === 'cancelled' && $cancel['queue_order'] === null, 'TC-14 cancellation failed.');
 

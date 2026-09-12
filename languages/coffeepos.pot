@@ -113,6 +113,26 @@ msgstr ""
 msgid "Allow new-order sound on KDS"
 msgstr ""
 
+#: templates/settings/content.php:146
+msgid "Disable features that the store does not use. Polling intervals are limited to 3000–60000 milliseconds."
+msgstr ""
+
+#: templates/settings/content.php:149
+msgid "Enable Kitchen Display (KDS)"
+msgstr ""
+
+#: templates/settings/content.php:150
+msgid "Enable shifts"
+msgstr ""
+
+#: includes/REST/OperationalOrderController.php:39
+msgid "Kitchen Display is disabled in CoffeePOS settings."
+msgstr ""
+
+#: includes/REST/ShiftController.php:43
+msgid "Shifts are disabled in CoffeePOS settings."
+msgstr ""
+
 #: templates/order-history/content.php:15
 msgid "All statuses"
 msgstr ""

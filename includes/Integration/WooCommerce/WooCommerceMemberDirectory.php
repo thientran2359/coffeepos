@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CoffeePOS\Integration\WooCommerce;
 
 use CoffeePOS\Application\Customer\CustomerPhone;
+use CoffeePOS\Application\MemberPortal\MemberPinService;
 
 final class WooCommerceMemberDirectory
 {
@@ -110,6 +111,8 @@ final class WooCommerceMemberDirectory
             'membership' => $provider->membershipForCustomer($customer),
             'override_code' => (string) ($override['code'] ?? ''),
             'net_spend' => (new WooCommerceMoney())->formatMinor($provider->netSpend($id), get_woocommerce_currency()),
+            'portal_pin_configured' => (new MemberPinService())->hasPin($id),
+            'portal_pin_must_change' => (new MemberPinService())->mustChange($id),
         ];
     }
 

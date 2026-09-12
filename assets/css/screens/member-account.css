@@ -1,0 +1,128 @@
+body.coffeepos-screen-member-account {
+    overflow: auto;
+    background: linear-gradient(145deg, #edf5f1 0%, #f7f3e8 100%);
+}
+
+body.coffeepos-screen-member-account #coffeepos-app {
+    min-height: 100vh;
+    height: auto;
+    grid-template-columns: unset !important;
+    grid-template-rows: unset !important;
+}
+
+.coffeepos-member-account {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    padding: 20px;
+    grid-column: unset !important;
+    grid-row: unset !important;
+}
+
+.coffeepos-member-account__header,
+.coffeepos-member-account__brand,
+.coffeepos-member-account__welcome,
+.coffeepos-member-account__card-heading,
+.coffeepos-member-account__pagination,
+.coffeepos-member-account__order,
+.coffeepos-member-order-dialog > header,
+.coffeepos-member-order-dialog__item,
+.coffeepos-member-order-dialog dl div {
+    display: flex;
+    align-items: center;
+}
+
+.coffeepos-member-account__header {
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.coffeepos-member-account__brand { gap: 12px; }
+.coffeepos-member-account__brand img { width: 46px; height: 46px; border-radius: 12px; object-fit: contain; background: #fff; }
+.coffeepos-member-account__brand div { display: grid; }
+.coffeepos-member-account__brand span { color: var(--coffeepos-text-muted); font-size: 13px; }
+.coffeepos-member-account__brand strong { font-size: 18px; }
+
+.coffeepos-member-account__status { min-height: 24px; color: var(--coffeepos-danger); }
+
+.coffeepos-member-account__auth-card,
+.coffeepos-member-account__card,
+.coffeepos-member-account__welcome {
+    border: 1px solid rgba(189, 199, 192, .8);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 16px 50px rgba(28, 60, 46, .1);
+}
+
+.coffeepos-member-account__auth-card {
+    width: min(460px, 100%);
+    margin: 8vh auto 0;
+    padding: 28px;
+}
+
+.coffeepos-member-account__auth-card h1 { margin-top: 8px; }
+.coffeepos-member-account__auth-card > p { color: var(--coffeepos-text-muted); }
+.coffeepos-member-account__auth-card form { display: grid; gap: 16px; margin-top: 22px; }
+.coffeepos-member-account__auth-card label { display: grid; gap: 7px; font-weight: 700; }
+.coffeepos-member-account__auth-card input { min-height: 50px !important; }
+.coffeepos-member-account__auth-card button { min-height: 48px; }
+.coffeepos-member-account__error { margin: 0; color: var(--coffeepos-danger); }
+
+.coffeepos-member-account__welcome {
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px;
+}
+
+.coffeepos-member-account__welcome p { margin: 5px 0 0; color: var(--coffeepos-text-muted); }
+.coffeepos-member-account__tier { padding: 8px 14px; border-radius: 999px; color: #fff; background: var(--coffeepos-primary); font-weight: 800; }
+
+.coffeepos-member-account__grid {
+    display: grid;
+    grid-template-columns: minmax(260px, .75fr) minmax(0, 1.5fr);
+    gap: 18px;
+    margin: 18px 0;
+}
+
+.coffeepos-member-account__card { padding: 22px; }
+.coffeepos-member-account__card dl { margin: 18px 0; }
+.coffeepos-member-account__card dl div { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--coffeepos-border); }
+.coffeepos-member-account__card dd { margin: 0; font-weight: 800; text-align: right; }
+.coffeepos-member-account__card-heading { justify-content: space-between; gap: 12px; }
+
+.coffeepos-member-account__progress { height: 10px; overflow: hidden; border-radius: 999px; background: #e4e9e5; }
+.coffeepos-member-account__progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--coffeepos-primary); transition: width .25s ease; }
+.coffeepos-member-account__card > p { color: var(--coffeepos-text-muted); }
+
+.coffeepos-member-account__orders [data-component="member-orders"] { display: grid; gap: 10px; margin-top: 14px; }
+.coffeepos-member-account__order { justify-content: space-between; gap: 14px; width: 100%; padding: 14px; border: 1px solid var(--coffeepos-border); border-radius: 12px; background: #fff; color: inherit; text-align: left; cursor: pointer; }
+.coffeepos-member-account__order:hover { border-color: var(--coffeepos-primary); background: #f5fbf8; }
+.coffeepos-member-account__order > span { display: grid; gap: 3px; }
+.coffeepos-member-account__order > span:last-child { justify-items: end; text-align: right; }
+.coffeepos-member-account__order small { color: var(--coffeepos-text-muted); }
+.coffeepos-member-account__pagination { justify-content: center; gap: 12px; margin-top: 16px; }
+
+.coffeepos-member-order-dialog { width: min(680px, calc(100% - 24px)); max-height: calc(100vh - 30px); padding: 0; border: 0; border-radius: 16px; color: var(--coffeepos-text); }
+.coffeepos-member-order-dialog::backdrop { background: rgba(20, 31, 26, .65); }
+.coffeepos-member-order-dialog > header { justify-content: space-between; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--coffeepos-border); }
+.coffeepos-member-order-dialog > header span { color: var(--coffeepos-text-muted); }
+.coffeepos-member-order-dialog > header button { width: 40px; height: 40px; border: 0; border-radius: 10px; font-size: 24px; cursor: pointer; }
+.coffeepos-member-order-dialog__body { overflow: auto; padding: 20px; }
+.coffeepos-member-order-dialog__item { justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--coffeepos-border); }
+.coffeepos-member-order-dialog__item div { display: grid; flex: 1; }
+.coffeepos-member-order-dialog__item small { color: var(--coffeepos-text-muted); }
+.coffeepos-member-order-dialog dl div { justify-content: space-between; gap: 12px; padding: 6px 0; }
+.coffeepos-member-order-dialog dl div:last-child { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--coffeepos-border); font-size: 18px; font-weight: 800; }
+.coffeepos-member-order-dialog dd { margin: 0; }
+
+@media (max-width: 760px) {
+    .coffeepos-member-account { padding: 14px; }
+    .coffeepos-member-account__auth-card { margin-top: 4vh; padding: 22px; }
+    .coffeepos-member-account__grid { grid-template-columns: 1fr; }
+    .coffeepos-member-account__welcome { align-items: flex-start; }
+    .coffeepos-member-account__order { align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .coffeepos-member-account__progress span { transition: none; }
+}

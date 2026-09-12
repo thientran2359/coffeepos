@@ -17,6 +17,10 @@
         const connection = root.querySelector('[data-component="customer-connection"]');
         const syncState = root.querySelector('[data-component="customer-sync-state"]');
         const syncMessage = root.querySelector('[data-field="customer-sync-message"]');
+        const memberPinDialog = root.querySelector('[data-component="customer-member-pin-dialog"]');
+        const memberPinChannel = window.BroadcastChannel && config.displayPairingScope
+            ? new window.BroadcastChannel('coffeepos:member-pin:' + String(config.displayPairingScope))
+            : null;
         let transport = null;
         let pairing = null;
         let recoveryPending = false;
@@ -24,6 +28,30 @@
         let rolloverTimer = 0;
         let handshakeTimer = 0;
         let disconnectedReloadTimer = 0;
+        let memberPinTimer = 0;
+
+        function onMemberPinMessage(event) {
+            const message = event.data && typeof event.data === 'object' ? event.data : {};
+            if (!memberPinDialog || message.type !== 'coffeepos:show-member-pin'
+                || !/^[0-9]{6}$/.test(String(message.pin || ''))) {
+                return;
+            }
+            const output = memberPinDialog.querySelector('[data-field="customer-member-pin"]');
+            output.textContent = String(message.pin);
+            memberPinDialog.showModal();
+            window.clearTimeout(memberPinTimer);
+            memberPinTimer = window.setTimeout(closeMemberPin, 12000);
+            memberPinChannel.postMessage({type: 'coffeepos:member-pin-shown', request_id: String(message.request_id || '')});
+        }
+
+        function closeMemberPin() {
+            if (!memberPinDialog) { return; }
+            window.clearTimeout(memberPinTimer);
+            memberPinTimer = 0;
+            const output = memberPinDialog.querySelector('[data-field="customer-member-pin"]');
+            output.textContent = '';
+            if (memberPinDialog.open) { memberPinDialog.close(); }
+        }
 
         function updateDisconnectedReload(state) {
             if (state === 'connected' || state === 'unsupported') {
@@ -119,6 +147,7 @@
             if (message.source !== 'cashier') { return; }
             if (message.type === 'state.snapshot') { hydrate(message); return; }
             if (message.type === 'cart.updated') { acceptCart(message); return; }
+            if (message.type === 'catalog.invalidated') { loadCatalog(); return; }
             if (message.type === 'display.reset') { rollover(message); return; }
             if (['checkout.started', 'payment.started', 'payment.updated', 'sale.completed'].indexOf(message.type) !== -1) { acceptWorkflow(message); }
         }
@@ -186,6 +215,11 @@
         function init() {
             window.name = 'coffeepos-customer-display';
             root.addEventListener('click', onClick); loadCatalog(); startPairing();
+            if (memberPinChannel) { memberPinChannel.addEventListener('message', onMemberPinMessage); }
+            if (memberPinDialog) {
+                memberPinDialog.addEventListener('click', closeMemberPin);
+                memberPinDialog.addEventListener('close', function () { window.clearTimeout(memberPinTimer); memberPinTimer = 0; memberPinDialog.querySelector('[data-field="customer-member-pin"]').textContent = ''; });
+            }
             if (config.pairingState !== 'paired' || !protocol.validSessionId(config.posSessionId)) {
                 setConnection('unpaired', config.pairingState === 'invalid' ? __('The pairing link is invalid. Open Customer Display from Cashier.', 'coffeepos') : __('Waiting for Cashier pairing…', 'coffeepos'), false);
                 render(); return;
@@ -197,7 +231,7 @@
             }
             connect(config.posSessionId);
         }
-        return { init: init, getState: store.getState, destroy: function () { if (transport) { transport.close(); } if (pairing) { pairing.close(); } window.clearTimeout(rolloverTimer); window.clearTimeout(handshakeTimer); window.clearTimeout(disconnectedReloadTimer); } };
+        return { init: init, getState: store.getState, destroy: function () { if (transport) { transport.close(); } if (pairing) { pairing.close(); } if (memberPinChannel) { memberPinChannel.close(); } window.clearTimeout(memberPinTimer); window.clearTimeout(rolloverTimer); window.clearTimeout(handshakeTimer); window.clearTimeout(disconnectedReloadTimer); } };
     };
     window.CoffeePOS = CoffeePOS;
 }(window));

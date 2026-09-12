@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CoffeePOS\POS;
 
+use CoffeePOS\Application\MemberPortal\MemberPinService;
 use CoffeePOS\Integration\WooCommerce\WooCommerceMemberDirectory;
 use CoffeePOS\Support\Capabilities;
 
@@ -33,7 +34,22 @@ final class MembershipScreen
 
         $input = wp_unslash($_POST);
         try {
-            if (sanitize_key((string) ($input['membership_action'] ?? '')) !== 'member-update') {
+            $action = sanitize_key((string) ($input['membership_action'] ?? ''));
+            if ($action === 'member-pin-reset') {
+                if (empty($input['confirm_pin_reset'])) {
+                    throw new \RuntimeException(__('Confirm that the current PIN and member sessions will be replaced.', 'coffeepos'));
+                }
+                $memberId = absint($input['customer_id'] ?? 0);
+                $temporaryPin = (new MemberPinService())->generateTemporaryPin($memberId);
+                nocache_headers();
+                return [
+                    'type' => 'success',
+                    'message' => __('Temporary member PIN generated. It will not be shown again.', 'coffeepos'),
+                    'member_id' => $memberId,
+                    'temporary_pin' => $temporaryPin,
+                ];
+            }
+            if ($action !== 'member-update') {
                 throw new \RuntimeException(__('Invalid membership action.', 'coffeepos'));
             }
             $memberId = (new WooCommerceMemberDirectory())->update($input);

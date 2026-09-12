@@ -42,6 +42,9 @@ final class ShiftController
 
     public function permissionCheck()
     {
+        if (! (bool) Settings::get(Settings::OPTION_SHIFTS_ENABLED)) {
+            return ErrorFactory::forbidden('coffeepos_feature_disabled', __('Shifts are disabled in CoffeePOS settings.', 'coffeepos'));
+        }
         return current_user_can(Capabilities::MANAGE_OWN_SHIFT) ? true : ErrorFactory::forbidden('coffeepos_action_forbidden', __('You are not allowed to access shifts.', 'coffeepos'));
     }
 

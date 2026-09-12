@@ -115,6 +115,26 @@ msgstr "Cho phép nhân viên thu ngân tạo hội viên"
 msgid "Allow new-order sound on KDS"
 msgstr "Bật âm thanh khi KDS có đơn hàng mới"
 
+#: templates/settings/content.php:146
+msgid "Disable features that the store does not use. Polling intervals are limited to 3000–60000 milliseconds."
+msgstr "Tắt các tính năng cửa hàng không sử dụng. Khoảng thời gian cập nhật được giới hạn từ 3000–60000 mili giây."
+
+#: templates/settings/content.php:149
+msgid "Enable Kitchen Display (KDS)"
+msgstr "Bật màn hình bếp (KDS)"
+
+#: templates/settings/content.php:150
+msgid "Enable shifts"
+msgstr "Bật ca làm việc"
+
+#: includes/REST/OperationalOrderController.php:39
+msgid "Kitchen Display is disabled in CoffeePOS settings."
+msgstr "Màn hình bếp đã bị tắt trong cài đặt CoffeePOS."
+
+#: includes/REST/ShiftController.php:43
+msgid "Shifts are disabled in CoffeePOS settings."
+msgstr "Ca làm việc đã bị tắt trong cài đặt CoffeePOS."
+
 #: templates/order-history/content.php:15
 msgid "All statuses"
 msgstr "Tất cả trạng thái"

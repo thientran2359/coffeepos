@@ -118,9 +118,12 @@ final class CheckoutController
     {
         return $this->respond(function () use ($request): array {
             $payload = $this->payload($request);
-            $shift = (bool) Settings::get(Settings::OPTION_REQUIRE_OPEN_SHIFT)
-                ? $this->shifts->requireOpen(get_current_user_id())
-                : $this->shifts->current(get_current_user_id());
+            $shiftsEnabled = (bool) Settings::get(Settings::OPTION_SHIFTS_ENABLED);
+            $shift = ! $shiftsEnabled
+                ? null
+                : ((bool) Settings::get(Settings::OPTION_REQUIRE_OPEN_SHIFT)
+                    ? $this->shifts->requireOpen(get_current_user_id())
+                    : $this->shifts->current(get_current_user_id()));
             return $this->checkout->checkout(
                 $this->sessionId((string) ($payload['pos_session_id'] ?? '')),
                 $this->revision($payload),

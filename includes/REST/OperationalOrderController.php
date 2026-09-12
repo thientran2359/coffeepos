@@ -18,7 +18,10 @@ final class OperationalOrderController
 
     public function __construct(?OperationalOrderService $orders = null)
     {
-        $this->orders = $orders ?? new OperationalOrderService(new WooCommerceOperationalOrderGateway());
+        $this->orders = $orders ?? new OperationalOrderService(
+            new WooCommerceOperationalOrderGateway(),
+            (bool) Settings::get(Settings::OPTION_KDS_ENABLED)
+        );
     }
 
     public function register(string $namespace): void
@@ -32,11 +35,17 @@ final class OperationalOrderController
 
     public function kdsPermissionCheck()
     {
+        if (! (bool) Settings::get(Settings::OPTION_KDS_ENABLED)) {
+            return ErrorFactory::forbidden('coffeepos_feature_disabled', __('Kitchen Display is disabled in CoffeePOS settings.', 'coffeepos'));
+        }
         return $this->check(Capabilities::ACCESS_KDS);
     }
 
     public function queuePermissionCheck()
     {
+        if (! (bool) Settings::get(Settings::OPTION_KDS_ENABLED) && current_user_can(Capabilities::ACCESS_CASHIER)) {
+            return true;
+        }
         return $this->check(Capabilities::ACCESS_ORDER_QUEUE);
     }
 

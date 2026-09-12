@@ -10,7 +10,11 @@ final class CustomerPhone
     {
         $value = trim($phone);
 
-        if ($value === '' || preg_match('/^\+?[0-9\s.()\-]+$/', $value) !== 1) {
+        // Mobile keyboards and browser autofill may insert non-breaking spaces
+        // or invisible Unicode formatting marks around a valid phone number.
+        $value = preg_replace('/[\p{Z}\p{Cf}]+/u', '', $value) ?? '';
+
+        if ($value === '' || preg_match('/^\+?[0-9.()\-]+$/', $value) !== 1) {
             return '';
         }
 

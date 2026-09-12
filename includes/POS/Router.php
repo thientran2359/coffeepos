@@ -115,7 +115,7 @@ final class Router
             $this->redirectToEntry(self::routeUrl($screen));
         }
 
-        $canAccess = $screen === 'customer' || Capabilities::currentUserCanAccessScreen($screen);
+        $canAccess = $screen === 'customer' || self::currentUserCanAccessScreen($screen);
 
         if (! $canAccess) {
             wp_die(
@@ -196,7 +196,7 @@ final class Router
         $items = [];
 
         foreach ($labels as $screen => $label) {
-            if (Capabilities::currentUserCanAccessScreen($screen)) {
+            if (self::currentUserCanAccessScreen($screen)) {
                 $items[] = ['screen' => $screen, 'label' => $label, 'url' => self::routeUrl($screen)];
             }
         }
@@ -266,12 +266,27 @@ final class Router
     private function firstPermittedRoute(): string
     {
         foreach (['cashier', 'kds', 'order-queue', 'shifts', 'order-history', 'reports', 'members', 'settings'] as $screen) {
-            if (Capabilities::currentUserCanAccessScreen($screen)) {
+            if (self::currentUserCanAccessScreen($screen)) {
                 return self::routeUrl($screen);
             }
         }
 
         return '';
+    }
+
+    public static function currentUserCanAccessScreen(string $screen): bool
+    {
+        if ($screen === 'kds' && ! (bool) Settings::get(Settings::OPTION_KDS_ENABLED)) {
+            return false;
+        }
+        if ($screen === 'shifts' && ! (bool) Settings::get(Settings::OPTION_SHIFTS_ENABLED)) {
+            return false;
+        }
+        if ($screen === 'order-queue' && ! (bool) Settings::get(Settings::OPTION_KDS_ENABLED)) {
+            return current_user_can(Capabilities::ACCESS_ORDER_QUEUE) || current_user_can(Capabilities::ACCESS_CASHIER);
+        }
+
+        return Capabilities::currentUserCanAccessScreen($screen);
     }
 
     private function redirectToEntry(string $target): void
@@ -286,7 +301,7 @@ final class Router
 
         foreach (Capabilities::screenCapabilities() as $screen => $capability) {
             $route = self::routeUrl($screen);
-            if (untrailingslashit($target) === untrailingslashit($route) && (! $requireCapability || current_user_can($capability))) {
+            if (untrailingslashit($target) === untrailingslashit($route) && (! $requireCapability || self::currentUserCanAccessScreen($screen))) {
                 return $route;
             }
         }

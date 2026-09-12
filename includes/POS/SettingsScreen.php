@@ -88,6 +88,8 @@ final class SettingsScreen
         Settings::update(Settings::OPTION_DEFAULT_ORDER_TYPE, (string) ($input[Settings::OPTION_DEFAULT_ORDER_TYPE] ?? 'takeaway'));
         Settings::update(Settings::OPTION_REQUIRE_DINE_IN_TABLE, ! empty($input[Settings::OPTION_REQUIRE_DINE_IN_TABLE]));
         Settings::update(Settings::OPTION_REQUIRE_OPEN_SHIFT, ! empty($input[Settings::OPTION_REQUIRE_OPEN_SHIFT]));
+        Settings::update(Settings::OPTION_KDS_ENABLED, ! empty($input[Settings::OPTION_KDS_ENABLED]));
+        Settings::update(Settings::OPTION_SHIFTS_ENABLED, ! empty($input[Settings::OPTION_SHIFTS_ENABLED]));
         Settings::update(Settings::OPTION_CASH_ENABLED, ! empty($input[Settings::OPTION_CASH_ENABLED]));
         Settings::update(Settings::OPTION_BANK_TRANSFER_ENABLED, ! empty($input[Settings::OPTION_BANK_TRANSFER_ENABLED]));
         Settings::update(Settings::OPTION_VIETQR_TEMPLATE, (string) ($input[Settings::OPTION_VIETQR_TEMPLATE] ?? 'qronly'));
@@ -99,6 +101,7 @@ final class SettingsScreen
         Settings::update(Settings::OPTION_MEMBERSHIP_TIERS, $input[Settings::OPTION_MEMBERSHIP_TIERS] ?? []);
         Settings::update(Settings::OPTION_MEMBER_CREATE_ENABLED, ! empty($input[Settings::OPTION_MEMBER_CREATE_ENABLED]));
         Settings::update(Settings::OPTION_MEMBER_REQUIRED_FIELDS, is_array($input[Settings::OPTION_MEMBER_REQUIRED_FIELDS] ?? null) ? $input[Settings::OPTION_MEMBER_REQUIRED_FIELDS] : ['phone']);
+        Settings::update(Settings::OPTION_MEMBER_ACCOUNT_PAGE_ID, (int) ($input[Settings::OPTION_MEMBER_ACCOUNT_PAGE_ID] ?? 0));
         Settings::update(Settings::OPTION_KDS_SOUND_ENABLED, ! empty($input[Settings::OPTION_KDS_SOUND_ENABLED]));
         Settings::update(Settings::OPTION_POS_BASE_SLUG, (string) ($input[Settings::OPTION_POS_BASE_SLUG] ?? 'pos'));
         Settings::update(Settings::OPTION_UNINSTALL_DELETE_DATA, ! empty($input[Settings::OPTION_UNINSTALL_DELETE_DATA]));
@@ -202,6 +205,11 @@ final class SettingsScreen
             return __('The selected POS logo is not a valid image attachment.', 'coffeepos');
         }
 
+        $memberAccountPageId = absint($input[Settings::OPTION_MEMBER_ACCOUNT_PAGE_ID] ?? 0);
+        if ($memberAccountPageId > 0 && ! Settings::isValidMemberAccountPageId($memberAccountPageId)) {
+            return __('Select a published WordPress Page that is not already used by CoffeePOS or as the posts page.', 'coffeepos');
+        }
+
         return '';
     }
 
@@ -214,6 +222,9 @@ final class SettingsScreen
             __('PHP version', 'coffeepos') => PHP_VERSION,
             __('REST API', 'coffeepos') => function_exists('rest_url') ? rest_url('coffeepos/v1/') : __('Unavailable', 'coffeepos'),
             __('POS route', 'coffeepos') => Router::routeUrl(),
+            __('Member account page', 'coffeepos') => ($memberPageId = (int) Settings::get(Settings::OPTION_MEMBER_ACCOUNT_PAGE_ID)) > 0 && function_exists('get_permalink')
+                ? (string) get_permalink($memberPageId)
+                : __('Not configured', 'coffeepos'),
             __('Timezone', 'coffeepos') => (string) Settings::get(Settings::OPTION_TIMEZONE),
         ];
     }

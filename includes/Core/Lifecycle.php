@@ -73,6 +73,12 @@ final class Lifecycle
 
         delete_option(Migrator::OPTION_DB_VERSION);
         delete_metadata('user', 0, '_coffeepos_tier_override', '', true);
+        delete_metadata('user', 0, \CoffeePOS\Application\MemberPortal\MemberPinService::META_PIN_HASH, '', true);
+        delete_metadata('user', 0, \CoffeePOS\Application\MemberPortal\MemberPinService::META_MUST_CHANGE, '', true);
+        delete_metadata('user', 0, \CoffeePOS\Application\MemberPortal\MemberSessionService::META_SESSIONS, '', true);
+        $transientPattern = $wpdb->esc_like('_transient_coffeepos_member_') . '%';
+        $timeoutPattern = $wpdb->esc_like('_transient_timeout_coffeepos_member_') . '%';
+        $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", $transientPattern, $timeoutPattern));
         delete_option('coffeepos_installed_version');
         delete_option('coffeepos_rewrite_version');
     }

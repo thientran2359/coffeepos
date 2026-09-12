@@ -28,6 +28,12 @@ final class RouteRegistrar
 
     private ReportController $reportController;
 
+    private MemberAuthController $memberAuthController;
+
+    private MemberAccountController $memberAccountController;
+
+    private MemberManagementController $memberManagementController;
+
     private static array $registeredRoutes = [];
 
     public function __construct(
@@ -40,7 +46,10 @@ final class RouteRegistrar
         ?OperationalOrderController $operationalOrderController = null,
         ?ShiftController $shiftController = null,
         ?OrderHistoryController $orderHistoryController = null,
-        ?ReportController $reportController = null
+        ?ReportController $reportController = null,
+        ?MemberAuthController $memberAuthController = null,
+        ?MemberAccountController $memberAccountController = null,
+        ?MemberManagementController $memberManagementController = null
     )
     {
         $this->healthController = $healthController ?? new HealthController();
@@ -53,6 +62,9 @@ final class RouteRegistrar
         $this->shiftController = $shiftController ?? new ShiftController();
         $this->orderHistoryController = $orderHistoryController ?? new OrderHistoryController();
         $this->reportController = $reportController ?? new ReportController();
+        $this->memberAuthController = $memberAuthController ?? new MemberAuthController();
+        $this->memberAccountController = $memberAccountController ?? new MemberAccountController();
+        $this->memberManagementController = $memberManagementController ?? new MemberManagementController();
     }
 
     public function register(): void
@@ -72,6 +84,9 @@ final class RouteRegistrar
         $this->shiftController->register(self::NAMESPACE);
         $this->orderHistoryController->register(self::NAMESPACE);
         $this->reportController->register(self::NAMESPACE);
+        $this->memberAuthController->register(self::NAMESPACE);
+        $this->memberAccountController->register(self::NAMESPACE);
+        $this->memberManagementController->register(self::NAMESPACE);
 
         self::$registeredRoutes = [
             self::NAMESPACE . '/health',
@@ -115,6 +130,14 @@ final class RouteRegistrar
             self::NAMESPACE . '/orders/(?P<id>\\d+)/reorder',
             self::NAMESPACE . '/reports/sales',
             self::NAMESPACE . '/reports/sales/export',
+            self::NAMESPACE . '/member/auth/login',
+            self::NAMESPACE . '/member/auth/session',
+            self::NAMESPACE . '/member/auth/change-pin',
+            self::NAMESPACE . '/member/auth/logout',
+            self::NAMESPACE . '/member/account',
+            self::NAMESPACE . '/member/orders',
+            self::NAMESPACE . '/member/orders/(?P<id>\d+)',
+            self::NAMESPACE . '/members/(?P<id>\d+)/temporary-pin',
         ];
     }
 

@@ -65,6 +65,8 @@ $asset_loader = phase06_source('includes/Infrastructure/Assets/AssetLoader.php')
 $cart_controller = phase06_source('includes/REST/CartController.php');
 $customer_screen = phase06_source('assets/js/screens/customer.js');
 $cashier_sync = phase06_source('assets/js/components/cashier-sync.js');
+$cashier_screen = phase06_source('assets/js/screens/cashier.js');
+$sync_protocol = phase06_source('assets/js/sync/protocol.js');
 $customer_content = phase06_source('templates/customer/content.php');
 $customer_menu = phase06_source('templates/customer/menu.php');
 $customer_cart = phase06_source('templates/customer/cart.php');
@@ -84,6 +86,8 @@ phase06_assert(strpos($customer_screen, 'disconnectedReloadTimer') !== false && 
 phase06_assert(strpos($customer_screen, "state === 'connected' || state === 'unsupported'") !== false, 'Connected and unsupported displays must not enter the disconnected reload loop.');
 phase06_assert(strpos($cashier_sync, "'state.snapshot'") !== false, 'Cashier must answer with a snapshot.');
 phase06_assert(strpos($cashier_sync, 'customer_display') !== false, 'Cashier must publish the safe cart projection.');
+phase06_assert(strpos($sync_protocol, "'catalog.invalidated'") !== false && strpos($cashier_sync, 'publishCatalogInvalidated') !== false, 'Cashier sync must expose the catalog invalidation event.');
+phase06_assert(strpos($cashier_screen, 'syncBridge.publishCatalogInvalidated()') !== false && strpos($customer_screen, "message.type === 'catalog.invalidated'") !== false && strpos($customer_screen, 'loadCatalog()') !== false, 'A successful Cashier stock update must refresh Customer Display catalog from REST.');
 phase06_assert(strpos($customer_content . $customer_menu . $customer_cart, 'data-action="add') === false, 'Customer templates must not expose mutation controls.');
 phase06_assert(strpos($customer_cart, '<span class="coffeepos-eyebrow" data-field="customer-service">') !== false, 'Customer service context must replace the static cart eyebrow.');
 phase06_assert(strpos($customer_cart, 'data-component="customer-member"') !== false && strpos($customer_cart, 'coffeepos-customer-membership-badge') !== false, 'Customer name and membership tier must share a member summary with a tier badge.');

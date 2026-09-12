@@ -69,6 +69,7 @@ const envelope = {
 assert.strictEqual(protocol.validateEnvelope(envelope, sessionId), true);
 assert.strictEqual(protocol.validateEnvelope({ ...envelope, version: 999 }, sessionId), false);
 assert.strictEqual(protocol.validateEnvelope({ ...envelope, type: 'unknown.event' }, sessionId), false);
+assert.strictEqual(protocol.validateEnvelope({ ...envelope, type: 'catalog.invalidated' }, sessionId), true);
 assert.strictEqual(protocol.validateEnvelope({ ...envelope, pos_session_id: 'fedcba0987654321' }, sessionId), false);
 assert.ok(!protocol.safeQrUrl('http://vietqr.app/img?amount=1'));
 assert.ok(!protocol.safeQrUrl('https://evil.example/img?amount=1'));

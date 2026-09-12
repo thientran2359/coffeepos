@@ -7,6 +7,7 @@ namespace CoffeePOS\Infrastructure\Assets;
 use CoffeePOS\Infrastructure\Settings\Settings;
 
 use CoffeePOS\POS\Router;
+use CoffeePOS\POS\MemberPortalRouter;
 use CoffeePOS\REST\RouteRegistrar;
 
 final class AssetLoader
@@ -14,6 +15,73 @@ final class AssetLoader
     public function register(): void
     {
         add_action('wp_enqueue_scripts', [$this, 'enqueuePosAssets']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueueMemberPortalAssets'], PHP_INT_MAX);
+        add_action('wp_footer', [$this, 'isolateMemberPortalFooterScripts'], 19);
+    }
+
+    public function enqueueMemberPortalAssets(): void
+    {
+        if (! MemberPortalRouter::isPortalRequest()) {
+            return;
+        }
+
+        $this->clearFrontendAssetQueues();
+        $version = COFFEEPOS_VERSION;
+        $fontDependencies = [];
+        $googleFontUrl = Settings::getGoogleFontStylesheetUrl();
+        if ($googleFontUrl !== '') {
+            wp_register_style('coffeepos-google-font', $googleFontUrl, [], null);
+            $fontDependencies[] = 'coffeepos-google-font';
+        }
+        $this->registerStyle('coffeepos-core', 'core.css', $fontDependencies, $version);
+        $this->registerStyle('coffeepos-base', 'base.css', ['coffeepos-core'], $version);
+        $this->registerStyle('coffeepos-components', 'components.css', ['coffeepos-base'], $version);
+        $this->registerStyle('coffeepos-screen-member-account', 'screens/member-account.css', ['coffeepos-components'], $version);
+        wp_enqueue_style('coffeepos-screen-member-account');
+        wp_add_inline_style('coffeepos-screen-member-account', sprintf(
+            ':root{--coffeepos-primary:%s;--coffeepos-primary-dark:%s;--coffeepos-font-family:%s;}',
+            Settings::getBrandColor(),
+            Settings::getBrandDarkColor(),
+            Settings::getFontFamilyCss()
+        ));
+
+        wp_register_script('coffeepos-core-app', COFFEEPOS_URL . 'assets/js/core/app.js', [], $version, true);
+        wp_register_script('coffeepos-member-template-renderer', COFFEEPOS_URL . 'assets/js/ui/template-renderer.js', ['coffeepos-core-app'], $version, true);
+        wp_register_script('coffeepos-screen-member-account', COFFEEPOS_URL . 'assets/js/screens/member-account.js', ['coffeepos-member-template-renderer'], $version, true);
+        wp_localize_script('coffeepos-screen-member-account', 'CoffeePOSMemberConfig', [
+            'restBase' => esc_url_raw(rest_url(RouteRegistrar::NAMESPACE . '/member/')),
+            'storeName' => Settings::getStoreName(),
+            'i18n' => [
+                'requestFailed' => __('The request could not be completed.', 'coffeepos'),
+                'sessionExpired' => __('Your member session has expired. Please sign in again.', 'coffeepos'),
+                'emptyOrders' => __('You do not have any CoffeePOS orders yet.', 'coffeepos'),
+            ],
+        ]);
+        wp_enqueue_script('coffeepos-screen-member-account');
+    }
+
+    public function isolateMemberPortalFooterScripts(): void
+    {
+        if (! MemberPortalRouter::isPortalRequest()) {
+            return;
+        }
+
+        global $wp_scripts;
+        if (is_object($wp_scripts)) {
+            $wp_scripts->queue = [];
+        }
+        wp_enqueue_script('coffeepos-screen-member-account');
+    }
+
+    private function clearFrontendAssetQueues(): void
+    {
+        global $wp_styles, $wp_scripts;
+        if (is_object($wp_styles)) {
+            $wp_styles->queue = [];
+        }
+        if (is_object($wp_scripts)) {
+            $wp_scripts->queue = [];
+        }
     }
 
     public function enqueuePosAssets(): void
@@ -103,8 +171,8 @@ final class AssetLoader
 
         wp_localize_script('coffeepos-app', 'CoffeePOSConfig', [
             'screen' => $screen,
-            'restBase' => esc_url_raw(rest_url(RouteRegistrar::NAMESPACE . '/')),
-            'restNonce' => wp_create_nonce('wp_rest'),
+              'restBase' => esc_url_raw(rest_url(RouteRegistrar::NAMESPACE . '/')),
+              'restNonce' => wp_create_nonce('wp_rest'),
             'currencyDecimals' => function_exists('wc_get_price_decimals') ? wc_get_price_decimals() : 2,
             'customerDisplayUrl' => esc_url_raw(home_url('/' . trim(Settings::getPosBaseSlug(), '/') . '/customer/')),
             'displayPairingScope' => substr(hash_hmac('sha256', (string) get_current_user_id(), wp_salt('auth')), 0, 32),
@@ -114,7 +182,8 @@ final class AssetLoader
             'storeName' => Settings::getStoreName(),
             'defaultOrderType' => (string) Settings::get(Settings::OPTION_DEFAULT_ORDER_TYPE),
             'requireDineInTable' => (bool) Settings::get(Settings::OPTION_REQUIRE_DINE_IN_TABLE),
-            'requireOpenShift' => (bool) Settings::get(Settings::OPTION_REQUIRE_OPEN_SHIFT),
+            'shiftsEnabled' => (bool) Settings::get(Settings::OPTION_SHIFTS_ENABLED),
+            'requireOpenShift' => (bool) Settings::get(Settings::OPTION_SHIFTS_ENABLED) && (bool) Settings::get(Settings::OPTION_REQUIRE_OPEN_SHIFT),
             'paymentMethods' => Settings::enabledPaymentMethods(),
             'receiptPaperWidth' => (string) Settings::get(Settings::OPTION_RECEIPT_PAPER_WIDTH),
             'autoPrintReceipt' => (bool) Settings::get(Settings::OPTION_RECEIPT_AUTO_PRINT),

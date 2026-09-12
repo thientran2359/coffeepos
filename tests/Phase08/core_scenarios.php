@@ -89,6 +89,8 @@ $service = new CustomerService($gateway, null, $lock);
 $test('TC-01/02 phone normalization and masking', static function () use ($assert): void {
     $assert(CustomerPhone::normalize('0353 123 250') === '0353123250', 'Local phone normalization failed.');
     $assert(CustomerPhone::normalize('+84 353 123 250') === '0353123250', '+84 normalization failed.');
+    $assert(CustomerPhone::normalize("\u{200B}0378\u{00A0}432\u{202F}359") === '0378432359', 'Unicode phone spacing normalization failed.');
+    $assert(CustomerPhone::normalize('phone 0378432359') === '', 'Phone text was accepted.');
     $assert(CustomerPhone::normalize('12') === '', 'Incomplete phone was accepted.');
     $assert(CustomerPhone::mask('0353123250') === '0353***250', 'Phone masking contract failed.');
     $assert(CustomerPhone::mask('123') === '', 'Short phone leaked through masking.');

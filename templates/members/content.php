@@ -15,6 +15,13 @@ $data = is_array($context['membership_data'] ?? null) ? $context['membership_dat
     </header>
     <?php if ($notice !== []) : ?>
         <p class="coffeepos-members__notice is-<?php echo esc_attr((string) ($notice['type'] ?? 'info')); ?>" role="<?php echo ($notice['type'] ?? '') === 'error' ? 'alert' : 'status'; ?>"><?php echo esc_html((string) ($notice['message'] ?? '')); ?></p>
+        <?php if (! empty($notice['temporary_pin'])) : ?>
+            <div class="coffeepos-members__temporary-pin" role="status">
+                <span><?php esc_html_e('Temporary PIN', 'coffeepos'); ?></span>
+                <strong><?php echo esc_html((string) $notice['temporary_pin']); ?></strong>
+                <small><?php esc_html_e('Give this PIN to the member now. It is displayed once and must be changed after first login.', 'coffeepos'); ?></small>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
     <?php require COFFEEPOS_PATH . 'templates/members/directory.php'; ?>
 </section>

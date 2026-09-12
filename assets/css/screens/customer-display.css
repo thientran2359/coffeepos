@@ -12,6 +12,23 @@ body.coffeepos-screen-customer {
     min-height: 620px;
 }
 
+.coffeepos-customer-member-pin {
+    box-sizing: border-box;
+    width: min(560px, calc(100vw - 32px));
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--coffeepos-border);
+    border-radius: 18px;
+    background: #fff;
+    color: var(--coffeepos-text);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, .32);
+}
+
+.coffeepos-customer-member-pin::backdrop { background: rgba(12, 22, 18, .72); }
+.coffeepos-customer-member-pin__body { display: grid; gap: 22px; padding: 32px; text-align: center; cursor: pointer; }
+.coffeepos-customer-member-pin__body p { margin: 0; color: var(--coffeepos-text-muted); font-size: 18px; line-height: 1.5; }
+.coffeepos-customer-member-pin__value { display: block; padding: 24px; border: 2px dashed var(--coffeepos-primary); border-radius: 14px; background: #f1f8f5; font-size: clamp(42px, 10vw, 64px); font-weight: 800; letter-spacing: .22em; }
+
 .coffeepos-customer-menu {
     display: flex;
     flex-direction: column;

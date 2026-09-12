@@ -116,6 +116,19 @@ $diagnostics = is_array($context['settings_diagnostics'] ?? null) ? $context['se
             </div>
         </section>
 
+        <section class="coffeepos-settings__card" aria-labelledby="coffeepos-settings-operations-title">
+            <div class="coffeepos-settings__card-heading"><div><h2 id="coffeepos-settings-operations-title"><?php esc_html_e('Operational screens', 'coffeepos'); ?></h2><p><?php esc_html_e('Disable features that the store does not use. Polling intervals are limited to 3000–60000 milliseconds.', 'coffeepos'); ?></p></div></div>
+            <div class="coffeepos-settings__checks coffeepos-settings__checks--inline">
+                <label class="coffeepos-settings__check"><input type="hidden" name="<?php echo esc_attr(Settings::OPTION_KDS_ENABLED); ?>" value="0"><input type="checkbox" name="<?php echo esc_attr(Settings::OPTION_KDS_ENABLED); ?>" value="1" <?php checked(! empty($settingValue(Settings::OPTION_KDS_ENABLED))); ?>><span><?php esc_html_e('Enable Kitchen Display (KDS)', 'coffeepos'); ?></span></label>
+                <label class="coffeepos-settings__check"><input type="hidden" name="<?php echo esc_attr(Settings::OPTION_SHIFTS_ENABLED); ?>" value="0"><input type="checkbox" name="<?php echo esc_attr(Settings::OPTION_SHIFTS_ENABLED); ?>" value="1" <?php checked(! empty($settingValue(Settings::OPTION_SHIFTS_ENABLED))); ?>><span><?php esc_html_e('Enable shifts', 'coffeepos'); ?></span></label>
+            </div>
+            <div class="coffeepos-settings__grid">
+                <label class="coffeepos-settings__field"><span><?php esc_html_e('KDS polling interval (ms)', 'coffeepos'); ?></span><input type="number" min="3000" max="60000" step="1000" name="<?php echo esc_attr(Settings::OPTION_KDS_POLL_INTERVAL); ?>" value="<?php echo esc_attr((string) Settings::getKdsPollInterval()); ?>"></label>
+                <label class="coffeepos-settings__field"><span><?php esc_html_e('Order Queue polling interval (ms)', 'coffeepos'); ?></span><input type="number" min="3000" max="60000" step="1000" name="<?php echo esc_attr(Settings::OPTION_ORDER_QUEUE_POLL_INTERVAL); ?>" value="<?php echo esc_attr((string) Settings::getOrderQueuePollInterval()); ?>"></label>
+                <label class="coffeepos-settings__check"><input type="hidden" name="<?php echo esc_attr(Settings::OPTION_KDS_SOUND_ENABLED); ?>" value="0"><input type="checkbox" name="<?php echo esc_attr(Settings::OPTION_KDS_SOUND_ENABLED); ?>" value="1" <?php checked(! empty($settingValue(Settings::OPTION_KDS_SOUND_ENABLED))); ?>><span><?php esc_html_e('Allow new-order sound on KDS', 'coffeepos'); ?></span></label>
+            </div>
+        </section>
+
         <section class="coffeepos-settings__card" aria-labelledby="coffeepos-settings-tables-title">
             <div class="coffeepos-settings__card-heading"><div>
                 <h2 id="coffeepos-settings-tables-title"><?php esc_html_e('Dine-in tables', 'coffeepos'); ?></h2>
@@ -140,15 +153,6 @@ $diagnostics = is_array($context['settings_diagnostics'] ?? null) ? $context['se
                 <label class="coffeepos-settings__field"><span><?php esc_html_e('Account holder', 'coffeepos'); ?></span><input type="text" name="<?php echo esc_attr(Settings::OPTION_VIETQR_ACCOUNT_NAME); ?>" value="<?php echo esc_attr((string) $settingValue(Settings::OPTION_VIETQR_ACCOUNT_NAME)); ?>"></label>
                 <label class="coffeepos-settings__field"><span><?php esc_html_e('VietQR template', 'coffeepos'); ?></span><select name="<?php echo esc_attr(Settings::OPTION_VIETQR_TEMPLATE); ?>"><?php foreach (['qronly' => 'QR only', 'compact' => 'Compact', 'compact2' => 'Compact 2'] as $value => $label) : ?><option value="<?php echo esc_attr($value); ?>" <?php selected((string) $settingValue(Settings::OPTION_VIETQR_TEMPLATE), $value); ?>><?php echo esc_html($label); ?></option><?php endforeach; ?></select></label>
                 <label class="coffeepos-settings__field"><span><?php esc_html_e('Transfer reference prefix', 'coffeepos'); ?></span><input type="text" maxlength="12" name="<?php echo esc_attr(Settings::OPTION_VIETQR_REFERENCE_PREFIX); ?>" value="<?php echo esc_attr((string) $settingValue(Settings::OPTION_VIETQR_REFERENCE_PREFIX)); ?>" placeholder="POS"></label>
-            </div>
-        </section>
-
-        <section class="coffeepos-settings__card" aria-labelledby="coffeepos-settings-operations-title">
-            <div class="coffeepos-settings__card-heading"><div><h2 id="coffeepos-settings-operations-title"><?php esc_html_e('Operational screens', 'coffeepos'); ?></h2><p><?php esc_html_e('Polling intervals are limited to 3000–60000 milliseconds.', 'coffeepos'); ?></p></div></div>
-            <div class="coffeepos-settings__grid">
-                <label class="coffeepos-settings__field"><span><?php esc_html_e('KDS polling interval (ms)', 'coffeepos'); ?></span><input type="number" min="3000" max="60000" step="1000" name="<?php echo esc_attr(Settings::OPTION_KDS_POLL_INTERVAL); ?>" value="<?php echo esc_attr((string) Settings::getKdsPollInterval()); ?>"></label>
-                <label class="coffeepos-settings__field"><span><?php esc_html_e('Order Queue polling interval (ms)', 'coffeepos'); ?></span><input type="number" min="3000" max="60000" step="1000" name="<?php echo esc_attr(Settings::OPTION_ORDER_QUEUE_POLL_INTERVAL); ?>" value="<?php echo esc_attr((string) Settings::getOrderQueuePollInterval()); ?>"></label>
-                <label class="coffeepos-settings__check"><input type="hidden" name="<?php echo esc_attr(Settings::OPTION_KDS_SOUND_ENABLED); ?>" value="0"><input type="checkbox" name="<?php echo esc_attr(Settings::OPTION_KDS_SOUND_ENABLED); ?>" value="1" <?php checked(! empty($settingValue(Settings::OPTION_KDS_SOUND_ENABLED))); ?>><span><?php esc_html_e('Allow new-order sound on KDS', 'coffeepos'); ?></span></label>
             </div>
         </section>
 
@@ -211,6 +215,17 @@ $diagnostics = is_array($context['settings_diagnostics'] ?? null) ? $context['se
                 <label class="coffeepos-settings__check"><input type="checkbox" name="<?php echo esc_attr(Settings::OPTION_MEMBER_REQUIRED_FIELDS); ?>[]" value="name" <?php checked(in_array('name', $requiredFields, true)); ?>><span><?php esc_html_e('Name', 'coffeepos'); ?></span></label>
                 <label class="coffeepos-settings__check"><input type="checkbox" name="<?php echo esc_attr(Settings::OPTION_MEMBER_REQUIRED_FIELDS); ?>[]" value="email" <?php checked(in_array('email', $requiredFields, true)); ?>><span><?php esc_html_e('Email', 'coffeepos'); ?></span></label>
             </fieldset>
+            <div class="coffeepos-settings__card-heading coffeepos-settings__subheading"><div><h3><?php esc_html_e('Member account page', 'coffeepos'); ?></h3><p><?php esc_html_e('Select the published Page whose permalink CoffeePOS will use for the customer membership portal.', 'coffeepos'); ?></p></div></div>
+            <label class="coffeepos-settings__field">
+                <span><?php esc_html_e('Portal page', 'coffeepos'); ?></span>
+                <select name="<?php echo esc_attr(Settings::OPTION_MEMBER_ACCOUNT_PAGE_ID); ?>">
+                    <option value="0"><?php esc_html_e('— Not configured —', 'coffeepos'); ?></option>
+                    <?php foreach (get_pages(['post_status' => 'publish', 'sort_column' => 'post_title']) as $page) : ?>
+                        <option value="<?php echo esc_attr((string) $page->ID); ?>" <?php selected((int) $settingValue(Settings::OPTION_MEMBER_ACCOUNT_PAGE_ID), (int) $page->ID); ?>><?php echo esc_html((string) $page->post_title); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <small><?php esc_html_e('The page content and theme template will not be used. Portal rendering is implemented separately.', 'coffeepos'); ?></small>
+            </label>
             <?php
             $tierRows = (array) $settingValue(Settings::OPTION_MEMBERSHIP_TIERS);
             $tierRows = array_merge($tierRows, array_fill(0, min(2, 30 - count($tierRows)), ['code' => '', 'label' => '', 'minimum' => '', 'coupon' => '']));

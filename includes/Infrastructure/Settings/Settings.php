@@ -16,6 +16,8 @@ final class Settings
 
     public const OPTION_CUSTOMER_PAGE_ID = 'coffeepos_customer_page_id';
 
+    public const OPTION_MEMBER_ACCOUNT_PAGE_ID = 'coffeepos_member_account_page_id';
+
     public const OPTION_UNINSTALL_DELETE_DATA = 'coffeepos_uninstall_delete_data';
 
     public const OPTION_MODIFIER_GROUPS = 'coffeepos_modifier_groups';
@@ -28,6 +30,8 @@ final class Settings
     public const OPTION_VIETQR_ACCOUNT_NAME = 'coffeepos_vietqr_account_name';
     public const OPTION_VIETQR_TEMPLATE = 'coffeepos_vietqr_template';
     public const OPTION_KDS_POLL_INTERVAL = 'coffeepos_kds_poll_interval_ms';
+    public const OPTION_KDS_ENABLED = 'coffeepos_kds_enabled';
+    public const OPTION_SHIFTS_ENABLED = 'coffeepos_shifts_enabled';
     public const OPTION_ORDER_QUEUE_POLL_INTERVAL = 'coffeepos_order_queue_poll_interval_ms';
     public const OPTION_RECEIPT_PRINT_ORDER_NOTE = 'coffeepos_receipt_print_order_note';
     public const OPTION_BRAND_COLOR = 'coffeepos_brand_color';
@@ -296,7 +300,11 @@ final class Settings
 
     public static function importableOptionNames(): array
     {
-        return array_values(array_diff(self::optionNames(), [self::OPTION_POS_PAGE_ID, self::OPTION_CUSTOMER_PAGE_ID]));
+        return array_values(array_diff(self::optionNames(), [
+            self::OPTION_POS_PAGE_ID,
+            self::OPTION_CUSTOMER_PAGE_ID,
+            self::OPTION_MEMBER_ACCOUNT_PAGE_ID,
+        ]));
     }
 
     public static function update(string $optionName, $value): void
@@ -429,6 +437,12 @@ final class Settings
                 'capability' => Capabilities::MANAGE_SETTINGS,
                 'sanitize' => 'absint',
             ],
+            self::OPTION_MEMBER_ACCOUNT_PAGE_ID => [
+                'type' => 'integer',
+                'default' => 0,
+                'capability' => Capabilities::MANAGE_SETTINGS,
+                'sanitize' => 'absint',
+            ],
             self::OPTION_UNINSTALL_DELETE_DATA => [
                 'type' => 'boolean',
                 'default' => false,
@@ -483,6 +497,14 @@ final class Settings
             self::OPTION_KDS_POLL_INTERVAL => [
                 'type' => 'integer', 'default' => 5000,
                 'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => 'absint',
+            ],
+            self::OPTION_KDS_ENABLED => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
+            ],
+            self::OPTION_SHIFTS_ENABLED => [
+                'type' => 'boolean', 'default' => true,
+                'capability' => Capabilities::MANAGE_SETTINGS, 'sanitize' => null,
             ],
             self::OPTION_ORDER_QUEUE_POLL_INTERVAL => [
                 'type' => 'integer', 'default' => 5000,
@@ -594,6 +616,12 @@ final class Settings
             return MembershipTierConfiguration::validateTiers($value);
         }
 
+        if ($optionName === self::OPTION_MEMBER_ACCOUNT_PAGE_ID) {
+            $pageId = absint($value);
+
+            return $pageId === 0 || self::isValidMemberAccountPageId($pageId) ? $pageId : 0;
+        }
+
         if (in_array($optionName, [
             self::OPTION_UNINSTALL_DELETE_DATA,
             self::OPTION_RECEIPT_PRINT_ORDER_NOTE,
@@ -601,6 +629,8 @@ final class Settings
             self::OPTION_SHOW_PRODUCT_IMAGES,
             self::OPTION_REQUIRE_DINE_IN_TABLE,
             self::OPTION_REQUIRE_OPEN_SHIFT,
+            self::OPTION_KDS_ENABLED,
+            self::OPTION_SHIFTS_ENABLED,
             self::OPTION_CASH_ENABLED,
             self::OPTION_BANK_TRANSFER_ENABLED,
             self::OPTION_RECEIPT_AUTO_PRINT,
@@ -715,6 +745,26 @@ final class Settings
     public static function customCssHasUnsafeSyntax(string $value): bool
     {
         return preg_match('/[<>]|@import\b|url\s*\(|expression\s*\(|(?:^|[;{])\s*behavior\s*:|-moz-binding\s*:|javascript\s*:/i', $value) === 1;
+    }
+
+    public static function isValidMemberAccountPageId(int $pageId): bool
+    {
+        if ($pageId <= 0 || ! function_exists('get_post')) {
+            return false;
+        }
+
+        $page = get_post($pageId);
+        if (! is_object($page) || (string) ($page->post_type ?? '') !== 'page' || (string) ($page->post_status ?? '') !== 'publish') {
+            return false;
+        }
+
+        $conflicts = [
+            (int) get_option(self::OPTION_POS_PAGE_ID, 0),
+            (int) get_option(self::OPTION_CUSTOMER_PAGE_ID, 0),
+            (int) get_option('page_for_posts', 0),
+        ];
+
+        return ! in_array($pageId, array_filter($conflicts), true);
     }
 
     private static function normalizedLabel(string $label): string

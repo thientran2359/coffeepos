@@ -7,3 +7,4 @@ if (! defined('ABSPATH')) { exit; }
     <?php require COFFEEPOS_PATH . 'templates/customer/cart.php'; ?>
 </div>
 <?php require COFFEEPOS_PATH . 'templates/components/customer-display-templates.php'; ?>
+<?php require COFFEEPOS_PATH . 'templates/customer/member-pin-dialog.php'; ?>

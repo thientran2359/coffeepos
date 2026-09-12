@@ -52,8 +52,32 @@ $listUrl = \CoffeePOS\POS\Router::routeUrl('members');
     <aside class="coffeepos-members__card coffeepos-members__profile-widget">
         <div class="coffeepos-members__card-heading"><div><h2><?php echo esc_html((string) $detail['name']); ?></h2><p><?php echo esc_html((string) ($membership['tier_label'] ?? __('No tier', 'coffeepos'))); ?> · <?php echo esc_html((string) $detail['net_spend']); ?></p></div></div>
         <?php $formId = 'coffeepos-member-profile-form'; require COFFEEPOS_PATH . 'templates/members/member-form.php'; ?>
+        <section class="coffeepos-members__pin" aria-labelledby="coffeepos-member-pin-title">
+            <h3 id="coffeepos-member-pin-title"><?php esc_html_e('Member portal PIN', 'coffeepos'); ?></h3>
+            <p data-component="member-pin-status"><?php echo ! empty($detail['portal_pin_configured'])
+                ? esc_html(! empty($detail['portal_pin_must_change']) ? __('A temporary PIN is active and must be changed on first login.', 'coffeepos') : __('This member has an active portal PIN.', 'coffeepos'))
+                : esc_html__('This member does not have a portal PIN yet.', 'coffeepos'); ?></p>
+            <form method="post" action="<?php echo esc_url(add_query_arg('member_id', (int) $detail['id'], $listUrl)); ?>" data-component="member-pin-reset-form">
+                <?php wp_nonce_field('coffeepos_manage_membership', 'coffeepos_membership_nonce'); ?>
+                <input type="hidden" name="customer_id" value="<?php echo esc_attr((string) $detail['id']); ?>">
+                <label class="coffeepos-members__pin-confirm"><input type="checkbox" name="confirm_pin_reset" value="1" required><span><?php esc_html_e('I understand that the current PIN and all member sessions will be replaced.', 'coffeepos'); ?></span></label>
+                <button class="coffeepos-btn" name="membership_action" value="member-pin-reset">
+                    <?php echo ! empty($detail['portal_pin_configured']) ? esc_html__('Reset temporary PIN', 'coffeepos') : esc_html__('Generate temporary PIN', 'coffeepos'); ?>
+                </button>
+            </form>
+            <small><?php esc_html_e('Generating a PIN signs this member out on every device and clears their failed attempts.', 'coffeepos'); ?></small>
+        </section>
     </aside>
 </div>
+<dialog class="coffeepos-member-pin-dialog" data-component="member-pin-dialog" aria-labelledby="coffeepos-member-pin-dialog-title">
+    <header><div><p><?php esc_html_e('Member portal', 'coffeepos'); ?></p><h2 id="coffeepos-member-pin-dialog-title"><?php esc_html_e('Temporary PIN generated', 'coffeepos'); ?></h2></div><button type="button" data-action="close-member-pin" aria-label="<?php esc_attr_e('Close temporary PIN', 'coffeepos'); ?>">×</button></header>
+    <div class="coffeepos-member-pin-dialog__body">
+        <p><?php esc_html_e('Give this PIN to the member now. It is displayed once and must be changed after first login.', 'coffeepos'); ?></p>
+        <output class="coffeepos-member-pin-dialog__value" data-field="temporary-pin" aria-live="polite"></output>
+        <p class="coffeepos-inline-error" data-component="member-pin-error" role="alert" hidden></p>
+        <div class="coffeepos-member-pin-dialog__actions"><button type="button" class="coffeepos-btn" data-action="show-member-pin-customer"><?php esc_html_e('Show on Customer Display', 'coffeepos'); ?></button><button type="button" class="coffeepos-btn" data-action="copy-member-pin"><?php esc_html_e('Copy PIN', 'coffeepos'); ?></button><button type="button" class="coffeepos-btn coffeepos-btn-primary" data-action="close-member-pin"><?php esc_html_e('Done', 'coffeepos'); ?></button></div>
+    </div>
+</dialog>
 <dialog class="coffeepos-member-edit-dialog" data-component="member-edit-dialog" aria-labelledby="coffeepos-member-edit-title"><header><div><p><?php esc_html_e('Member', 'coffeepos'); ?></p><h2 id="coffeepos-member-edit-title"><?php esc_html_e('Quick edit', 'coffeepos'); ?></h2></div><button type="button" data-action="close-member-edit" aria-label="<?php esc_attr_e('Close member details', 'coffeepos'); ?>">×</button></header><div class="coffeepos-member-edit-dialog__body"><?php $formId = 'coffeepos-member-quick-edit-form'; require COFFEEPOS_PATH . 'templates/members/member-form.php'; ?></div></dialog>
 <dialog class="coffeepos-history-dialog" data-component="history-detail-dialog" aria-labelledby="coffeepos-member-order-title">
     <header><div><p data-field="detail-status"></p><h2 id="coffeepos-member-order-title" data-field="detail-number"></h2></div><button type="button" data-action="close-order-detail" aria-label="<?php esc_attr_e('Close order detail', 'coffeepos'); ?>">×</button></header>

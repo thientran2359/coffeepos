@@ -13,6 +13,7 @@
         const config = window.CoffeePOSConfig || {};
         const requireDineInTable = config.requireDineInTable === true || config.requireDineInTable === 1 || config.requireDineInTable === '1';
         const requireOpenShift = config.requireOpenShift === true || config.requireOpenShift === 1 || config.requireOpenShift === '1';
+        const shiftsEnabled = config.shiftsEnabled === true || config.shiftsEnabled === 1 || config.shiftsEnabled === '1';
         const renderer = new CoffeePOS.ui.TemplateRenderer();
         renderer.registerUrlValidator('src', function (value) {
             if (value === undefined || value === null || value === '') {
@@ -65,6 +66,14 @@
         async function loadShift() {
             const label = root.querySelector('[data-component="shift-status"]');
             const header = root.querySelector('[data-component="cashier-header"]');
+            if (!shiftsEnabled) {
+                activeShift = null;
+                if (label) {
+                    label.hidden = true;
+                }
+                setState(header, 'shifts_disabled');
+                return;
+            }
             try {
                 const data = await api.getCurrentShift();
                 activeShift = data.shift || null;
@@ -223,6 +232,7 @@
 
         const stockModal = CoffeePOS.components.createStockModalController(root, renderer, api, function () {
             toast.show(__('Stock updated.', 'coffeepos'), 'success');
+            syncBridge.publishCatalogInvalidated();
             loadCatalog();
         });
 
